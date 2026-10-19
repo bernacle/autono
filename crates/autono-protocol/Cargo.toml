@@ -1,0 +1,15 @@
+[package]
+name = "autono-protocol"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+serde.workspace = true
+
+[lints]
+workspace = true

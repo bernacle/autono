@@ -1,0 +1,188 @@
+use std::{
+    path::{Path, PathBuf},
+    time::Duration,
+};
+
+use anyhow::{Context, Result};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone)]
+pub struct Paths {
+    pub home: PathBuf,
+}
+
+impl Paths {
+    pub fn discover(override_home: Option<PathBuf>) -> Result<Self> {
+        let home = override_home
+            .or_else(|| std::env::var_os("AUTONO_HOME").map(PathBuf::from))
+            .or_else(|| {
+                directories::ProjectDirs::from("", "", "autono")
+                    .map(|dirs| dirs.data_local_dir().to_owned())
+            })
+            .context("cannot locate user data directory; set AUTONO_HOME or --home")?;
+        anyhow::ensure!(home.is_absolute(), "Autono home must be an absolute path");
+        Ok(Self { home })
+    }
+
+    pub fn database(&self) -> PathBuf {
+        self.home.join("runtime.sqlite3")
+    }
+    pub fn metadata(&self) -> PathBuf {
+        self.home.join("daemon.json")
+    }
+    pub fn config(&self) -> PathBuf {
+        self.home.join("config.toml")
+    }
+
+    pub async fn prepare(&self) -> Result<()> {
+        tokio::fs::create_dir_all(&self.home)
+            .await
+            .context("create Autono home")?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::{MetadataExt, PermissionsExt};
+            let metadata = tokio::fs::symlink_metadata(&self.home).await?;
+            anyhow::ensure!(
+                metadata.is_dir() && !metadata.file_type().is_symlink(),
+                "Autono home must be a real directory"
+            );
+            // SAFETY: geteuid takes no arguments and has no safety preconditions.
+            anyhow::ensure!(
+                metadata.uid() == unsafe { libc::geteuid() },
+                "Autono home must be owned by the current user"
+            );
+            tokio::fs::set_permissions(&self.home, std::fs::Permissions::from_mode(0o700)).await?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct Config {
+    pub runner: RunnerConfig,
+    pub daemon: DaemonConfig,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            runner: RunnerConfig {
+                keep_awake: true,
+                max_active_runs: 8,
+                max_pending_submissions: 32,
+            },
+            daemon: DaemonConfig {
+                port: 0,
+                body_timeout_seconds: 5,
+                drain_timeout_seconds: 2,
+            },
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct RunnerConfig {
+    pub keep_awake: bool,
+    pub max_active_runs: usize,
+    pub max_pending_submissions: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DaemonConfig {
+    pub port: u16,
+    pub body_timeout_seconds: u64,
+    pub drain_timeout_seconds: u64,
+}
+
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct Patch {
+    runner: RunnerPatch,
+    daemon: DaemonPatch,
+}
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct RunnerPatch {
+    keep_awake: Option<bool>,
+    max_active_runs: Option<usize>,
+    max_pending_submissions: Option<usize>,
+}
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct DaemonPatch {
+    port: Option<u16>,
+    body_timeout_seconds: Option<u64>,
+    drain_timeout_seconds: Option<u64>,
+}
+
+impl Config {
+    pub async fn load(paths: &Paths) -> Result<Self> {
+        let patch = read_patch(&paths.config()).await?;
+        let mut config = Self::default();
+        if let Some(value) = patch.runner.keep_awake {
+            config.runner.keep_awake = value;
+        }
+        if let Some(value) = patch.daemon.port {
+            config.daemon.port = value;
+        }
+        if let Some(value) = patch.runner.max_active_runs {
+            config.runner.max_active_runs = value;
+        }
+        if let Some(value) = patch.runner.max_pending_submissions {
+            config.runner.max_pending_submissions = value;
+        }
+        if let Some(value) = patch.daemon.body_timeout_seconds {
+            config.daemon.body_timeout_seconds = value;
+        }
+        if let Some(value) = patch.daemon.drain_timeout_seconds {
+            config.daemon.drain_timeout_seconds = value;
+        }
+        anyhow::ensure!(
+            (1..=1024).contains(&config.runner.max_active_runs),
+            "max_active_runs must be 1..1024"
+        );
+        anyhow::ensure!(
+            (1..=4096).contains(&config.runner.max_pending_submissions),
+            "max_pending_submissions must be 1..4096"
+        );
+        anyhow::ensure!(
+            (1..=60).contains(&config.daemon.body_timeout_seconds),
+            "body_timeout_seconds must be 1..60"
+        );
+        anyhow::ensure!(
+            (1..=30).contains(&config.daemon.drain_timeout_seconds),
+            "drain_timeout_seconds must be 1..30"
+        );
+        Ok(config)
+    }
+
+    /// Project configuration can opt runs out of inhibition, but cannot change daemon settings.
+    pub async fn with_project(mut self, directory: &Path) -> Result<Self> {
+        let patch = read_patch(&directory.join("autono.toml")).await?;
+        anyhow::ensure!(
+            patch.daemon.port.is_none()
+                && patch.daemon.body_timeout_seconds.is_none()
+                && patch.daemon.drain_timeout_seconds.is_none()
+                && patch.runner.max_active_runs.is_none()
+                && patch.runner.max_pending_submissions.is_none(),
+            "project autono.toml may only configure runner.keep_awake"
+        );
+        if let Some(value) = patch.runner.keep_awake {
+            self.runner.keep_awake = value;
+        }
+        Ok(self)
+    }
+}
+
+async fn read_patch(path: &Path) -> Result<Patch> {
+    match tokio::fs::read_to_string(path).await {
+        Ok(text) => toml::from_str(&text).with_context(|| format!("parse {}", path.display())),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(Patch::default()),
+        Err(error) => Err(error).with_context(|| format!("read {}", path.display())),
+    }
+}
+
+pub const HTTP_TIMEOUT: Duration = Duration::from_secs(10);
