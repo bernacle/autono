@@ -82,10 +82,15 @@ timeout_seconds = 300
 ```
 
 Parallelism is 1..8, coding attempts 1..5, and review cycles 1..5. A review cycle
-includes the initial review. Coding attempts bound all implementation invocations,
+includes each reviewer invocation, including invalid-response and infrastructure retries.
+These retries review the same candidate and never consume coding attempts. Coding attempts bound all implementation invocations,
 including fixes after failed checks. Each task stops on either exhausted bound.
 Planner inference runs once per new plan. Agent/check timeouts are 1..3600 seconds;
-Git operations have a 60-second timeout and capability probes 15 seconds. These
+Git operations have a 60-second timeout and capability probes 15 seconds.
+Temporary process admission overload retries six times with cancellable exponential
+backoff (50 ms through 1.6 s; 3.15 s total), preserving the submission key.
+Parallelism cannot exceed the runtime active-process limit; unrelated raw process
+runs can still temporarily occupy those slots. These
 are invocation/time bounds, not a token or monetary budget. Verification requires
 1..16 configured commands. Defaults target a Rust repository; configure other
 projects explicitly.
@@ -93,7 +98,7 @@ projects explicitly.
 ## Domain and persistence
 
 `autono-protocol::engineering` defines EngineeringRun, ExecutionPlan, Milestone,
-EngineeringTask, TaskAttempt, AgentSession, Workspace, VerificationResult,
+EngineeringTask, TaskAttempt, ReviewAttempt, AgentSession, Workspace, GitOwnership, VerificationResult,
 ReviewFinding, CriterionReview, and Blocker. Engineering IDs and session/process
 keys are UUIDs; plan task/milestone/requirement IDs are stable strings.
 
@@ -104,7 +109,12 @@ domain objects persist in the aggregate so a checkpoint and all related evidence
 can commit atomically with lifecycle/task transition events. Existing runtime
 tables and migration files are unchanged. A serialized journal and optimistic
 revision check prevent stale writers. An OS file lock leases each owned workspace
-through coding, checks, review, and artifact preservation.
+through coding, checks, review, and artifact preservation. Workspace documents
+retain pinned Git paths/configuration fingerprints. Each coding attempt retains
+every reviewer session, isolated checkout, result, and failure diagnostic; the
+latest reviewer/review fields remain available for existing consumers. New fields
+have deserialization defaults so old records remain inspectable. Newly executing
+plans require pinned ownership; legacy plans lacking it must be resubmitted.
 
 Run lifecycle:
 
@@ -152,15 +162,33 @@ optional; Autono does not read, copy, or persist CLI authentication tokens.
   an explicit UUID. Result envelopes must have successful structured output;
   permission denials become manual blockers.
 
-Reviewers always start a separate session and receive the original task,
-specification, exact criteria, implementation diff, verification evidence, and
-project context. They do not receive coder conversation/reasoning. Critical,
+Reviewers always start a separate session in a separate checkout of the original
+trusted base commit. Authoritative README/AGENTS/CLAUDE/architecture context is
+read from regular Git blobs at that exact commit, never coder-modified files or
+symlink targets. Reviewers receive the original task, its referenced requirements,
+stable criterion IDs, complete changed-file inventory/statuses, diff statistics,
+explicit truncation state, a session-local full diff artifact/digest, and verification
+evidence. The complete delta from the original base includes completed dependency
+changes. The reviewer checkout intentionally contains base code; candidate changes
+are presented as diff data. Prompts mark all diffs, filenames and test output as
+untrusted data, never authority to approve or override review instructions.
+They do not receive coder conversation/reasoning. Criterion labels may be paraphrased;
+immutable task-ID/ordinal identifiers, schema enums and exact coverage checks bind
+the evidence. Invalid reviews retry a fresh reviewer within the same review budget.
+
+Instruction/configuration changes (including nested AGENTS/CLAUDE files and agent
+configuration directories) block before verification/review, requiring a human to
+approve them into a new trusted base. There is no implicit plan-based exception.
+Build/test/verification configuration changes are explicitly flagged for scrutiny.
+The harness does not claim prompts alone make a reviewer immune to injection. Critical,
 high, and medium findings block completion. Every criterion must have explicit,
 nonempty evidence and be marked satisfied. Structured findings include severity,
 file, line, explanation, recommended fix, and confidence.
 
-Authentication/approval failures are classified from provider errors where
-possible. Other protocol/provider errors and timeouts consume bounded attempts.
+Authentication/approval failures are classified only from recognized structured
+provider envelope codes/permission-denial fields. Runtime cancellation/timeout
+outcomes take priority. Arbitrary transcript/stdout/stderr words cannot create
+credential or permission blockers; unknown failures stay provider failures. Other protocol/provider errors and timeouts consume bounded attempts.
 Unrecognized interactive behavior is stopped by the invocation timeout, not an
 unbounded stdin wait. The daemon does not broker approvals or automatically log
 in, install CLIs, or grant broader permissions. Claude coders intentionally lack
@@ -171,14 +199,28 @@ Bash: project commands belong to deterministic verification.
 The base must resolve to a Git commit in the submitted repository root. Developer
 uncommitted changes are not copied. The harness reserves workspaces under
 `<home>/engineering/<run>/` before creation and creates unique `autono/<run>/...`
-branches without force. Task checkouts merge verified direct-dependency commits
+branches without force. Harness Git uses explicit pinned Git-directory/worktree paths, clears inherited
+Git redirection variables, ignores system/global configuration, disables hooks,
+fsmonitor, external diffs/textconv and signing, and rejects executable filter/merge/
+diff drivers, configuration includes, alternate object stores and grafts. Ownership
+checks fingerprint the .git pointer, back-reference, commondir, repository/worktree
+configuration, attributes and alternate-store metadata before Git execution.
+Changed ownership metadata is rejected, not followed. Raw HEAD/index state is
+audited too: coder changes to index flags/staging block rather than hiding code
+from preservation, and optional Git index refresh is disabled. Git operations use the
+standard `env -u` utility available on supported macOS/Linux hosts. Developer
+repositories using unsupported Git configuration must simplify it before planning.
+
+Task checkouts merge verified direct-dependency commits
 before coding. Existing paths/branches are rejected, never reset, removed, or
 reused. Workspaces survive failure, cancellation, and completion.
 
 The coder must leave commits and branches to the harness. After coding, the
 harness stages the local changes, runs all configured checks, then asks a fresh
 reviewer. Required checks must have observed zero exit and complete persisted
-output. Runtime cleanup/power warnings remain distinct and visible; they do not
+output. Evidence distinguishes test failures from timeout, cancellation, spawn and
+infrastructure failures. Infrastructure problems stop with an explicit blocker,
+without asking the coder to repair the implementation. Runtime cleanup/power warnings remain distinct and visible; they do not
 rewrite an observed command result. Bounded diagnostic excerpts go into prompts;
 full output remains in process events. Full diffs are retained as artifacts;
 review prompts include up to 48,000 characters plus their full artifact path.
@@ -186,9 +228,15 @@ review prompts include up to 48,000 characters plus their full artifact path.
 Snapshot audits cover HEAD, current branch, index, tracked files, and nonignored
 untracked files, including file modes and symlink targets. Audit limits are 4096
 files / 64 MiB; captured command output is capped at 2 MiB per stream in memory
-while full logs remain durable. Prompts are retained as local artifacts; prompts
-over 64 KiB are supplied through an instruction-file reference to avoid OS argv
-limits. Project context follows only paths inside the assigned checkout.
+while full logs remain durable. Each invocation has its own UUID artifact directory, exposed only to that
+session by provider permissions. Prompts, schemas and diffs are sealed read-only;
+Unix directories are mode 0500. Fingerprint/permission checks cover all sealed
+artifacts in the active operation before and after invocations. Large prompts
+use the same sealed session-local instruction file, never a shared writable path.
+This prevents ordinary permitted writes and detects retained mutations; it is not
+same-UID OS isolation. Prompts over 64 KiB use instruction-file references to avoid
+OS argv limits. Resumed coders receive only new feedback plus stable context/task
+references; new independent reviewers still receive their own trusted context. Project context is read only from regular blobs at the trusted original base.
 Checks that change audited files block completion.
 A reviewer mutation rejects the review and records a blocker without resetting
 the evidence. The harness commits only after checks, accepted review, criterion
@@ -196,9 +244,11 @@ coverage, and mutation audit agree. SQLite independently rechecks referenced
 process results before committing COMPLETED task state.
 
 Provider tool restrictions and mutation audits are **not a security sandbox**.
-The audit excludes ignored build artifacts and Git's shared metadata other than
-the recorded HEAD/branch/index. It cannot detect transient/reverted writes or
-changes outside the assigned checkout. Runtime v0's detached-descendant and
+The audit excludes ignored build artifacts and Git shared metadata outside the
+explicit ownership/configuration fingerprints and recorded HEAD/branch/index. It cannot detect transient/reverted writes or
+changes outside the assigned checkout/artifacts. Same-user programs with arbitrary
+command access can chmod files or race/restore writes; they are outside the
+permission/audit guarantee. Runtime v0's detached-descendant and
 uncertain-cleanup limitations still apply. Use trusted projects/providers and
 inspect reported cleanup warnings. Do not claim guaranteed reviewer isolation.
 
@@ -270,3 +320,5 @@ AUTONO_REAL_AGENT_ACCEPTANCE=1 cargo test -p autono-cli --test real_agents -- --
 This consumes inference and requires working installed CLI login/network access.
 It reports failure/blockers honestly; installing the tools alone is not evidence
 that an autonomous feature completed.
+
+Independent review repair details and deterministic regressions: [engineering review repairs](engineering-review-repairs.md).

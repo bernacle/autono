@@ -29,7 +29,7 @@ impl AgentRuntime for Fake {
                 }
                 AgentRole::Coder => json!({"summary":"Implemented feature","blocker":""}),
                 AgentRole::Reviewer => {
-                    json!({"accepted":true,"criteria":[{"criterion":"Feature exists","satisfied":true,"evidence":"Inspected feature.txt and the passing check"}],"findings":[],"blocker":""})
+                    json!({"accepted":true,"criteria":[{"criterion_id":"t-C1","criterion":"Feature exists","satisfied":true,"evidence":"Inspected feature.txt and the passing check"}],"findings":[],"blocker":""})
                 }
             };
             let session = Uuid::new_v4();
@@ -72,9 +72,7 @@ async fn authenticated_api_owns_planning_execution_evidence_and_integration() ->
     tokio::fs::create_dir(&repo).await?;
     let store = Store::open(&root.join("db")).await?;
     let supervisor = Supervisor::new(store, false);
-    let runner = ProcessRunner {
-        supervisor: supervisor.clone(),
-    };
+    let runner = ProcessRunner::new(supervisor.clone());
     let stop = CancellationToken::new();
     runner.git(&repo, &["init", "-b", "main"], &stop).await?;
     tokio::fs::write(repo.join("README.md"), "Feature seed").await?;

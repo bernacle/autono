@@ -19,6 +19,7 @@ pub fn reference(home: &Path, run: Uuid, label: &str, base: &str) -> Workspace {
         branch: format!("autono/{run}/{label}"),
         base_commit: base.into(),
         head_commit: None,
+        git: None,
     }
 }
 pub struct WorkspaceLease {
@@ -81,7 +82,7 @@ pub async fn repository(
 pub async fn create(
     runner: &ProcessRunner,
     repo: &Path,
-    workspace: &Workspace,
+    workspace: &mut Workspace,
     stop: &CancellationToken,
 ) -> Result<()> {
     ensure!(
@@ -104,6 +105,7 @@ pub async fn create(
             stop,
         )
         .await?;
+    workspace.git = Some(runner.git_ownership(&workspace.path)?);
     Ok(())
 }
 pub async fn head(runner: &ProcessRunner, path: &Path, stop: &CancellationToken) -> Result<String> {
@@ -119,6 +121,12 @@ pub async fn assert_owned(
     expected: &str,
     stop: &CancellationToken,
 ) -> Result<()> {
+    runner.bind_git(
+        workspace
+            .git
+            .as_ref()
+            .context("workspace lacks pinned Git ownership; submit a new plan")?,
+    )?;
     ensure!(
         head(runner, &workspace.path, stop).await? == expected,
         "workspace HEAD changed outside harness control"
@@ -167,6 +175,23 @@ pub async fn commit(
         .await?;
     head(runner, path, stop).await
 }
+/// The coder may edit source, but not HEAD/index control state (including index flags).
+pub fn git_state(runner: &ProcessRunner, path: &Path) -> Result<String> {
+    let owned = runner.git_ownership(path)?;
+    let mut digest = Sha256::new();
+    for name in ["HEAD", "index"] {
+        digest.update(name.as_bytes());
+        match std::fs::read(owned.git_dir.join(name)) {
+            Ok(bytes) => {
+                digest.update([1]);
+                digest.update(bytes);
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => digest.update([0]),
+            Err(e) => return Err(e.into()),
+        }
+    }
+    Ok(format!("{:x}", digest.finalize()))
+}
 /// Mutation audit covers HEAD, index, tracked and nonignored untracked files, modes and symlinks.
 /// This detects changes; it is not an OS sandbox and cannot observe transient/reverted writes.
 pub async fn snapshot(
@@ -181,10 +206,20 @@ pub async fn snapshot(
     );
     let root = tokio::fs::canonicalize(path).await?;
     let mut digest = Sha256::new();
+    let owned = runner.git_ownership(path)?;
+    digest.update(serde_json::to_vec(&owned)?);
+    digest.update(git_state(runner, path)?);
     for args in [
         &["rev-parse", "HEAD"][..],
         &["symbolic-ref", "HEAD"][..],
-        &["diff", "--cached", "--binary", "HEAD"][..],
+        &[
+            "diff",
+            "--no-ext-diff",
+            "--no-textconv",
+            "--cached",
+            "--binary",
+            "HEAD",
+        ][..],
     ] {
         digest.update(runner.git(path, args, stop).await?.as_bytes());
     }

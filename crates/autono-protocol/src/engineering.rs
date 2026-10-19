@@ -390,6 +390,14 @@ impl TaskStatus {
             )
     }
 }
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GitOwnership {
+    pub worktree: PathBuf,
+    pub git_dir: PathBuf,
+    pub common_dir: PathBuf,
+    /// SHA-256 of ownership/configuration files; None records an absent file.
+    pub metadata: BTreeMap<PathBuf, Option<String>>,
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Workspace {
     pub id: Uuid,
@@ -397,6 +405,8 @@ pub struct Workspace {
     pub branch: String,
     pub base_commit: String,
     pub head_commit: Option<String>,
+    #[serde(default)]
+    pub git: Option<GitOwnership>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Blocker {
@@ -418,6 +428,15 @@ pub struct AgentSession {
     pub outcome: Option<String>,
     pub result: Option<String>,
 }
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum VerificationOutcome {
+    Passed,
+    TestFailure,
+    Timeout,
+    Cancelled,
+    InfrastructureFailure,
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VerificationResult {
     pub process_key: Uuid,
@@ -425,6 +444,8 @@ pub struct VerificationResult {
     pub command: Vec<String>,
     pub exit_code: Option<i32>,
     pub passed: bool,
+    #[serde(default)]
+    pub outcome: Option<VerificationOutcome>,
     pub output_complete: bool,
     pub summary: String,
 }
@@ -458,6 +479,8 @@ impl ReviewFinding {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct CriterionReview {
+    #[serde(default)]
+    pub criterion_id: String,
     pub criterion: String,
     pub satisfied: bool,
     pub evidence: String,
@@ -476,12 +499,25 @@ impl ReviewResult {
             self.findings.len() <= 64 && self.criteria.len() == task.acceptance_criteria.len(),
             "review must account for every acceptance criterion"
         );
-        let actual: BTreeSet<_> = self.criteria.iter().map(|c| c.criterion.as_str()).collect();
-        let expected: BTreeSet<_> = task
-            .acceptance_criteria
+        // Old persisted reviews used exact labels. New responses identify immutable
+        // criteria by task ID and ordinal, so paraphrasing a label is harmless.
+        let legacy = self.criteria.iter().all(|c| c.criterion_id.is_empty());
+        let actual: BTreeSet<_> = self
+            .criteria
             .iter()
-            .map(String::as_str)
+            .map(|c| {
+                if legacy {
+                    c.criterion.clone()
+                } else {
+                    c.criterion_id.clone()
+                }
+            })
             .collect();
+        let expected: BTreeSet<_> = if legacy {
+            task.acceptance_criteria.iter().cloned().collect()
+        } else {
+            task.criterion_ids().into_iter().collect()
+        };
         ensure!(
             actual == expected && self.criteria.iter().all(|c| text(&c.evidence)),
             "invalid acceptance evidence"
@@ -503,12 +539,28 @@ impl ReviewResult {
             && !self.findings.iter().any(ReviewFinding::blocking)
     }
 }
+impl PlannedTask {
+    pub fn criterion_ids(&self) -> Vec<String> {
+        (1..=self.acceptance_criteria.len())
+            .map(|n| format!("{}-C{n}", self.id))
+            .collect()
+    }
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReviewAttempt {
+    pub session: AgentSession,
+    pub workspace: Option<Workspace>,
+    pub review: Option<ReviewResult>,
+    pub diagnostic: Option<String>,
+}
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskAttempt {
     pub number: usize,
     pub coder: AgentSession,
     pub verification: Vec<VerificationResult>,
     pub reviewer: Option<AgentSession>,
+    #[serde(default)]
+    pub reviews: Vec<ReviewAttempt>,
     pub review: Option<ReviewResult>,
     pub snapshot: Option<String>,
     pub detail: Option<String>,
@@ -529,6 +581,8 @@ pub struct EngineeringRun {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub repository: PathBuf,
+    #[serde(default)]
+    pub repository_git: Option<GitOwnership>,
     pub requested_base: String,
     pub base_commit: String,
     pub specification: String,

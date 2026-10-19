@@ -89,6 +89,7 @@ impl Store {
         ensure!(
             old.specification == run.specification
                 && old.repository == run.repository
+                && old.repository_git == run.repository_git
                 && old.requested_base == run.requested_base
                 && old.base_commit == run.base_commit
                 && old.settings == run.settings,
@@ -115,6 +116,13 @@ impl Store {
                     old.status == EngineeringStatus::Planning,
                     "cannot add tasks after planning"
                 );
+            }
+            for attempt in &task.attempts {
+                for review in &attempt.reviews {
+                    if let Some(workspace) = &review.workspace {
+                        reserve(&mut tx, run, workspace).await?;
+                    }
+                }
             }
             if let Some(workspace) = &task.workspace {
                 reserve(&mut tx, run, workspace).await?;
@@ -379,6 +387,7 @@ mod tests {
             created_at: now,
             updated_at: now,
             repository: root.to_owned(),
+            repository_git: None,
             requested_base: "HEAD".into(),
             base_commit: "a".repeat(40),
             specification: "A feature".into(),
@@ -556,14 +565,17 @@ mod tests {
                     command: command.clone(),
                     exit_code: Some(0),
                     passed: true,
+                    outcome: Some(VerificationOutcome::Passed),
                     output_complete: true,
                     summary: "forged check".into(),
                 })
                 .collect(),
+            reviews: vec![],
             reviewer: Some(session(AgentRole::Reviewer)),
             review: Some(ReviewResult {
                 accepted: true,
                 criteria: vec![CriterionReview {
+                    criterion_id: String::new(),
                     criterion: "Criterion".into(),
                     satisfied: true,
                     evidence: "Claimed evidence".into(),

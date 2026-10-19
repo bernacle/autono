@@ -1,8 +1,11 @@
 //! Daemon-owned engineering orchestration above the process supervisor.
 pub mod agent;
+mod artifacts;
 mod engine;
+mod git;
 mod journal;
 pub mod process;
+mod review;
 mod service;
 mod store;
 pub mod workspace;

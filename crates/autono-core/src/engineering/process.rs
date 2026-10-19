@@ -1,8 +1,15 @@
 //! All workflow commands reuse Runtime v0 ownership, closed stdin and process-group cleanup.
+use super::git::Ownership;
+use super::{GitOwnership, VerificationOutcome, agent::AgentFailure};
 use crate::{EventKind, Run, RunSpec, RunStatus, Supervisor, model::OutputStream};
 use anyhow::{Context, Result};
 use base64::{Engine, engine::general_purpose::STANDARD};
-use std::{collections::BTreeMap, path::Path, time::Duration};
+use std::{
+    collections::BTreeMap,
+    path::{Path, PathBuf},
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
@@ -10,6 +17,7 @@ const CAPTURE_LIMIT: usize = 2 * 1024 * 1024;
 #[derive(Clone)]
 pub struct ProcessRunner {
     pub supervisor: Supervisor,
+    git: Arc<Mutex<BTreeMap<PathBuf, GitOwnership>>>,
 }
 #[derive(Debug)]
 pub struct CommandOutput {
@@ -19,6 +27,26 @@ pub struct CommandOutput {
     pub truncated: bool,
 }
 impl CommandOutput {
+    pub fn outcome(&self) -> VerificationOutcome {
+        if matches!(
+            self.run.status,
+            RunStatus::Cancelled | RunStatus::Interrupted
+        ) {
+            VerificationOutcome::Cancelled
+        } else if self.run.detail.as_deref() == Some("timeout exceeded") {
+            VerificationOutcome::Timeout
+        } else if self.succeeded() {
+            VerificationOutcome::Passed
+        } else if self.run.status == RunStatus::Failed
+            && self.run.exit_code.is_some()
+            && self.run.output_complete == Some(true)
+        {
+            VerificationOutcome::TestFailure
+        } else {
+            VerificationOutcome::InfrastructureFailure
+        }
+    }
+
     pub fn succeeded(&self) -> bool {
         self.run.status == RunStatus::Succeeded
             && self.run.exit_code == Some(0)
@@ -57,6 +85,42 @@ impl CommandOutput {
     }
 }
 impl ProcessRunner {
+    pub fn new(supervisor: Supervisor) -> Self {
+        Self {
+            supervisor,
+            git: Arc::new(Mutex::new(BTreeMap::new())),
+        }
+    }
+    pub fn bind_git(&self, owned: &GitOwnership) -> Result<()> {
+        owned.verify()?;
+        let mut map = self.git.lock().expect("Git bindings");
+        if let Some(previous) = map.get(&owned.worktree) {
+            anyhow::ensure!(previous == owned, "Git ownership binding changed");
+        } else {
+            map.insert(owned.worktree.clone(), owned.clone());
+        }
+        Ok(())
+    }
+    pub fn git_ownership(&self, cwd: &Path) -> Result<GitOwnership> {
+        // Consult the trusted spelling before canonicalization can follow a replaced path.
+        if let Some(owned) = self.git.lock().expect("Git bindings").get(cwd).cloned() {
+            owned.verify()?;
+            return Ok(owned);
+        }
+        let path = std::fs::canonicalize(cwd)?;
+        let previous = self.git.lock().expect("Git bindings").get(&path).cloned();
+        let owned = match previous {
+            Some(owned) => owned,
+            None => GitOwnership::capture(&path)?,
+        };
+        self.bind_git(&owned)?;
+        self.git
+            .lock()
+            .expect("Git bindings")
+            .insert(cwd.to_owned(), owned.clone());
+        Ok(owned)
+    }
+
     pub async fn run(
         &self,
         command: Vec<String>,
@@ -86,19 +150,50 @@ impl ProcessRunner {
             cwd: cwd.to_owned(),
             env: BTreeMap::from([
                 ("GIT_TERMINAL_PROMPT".into(), "0".into()),
+                ("GIT_OPTIONAL_LOCKS".into(), "0".into()),
                 ("GIT_EDITOR".into(), "true".into()),
                 ("GIT_MERGE_AUTOEDIT".into(), "no".into()),
             ]),
             timeout_seconds: Some(seconds),
             keep_awake: true,
         };
-        let run = self
-            .supervisor
-            .submit_keyed(autono_protocol::Submission {
-                submission_key: key,
-                spec,
-            })
-            .await?;
+        self.start_spec(spec, key, stop).await
+    }
+    async fn start_spec(&self, spec: RunSpec, key: Uuid, stop: &CancellationToken) -> Result<Run> {
+        anyhow::ensure!(
+            !stop.is_cancelled(),
+            "workflow cancelled before process admission"
+        );
+        let mut delay = Duration::from_millis(50);
+        let mut retries = 0;
+        let run = loop {
+            match self
+                .supervisor
+                .submit_keyed(autono_protocol::Submission {
+                    submission_key: key,
+                    spec: spec.clone(),
+                })
+                .await
+            {
+                Ok(run) => break run,
+                Err(e) if e.is::<crate::supervisor::Overloaded>() && retries < 6 => {
+                    retries += 1;
+                    tokio::select! { biased; _ = stop.cancelled() => anyhow::bail!("workflow cancelled during admission backoff"), _ = tokio::time::sleep(delay) => {} }
+                    delay *= 2;
+                }
+                Err(e) if e.is::<crate::supervisor::Overloaded>() => {
+                    return Err(AgentFailure {
+                        kind: "process_admission".into(),
+                        detail: format!(
+                            "Process capacity unavailable after {retries} retries: {e}"
+                        ),
+                        blocked: true,
+                    }
+                    .into());
+                }
+                Err(e) => return Err(e),
+            }
+        };
         if let Some(finished) = self.supervisor.control_finished(run.id) {
             let supervisor = self.supervisor.clone();
             let stop = stop.clone();
@@ -178,28 +273,101 @@ impl ProcessRunner {
         }
     }
     pub async fn git(&self, cwd: &Path, args: &[&str], stop: &CancellationToken) -> Result<String> {
-        let command = std::iter::once("git".to_string())
-            .chain(
-                [
-                    "-c",
-                    "core.hooksPath=/dev/null",
-                    "-c",
-                    "commit.gpgSign=false",
-                    "-c",
-                    "user.name=Autono",
-                    "-c",
-                    "user.email=autono@localhost",
-                ]
-                .map(String::from),
-            )
-            .chain(args.iter().map(|s| s.to_string()))
-            .collect();
-        let output = self.run(command, cwd, 60, Uuid::new_v4(), stop).await?;
+        // Bootstrap is only permitted before any agents run, when creating a new repository.
+        let initializing = args.first() == Some(&"init") && !cwd.join(".git").exists();
+        let owned = if initializing {
+            None
+        } else {
+            Some(self.git_ownership(cwd)?)
+        };
+        let mut command = vec![
+            "git".into(),
+            "--no-pager".into(),
+            "--no-optional-locks".into(),
+        ];
+        if let Some(owned) = &owned {
+            command.extend([
+                format!("--git-dir={}", owned.git_dir.display()),
+                format!("--work-tree={}", owned.worktree.display()),
+            ]);
+        }
+        for setting in [
+            "core.hooksPath=/dev/null",
+            "core.fsmonitor=false",
+            "core.untrackedCache=false",
+            "core.attributesFile=/dev/null",
+            "core.sshCommand=false",
+            "credential.helper=",
+            "core.askPass=",
+            "core.bare=false",
+            "commit.gpgSign=false",
+            "tag.gpgSign=false",
+            "protocol.ext.allow=never",
+            "protocol.file.allow=never",
+            "merge.autoStash=false",
+            "merge.verifySignatures=false",
+            "log.showSignature=false",
+            "gpg.program=false",
+            "gpg.ssh.program=false",
+            "user.name=Autono",
+            "user.email=autono@localhost",
+        ] {
+            command.extend(["-c".into(), setting.into()]);
+        }
+        command.extend(args.iter().map(|s| s.to_string()));
+        // Neutralize inherited Git configuration and execution environment. Explicit
+        // directories above and audited repository config define harness ownership.
+        let env = BTreeMap::from([
+            ("GIT_CONFIG_NOSYSTEM".into(), "1".into()),
+            ("GIT_CONFIG_SYSTEM".into(), "/dev/null".into()),
+            ("GIT_CONFIG_GLOBAL".into(), "/dev/null".into()),
+            ("GIT_CONFIG_COUNT".into(), "0".into()),
+            ("GIT_CONFIG_PARAMETERS".into(), String::new()),
+            ("GIT_NO_REPLACE_OBJECTS".into(), "1".into()),
+            ("GIT_ATTR_NOSYSTEM".into(), "1".into()),
+            ("GIT_ALTERNATE_OBJECT_DIRECTORIES".into(), String::new()),
+            ("GIT_TERMINAL_PROMPT".into(), "0".into()),
+            ("GIT_EDITOR".into(), "true".into()),
+            ("GIT_MERGE_AUTOEDIT".into(), "no".into()),
+        ]);
+        // Never leak a parent's GIT_INDEX_FILE into worktree-add's child checkout.
+        // Explicit directories and audited commondir own discovery instead.
+        let mut isolated = vec!["env".to_string()];
+        for key in [
+            "GIT_DIR",
+            "GIT_WORK_TREE",
+            "GIT_COMMON_DIR",
+            "GIT_INDEX_FILE",
+            "GIT_OBJECT_DIRECTORY",
+            "GIT_NAMESPACE",
+            "GIT_SHALLOW_FILE",
+            "GIT_CONFIG",
+            "GIT_EXTERNAL_DIFF",
+            "GIT_DIFF_OPTS",
+            "GIT_TEMPLATE_DIR",
+            "GIT_EXEC_PATH",
+        ] {
+            isolated.extend(["-u".into(), key.into()]);
+        }
+        isolated.extend(command);
+        let command = isolated;
+        let spec = RunSpec {
+            command,
+            cwd: cwd.to_owned(),
+            env,
+            timeout_seconds: Some(60),
+            keep_awake: true,
+        };
+        let run = self.start_spec(spec, Uuid::new_v4(), stop).await?;
+        let output = self.wait(run.id, stop).await?;
         anyhow::ensure!(
             output.succeeded(),
             "Git operation failed: {}",
             output.summary()
         );
+        if initializing {
+            self.git_ownership(cwd)?;
+        }
         output.stdout_text()
     }
 }

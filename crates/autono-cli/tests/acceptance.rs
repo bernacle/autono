@@ -50,6 +50,7 @@ async fn daemon_restart_reconciles_engineering_checkpoints_without_agent_login()
         status: EngineeringStatus::Running,
         created_at: now,
         updated_at: now,
+        repository_git: None,
         repository: home.clone(),
         requested_base: "HEAD".into(),
         base_commit: "a".repeat(40),

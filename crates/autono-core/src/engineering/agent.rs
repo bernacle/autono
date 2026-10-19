@@ -72,6 +72,7 @@ impl AgentRuntime for CliAgentRuntime {
             let help = runner
                 .run(help_args, &request.cwd, 15, Uuid::new_v4(), stop)
                 .await?;
+            require_probe_outcome(&help)?;
             if !help.succeeded() {
                 return Err(failure("missing_cli", help.summary(), true));
             }
@@ -118,6 +119,7 @@ impl AgentRuntime for CliAgentRuntime {
                             stop,
                         )
                         .await?;
+                    require_probe_outcome(&global)?;
                     if !global.succeeded() || !global.stdout_text()?.contains("--no-daemon") {
                         return Err(failure(
                             "unsupported_cli",
@@ -154,6 +156,7 @@ impl AgentRuntime for CliAgentRuntime {
                                 stop,
                             )
                             .await?;
+                        require_probe_outcome(&resume_help)?;
                         if !resume_help.succeeded()
                             || !resume_help.stdout_text()?.contains("--output-schema")
                         {
@@ -223,8 +226,32 @@ impl AgentRuntime for CliAgentRuntime {
     }
 }
 
+fn require_probe_outcome(output: &CommandOutput) -> Result<()> {
+    use super::VerificationOutcome;
+    match output.outcome() {
+        VerificationOutcome::Timeout => Err(failure("timeout", output.summary(), false)),
+        VerificationOutcome::Cancelled => Err(failure("cancelled", output.summary(), false)),
+        // A missing executable is a known runtime spawn failure, not a transcript claim.
+        VerificationOutcome::InfrastructureFailure => {
+            Err(failure("cli_infrastructure", output.summary(), true))
+        }
+        _ => Ok(()),
+    }
+}
+
 /// Decode only documented JSONL envelopes; terminal scraping is never a success path.
 pub fn decode(provider: Provider, output: &CommandOutput) -> Result<AgentResponse> {
+    use super::VerificationOutcome;
+    match output.outcome() {
+        VerificationOutcome::Timeout => return Err(failure("timeout", output.summary(), false)),
+        VerificationOutcome::Cancelled => {
+            return Err(failure("cancelled", output.summary(), false));
+        }
+        VerificationOutcome::InfrastructureFailure => {
+            return Err(failure("infrastructure_failure", output.summary(), false));
+        }
+        _ => {}
+    }
     if output.truncated {
         return Err(failure(
             "output_limit",
@@ -238,8 +265,39 @@ pub fn decode(provider: Provider, output: &CommandOutput) -> Result<AgentRespons
     let mut complete = false;
     let mut errors = Vec::new();
     let mut denied = false;
+    let mut credentials = false;
     for line in stdout.lines().filter(|s| !s.trim().is_empty()) {
         let event: Value = serde_json::from_str(line).context("invalid agent JSONL event")?;
+        // Only provider-owned envelope fields classify blockers. Tool output,
+        // transcript text and diagnostic strings never grant this authority.
+        let envelope = matches!(
+            event["type"].as_str(),
+            Some("error" | "turn.failed" | "result")
+        ) || (provider == Provider::Claude
+            && event["type"] == "assistant"
+            && event.get("error").is_some());
+        if envelope {
+            let error = &event["error"];
+            let code = error["code"]
+                .as_str()
+                .or(error["type"].as_str())
+                .or(error.as_str());
+            credentials |= matches!(
+                code,
+                Some(
+                    "authentication_error"
+                        | "authentication_failed"
+                        | "unauthorized"
+                        | "invalid_api_key"
+                        | "login_required"
+                )
+            ) || error["status_code"] == 401
+                || error["http_status_code"] == 401;
+            denied |= matches!(
+                code,
+                Some("permission_denied" | "approval_required" | "sandbox_denied")
+            );
+        }
         match provider {
             Provider::Codex => match event["type"].as_str().unwrap_or("") {
                 "thread.started" => {
@@ -278,6 +336,13 @@ pub fn decode(provider: Provider, output: &CommandOutput) -> Result<AgentRespons
             }
         }
     }
+    if credentials {
+        return Err(failure(
+            "credentials_required",
+            "provider reported a structured authentication failure",
+            true,
+        ));
+    }
     if denied {
         return Err(failure(
             "approval_required",
@@ -287,38 +352,10 @@ pub fn decode(provider: Provider, output: &CommandOutput) -> Result<AgentRespons
     }
     if !output.succeeded() || !complete || !errors.is_empty() {
         let diagnostic = format!("{} {}", errors.join(" "), output.summary());
-        let lower = diagnostic.to_lowercase();
-        let (kind, blocked) = if [
-            "not logged in",
-            "authentication",
-            "unauthorized",
-            "login required",
-            "invalid api key",
-            "credentials",
-        ]
-        .iter()
-        .any(|s| lower.contains(s))
-        {
-            ("credentials_required", true)
-        } else if [
-            "approval",
-            "permission denied",
-            "requires permission",
-            "sandbox",
-        ]
-        .iter()
-        .any(|s| lower.contains(s))
-        {
-            ("approval_required", true)
-        } else if lower.contains("timeout") {
-            ("timeout", false)
-        } else {
-            ("provider_failure", false)
-        };
         return Err(failure(
-            kind,
+            "provider_failure",
             diagnostic.chars().take(4000).collect::<String>(),
-            blocked,
+            false,
         ));
     }
     if session.as_ref().is_none_or(|s| Uuid::parse_str(s).is_err()) {
@@ -359,9 +396,16 @@ pub fn schema(role: AgentRole) -> Value {
             "tasks":{"type":"array","items":object(json!({"id":string(),"goal":string(),"description":string(),"acceptance_criteria":strings(),"dependencies":strings(),"requirement_ids":strings(),"verification_expectations":strings(),"role":{"type":"string","enum":["coder"]}}))}
         })),
         AgentRole::Reviewer => object(
-            json!({"accepted":{"type":"boolean"}, "blocker":string(), "criteria":{"type":"array","items":object(json!({"criterion":string(),"satisfied":{"type":"boolean"},"evidence":string()}))}, "findings":{"type":"array","items":object(json!({"severity":{"type":"string","enum":["critical","high","medium","low","info"]},"file":string(),"line":{"type":"integer","minimum":0},"explanation":string(),"recommended_fix":string(),"confidence":{"type":"number","minimum":0,"maximum":1}}))}}),
+            json!({"accepted":{"type":"boolean"}, "blocker":string(), "criteria":{"type":"array","items":object(json!({"criterion_id":string(),"criterion":string(),"satisfied":{"type":"boolean"},"evidence":string()}))}, "findings":{"type":"array","items":object(json!({"severity":{"type":"string","enum":["critical","high","medium","low","info"]},"file":string(),"line":{"type":"integer","minimum":0},"explanation":string(),"recommended_fix":string(),"confidence":{"type":"number","minimum":0,"maximum":1}}))}}),
         ),
     }
+}
+
+pub(super) fn review_schema(task: &super::PlannedTask) -> Value {
+    let mut schema = schema(AgentRole::Reviewer);
+    schema["properties"]["criteria"]["items"]["properties"]["criterion_id"] =
+        json!({"type":"string", "enum":task.criterion_ids()});
+    schema
 }
 
 #[cfg(test)]
@@ -432,8 +476,8 @@ mod tests {
         let error = decode(
             Provider::Claude,
             &output(
-                String::new(),
-                "Authentication failed: not logged in",
+                json!({"type":"error","error":{"type":"authentication_error","message":"login failed"}}).to_string(),
+                "",
                 RunStatus::Failed,
             ),
         )
@@ -445,6 +489,60 @@ mod tests {
                 .kind,
             "credentials_required"
         );
+        Ok(())
+    }
+    #[test]
+    fn transcript_words_cannot_classify_blockers_and_runtime_outcomes_take_priority() -> Result<()>
+    {
+        let misleading = "authentication approval sandbox timeout permission denied credentials";
+        for provider in [Provider::Codex, Provider::Claude] {
+            let events = if provider == Provider::Codex {
+                json!({"type":"turn.failed","error":{"message":misleading}}).to_string()
+            } else {
+                json!({"type":"result","subtype":"error_during_execution","errors":[misleading]})
+                    .to_string()
+            };
+            let e = decode(
+                provider,
+                &output(events.clone(), misleading, RunStatus::Failed),
+            )
+            .expect_err("provider failure");
+            let f = e.downcast_ref::<AgentFailure>().expect("classified");
+            assert_eq!(f.kind, "provider_failure");
+            assert!(!f.blocked);
+            let mut timed = output(events, misleading, RunStatus::Failed);
+            timed.run.detail = Some("timeout exceeded".into());
+            timed.run.exit_code = None;
+            assert_eq!(
+                decode(provider, &timed)
+                    .expect_err("timeout")
+                    .downcast_ref::<AgentFailure>()
+                    .expect("classified")
+                    .kind,
+                "timeout"
+            );
+            timed.run.status = RunStatus::Cancelled;
+            assert_eq!(
+                decode(provider, &timed)
+                    .expect_err("cancelled")
+                    .downcast_ref::<AgentFailure>()
+                    .expect("classified")
+                    .kind,
+                "cancelled"
+            );
+            let auth = if provider == Provider::Codex {
+                json!({"type":"turn.failed","error":{"code":"unauthorized"}})
+            } else {
+                json!({"type":"error","error":{"type":"authentication_error"}})
+            };
+            let e = decode(provider, &output(auth.to_string(), "", RunStatus::Failed))
+                .expect_err("structured auth");
+            assert!(
+                e.downcast_ref::<AgentFailure>()
+                    .expect("classified")
+                    .blocked
+            );
+        }
         Ok(())
     }
 }

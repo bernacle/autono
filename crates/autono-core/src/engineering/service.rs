@@ -62,7 +62,7 @@ impl EngineeringService {
     ) -> Self {
         Self {
             inner: Arc::new(Inner {
-                runner: ProcessRunner { supervisor },
+                runner: ProcessRunner::new(supervisor),
                 config,
                 home,
                 agents,
@@ -226,6 +226,8 @@ impl EngineeringService {
             agents: self.inner.agents.clone(),
             home: self.inner.home.clone(),
             stop: stop.child_token(),
+            artifacts: Default::default(),
+            trusted_context: Default::default(),
         };
         let result = match operation {
             0 => engine.plan().await,
@@ -248,6 +250,11 @@ impl EngineeringService {
                 )
                 .await?;
                 let config = self.inner.config.clone().with_project(&repo).await?;
+                ensure!(
+                    config.execution.max_parallel
+                        <= self.inner.runner.supervisor.admission().max_active_runs,
+                    "max_parallel exceeds runtime max_active_runs; lower engineering parallelism or increase process capacity"
+                );
                 let w = workspace::reference(&self.inner.home, submission.id, "planner", &base);
                 let now = Utc::now();
                 let run = EngineeringRun {
@@ -256,6 +263,7 @@ impl EngineeringService {
                     status: EngineeringStatus::Planning,
                     created_at: now,
                     updated_at: now,
+                    repository_git: Some(self.inner.runner.git_ownership(&repo)?),
                     repository: repo,
                     requested_base: submission.base,
                     base_commit: base,
@@ -284,6 +292,11 @@ impl EngineeringService {
                     )
                 );
                 run.plan.as_ref().context("plan missing")?.validate()?;
+                ensure!(
+                    run.settings.execution.max_parallel
+                        <= self.inner.runner.supervisor.admission().max_active_runs,
+                    "stored max_parallel exceeds runtime process capacity"
+                );
                 let journal = Journal::new(self.store().clone(), run);
                 journal
                     .change(
