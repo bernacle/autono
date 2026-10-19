@@ -3,6 +3,17 @@
 Autono Runtime v0 executes commands with the daemon user's privileges. It is
 **not a sandbox**. Only submit commands and projects you trust.
 
+Engineering workflows also execute installed coding CLIs and developer-configured
+verification commands. Provider permission restrictions and workspace mutation
+audits reduce accidental writes; they are not a security boundary against a
+malicious agent, repository, test, or local user. Worktree audits exclude ignored
+files and cannot detect transient/reverted or external writes. See
+[the engineering boundaries](docs/engineering.md) before approving a plan.
+Autono uses CLI login without reading authentication files. Provider output,
+prompts, diffs, and verification logs are retained locally and can contain
+sensitive project data. Protect the engineering directory with the rest of the
+Autono home.
+
 The daemon listens on IPv4 loopback only. Every route requires a random 256-bit
 bearer token, published in `daemon.json` inside the user data directory. Tokens
 rotate on startup. Browser Origin headers and nonmatching Host headers are

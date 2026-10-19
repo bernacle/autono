@@ -1,13 +1,19 @@
 # Autono
 
-Autono is a local-first autonomous engineering harness, starting with **Runtime
-v0**: a headless Rust daemon that supervises commands and durably records their
-state and output. The runtime is the source of truth.
+Autono is a local-first autonomous engineering harness, with a durable Rust
+daemon supervising processes and autonomous engineering workflows. The runtime
+is the source of truth; coding agents are replaceable execution providers.
 
-Today it can submit commands, track concurrent runs, replay or stream logs,
-cancel runs, enforce timeouts, reconcile after a daemon restart, and inhibit idle
-system sleep on macOS. There are no agents, LLM integrations, planning, coding,
-or review workflows yet. No cloud service, desktop UI, or account is required.
+It can plan a Markdown feature, wait for developer approval, run coding agents
+in isolated Git worktrees, verify changes, request independent review, apply
+bounded fixes, and integrate verified commits into a local branch. Existing
+Runtime v0 command supervision, durable logs, cancellation, timeouts, restart
+reconciliation, and macOS idle-sleep inhibition remain available. Agent workflows
+use installed Codex/Claude CLI login; raw process execution requires neither.
+No cloud service or desktop UI is required.
+
+See [the engineering workflow](docs/engineering.md) for commands, configuration,
+contracts, safety boundaries, and the opt-in real-agent acceptance scenario.
 
 ## Build and run
 
@@ -83,6 +89,8 @@ The directory contains:
 - `daemon.json`: current loopback address, PID, API version, and secret token.
   Published atomically, rotated at startup, removed on graceful shutdown.
 - `config.toml`: optional user configuration, read at daemon/CLI startup.
+- `engineering/<run>/`: retained planner/task/integration worktrees, OS-held
+  workspace locks, structured-output schemas, and review diff artifacts.
 
 Example `config.toml`:
 
@@ -100,7 +108,10 @@ drain_timeout_seconds = 2
 
 An optional `autono.toml` in the submitted working directory can set
 `[runner].keep_awake`. Parent directories are not searched. Project configuration
-cannot change daemon settings or admission limits. The daemon's `keep_awake = false` is an overall
+can also override
+[agent, engineering execution, and verification settings](docs/engineering.md#configuration).
+It cannot change daemon settings or process admission limits. The daemon's
+`keep_awake = false` is an overall
 off switch; project configuration or API requests cannot override it. Restart the
 daemon after changing its configuration.
 
@@ -145,7 +156,7 @@ includes reserved launch slots and finalizing attempts; pending capacity bounds
 daemon-owned admission operations, not a durable workflow queue. Overload returns
 HTTP 429 with `code: "overloaded"`, without consuming cancel/status capacity.
 A retry can also receive 429 while admission is saturated; retry later with the
-same key. There is no workflow scheduler, log retention/rotation, sandbox,
+same key. There is no log retention/rotation, security sandbox,
 checkpoint restart, resource quota, service installer, or schema downgrade support.
 Logs grow on disk until you manage the installation's data. Keep the database on
 a local filesystem. Back up with SQLite's backup facilities or stop the daemon
@@ -241,9 +252,9 @@ log reconnect, repeated rapid failures, and live macOS helper replacement. See [
 
 ## Roadmap
 
-Later versions may add durable engineering checkpoints, planner/coder/reviewer
-workflows, verification, and a Tauri + React desktop interface. These are future
-work, not implemented features of Runtime v0.
+The first local planner/coder/verifier/reviewer loop is implemented above Runtime
+v0. Future milestones may add intelligent preflight, permission brokerage,
+autonomous replanning, and a desktop interface. They are not part of this version.
 
 MIT licensed; see [LICENSE](LICENSE).
 

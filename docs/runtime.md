@@ -76,8 +76,9 @@ active-run bound also bounds accumulated finalization records.
 SIGKILL is immediate. There is no graceful child termination period in v0.
 `Run` is a **process attempt**, not an engineering task. No dependency graph,
 agent session, workspace, verification contract, retry policy, review finding, or
-`BLOCKED_HUMAN` state belongs in this supervisor. Future engineering orchestration
-must build on these primitives and durable checkpoints as a separate layer.
+`BLOCKED_HUMAN` state belongs in this supervisor. The
+[engineering layer](engineering.md) builds on these primitives with separate
+durable domain checkpoints and leaves these process contracts intact.
 
 ## API v1
 

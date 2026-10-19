@@ -1,5 +1,6 @@
 use std::{convert::Infallible, net::SocketAddr, sync::Arc, time::Duration};
 
+use autono_core::engineering::{EngineeringRun, EngineeringService, PlanSubmission};
 use autono_core::{
     Run, Supervisor,
     store::{InvalidTransition, RunNotFound},
@@ -25,6 +26,7 @@ use uuid::Uuid;
 
 #[derive(Clone)]
 struct App {
+    engineering: Option<EngineeringService>,
     supervisor: Supervisor,
     token: String,
     authority: String,
@@ -50,7 +52,35 @@ pub fn configured_router(
     stop: CancellationToken,
     body_timeout: Duration,
 ) -> Router {
+    build_router(supervisor, None, token, address, stop, body_timeout)
+}
+pub fn workflow_router(
+    supervisor: Supervisor,
+    engineering: EngineeringService,
+    token: String,
+    address: SocketAddr,
+    stop: CancellationToken,
+    body_timeout: Duration,
+) -> Router {
+    build_router(
+        supervisor,
+        Some(engineering),
+        token,
+        address,
+        stop,
+        body_timeout,
+    )
+}
+fn build_router(
+    supervisor: Supervisor,
+    engineering: Option<EngineeringService>,
+    token: String,
+    address: SocketAddr,
+    stop: CancellationToken,
+    body_timeout: Duration,
+) -> Router {
     let state = Arc::new(App {
+        engineering,
         supervisor,
         token,
         authority: address.to_string(),
@@ -60,6 +90,19 @@ pub fn configured_router(
         streams: Arc::new(tokio::sync::Semaphore::new(32)),
     });
     Router::new()
+        .route(
+            "/v1/engineering",
+            get(engineering_list).post(engineering_plan),
+        )
+        .route("/v1/engineering/health", get(engineering_health))
+        .route("/v1/engineering/{id}", get(engineering_inspect))
+        .route("/v1/engineering/{id}/execute", post(engineering_execute))
+        .route(
+            "/v1/engineering/{id}/integrate",
+            post(engineering_integrate),
+        )
+        .route("/v1/engineering/{id}/cancel", post(engineering_cancel))
+        .route("/v1/engineering/{id}/events", get(engineering_events))
         .route("/v1/status", get(status))
         .route("/v1/runs", get(list).post(submit))
         .route("/v1/runs/{id}", get(inspect))
@@ -114,24 +157,28 @@ async fn authenticate(State(app): State<Arc<App>>, request: Request, next: Next)
     }
     // Keep complete/incomplete submissions and slow streams below the HTTP
     // connection bound so operational saturation leaves room for control routes.
-    let _submission =
-        if request.method() == axum::http::Method::POST && request.uri().path() == "/v1/runs" {
-            match app.submissions.clone().try_acquire_owned() {
-                Ok(slot) => Some(slot),
-                Err(_) => {
-                    return (
-                        StatusCode::TOO_MANY_REQUESTS,
-                        Json(ApiError {
-                            code: "overloaded".into(),
-                            error: "HTTP submission capacity exhausted".into(),
-                        }),
-                    )
-                        .into_response();
-                }
+    let _submission = if request.method() == axum::http::Method::POST
+        && (request.uri().path() == "/v1/runs"
+            || request.uri().path() == "/v1/engineering"
+            || request.uri().path().ends_with("/execute")
+            || request.uri().path().ends_with("/integrate"))
+    {
+        match app.submissions.clone().try_acquire_owned() {
+            Ok(slot) => Some(slot),
+            Err(_) => {
+                return (
+                    StatusCode::TOO_MANY_REQUESTS,
+                    Json(ApiError {
+                        code: "overloaded".into(),
+                        error: "HTTP submission capacity exhausted".into(),
+                    }),
+                )
+                    .into_response();
             }
-        } else {
-            None
-        };
+        }
+    } else {
+        None
+    };
     let (parts, body) = request.into_parts();
     let bytes = match tokio::time::timeout(app.body_timeout, to_bytes(body, 1024 * 1024)).await {
         Ok(Ok(bytes)) => bytes,
@@ -181,7 +228,9 @@ impl From<anyhow::Error> for Failure {
 }
 impl IntoResponse for Failure {
     fn into_response(self) -> Response {
-        let (status, code) = if self.0.is::<RunNotFound>() {
+        let (status, code) = if self.0.is::<RunNotFound>()
+            || self.0.is::<autono_core::engineering::EngineeringNotFound>()
+        {
             (StatusCode::NOT_FOUND, "not_found")
         } else if self.0.is::<autono_core::supervisor::Overloaded>() {
             (StatusCode::TOO_MANY_REQUESTS, "overloaded")
@@ -191,7 +240,10 @@ impl IntoResponse for Failure {
             (StatusCode::SERVICE_UNAVAILABLE, "persistence_degraded")
         } else if self.0.is::<autono_core::store::SubmissionConflict>() {
             (StatusCode::CONFLICT, "submission_conflict")
-        } else if self.0.is::<NotActive>() || self.0.is::<InvalidTransition>() {
+        } else if self.0.is::<NotActive>()
+            || self.0.is::<InvalidTransition>()
+            || self.0.is::<autono_core::engineering::EngineeringConflict>()
+        {
             (StatusCode::CONFLICT, "not_active")
         } else {
             tracing::error!(error = %format!("{:#}", self.0), "API request failed");
@@ -211,6 +263,98 @@ impl IntoResponse for Failure {
         )
             .into_response()
     }
+}
+
+fn engineering(app: &App) -> Result<&EngineeringService, Failure> {
+    app.engineering.as_ref().ok_or_else(|| {
+        Failure(anyhow::anyhow!(
+            "engineering workflow service is unavailable"
+        ))
+    })
+}
+async fn engineering_health(
+    State(app): State<Arc<App>>,
+) -> Result<Json<serde_json::Value>, Failure> {
+    let (active, error) = engineering(&app)?.health();
+    Ok(Json(
+        serde_json::json!({"active_run":active,"persistence_error":error}),
+    ))
+}
+async fn engineering_list(
+    State(app): State<Arc<App>>,
+    Query(page): Query<Page>,
+) -> Result<Json<Vec<EngineeringRun>>, Failure> {
+    Ok(Json(
+        engineering(&app)?
+            .store()
+            .engineering_list(page.limit.unwrap_or(20), page.offset.unwrap_or(0))
+            .await?,
+    ))
+}
+async fn engineering_inspect(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<EngineeringRun>, Failure> {
+    Ok(Json(engineering(&app)?.store().engineering_get(id).await?))
+}
+async fn engineering_plan(
+    State(app): State<Arc<App>>,
+    Json(submission): Json<PlanSubmission>,
+) -> Response {
+    if !submission.repository.is_absolute()
+        || submission.specification.trim().is_empty()
+        || submission.specification.len() > 128 * 1024
+    {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiError {
+                code: "invalid_plan".into(),
+                error: "use an absolute repository and a nonempty specification up to 128 KiB"
+                    .into(),
+            }),
+        )
+            .into_response();
+    }
+    match engineering(&app) {
+        Ok(service) => match service.plan(submission).await {
+            Ok(run) => (StatusCode::ACCEPTED, Json(run)).into_response(),
+            Err(e) => Failure(e).into_response(),
+        },
+        Err(e) => e.into_response(),
+    }
+}
+async fn engineering_execute(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<EngineeringRun>, Failure> {
+    Ok(Json(engineering(&app)?.execute(id).await?))
+}
+async fn engineering_integrate(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<EngineeringRun>, Failure> {
+    Ok(Json(engineering(&app)?.integrate(id).await?))
+}
+async fn engineering_cancel(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<CancelResponse>, Failure> {
+    engineering(&app)?.cancel(id).await?;
+    Ok(Json(CancelResponse { accepted: true }))
+}
+async fn engineering_events(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+    Query(page): Query<Page>,
+) -> Result<Json<Vec<autono_protocol::engineering::EngineeringEvent>>, Failure> {
+    let service = engineering(&app)?;
+    service.store().engineering_get(id).await?;
+    Ok(Json(
+        service
+            .store()
+            .engineering_events(id, page.after.unwrap_or(0), page.limit.unwrap_or(500))
+            .await?,
+    ))
 }
 
 async fn status(State(app): State<Arc<App>>) -> Result<Json<HostStatus>, Failure> {

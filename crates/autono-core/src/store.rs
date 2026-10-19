@@ -12,9 +12,9 @@ use crate::{Event, EventKind, Run, RunSpec, RunStatus};
 
 #[derive(Clone)]
 pub struct Store {
-    pool: SqlitePool,
-    readers: SqlitePool,
-    changed: tokio::sync::watch::Sender<()>,
+    pub(crate) pool: SqlitePool,
+    pub(crate) readers: SqlitePool,
+    pub(crate) changed: tokio::sync::watch::Sender<()>,
 }
 
 #[derive(Debug, thiserror::Error)]

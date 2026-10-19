@@ -23,6 +23,11 @@ pub async fn run(paths: Paths, config: Config, stop: CancellationToken) -> Resul
         .await
         .context("startup database health inspection timed out")??;
     let reconciled = store.reconcile().await?;
+    let engineering_reconciled = store.engineering_reconcile().await?;
+    tracing::info!(
+        engineering_reconciled,
+        "reconciled unfinished engineering workflows"
+    );
     tracing::info!(reconciled, "reconciled unfinished runs");
     let listener = TcpListener::bind((Ipv4Addr::LOCALHOST, config.daemon.port))
         .await
@@ -38,8 +43,20 @@ pub async fn run(paths: Paths, config: Config, stop: CancellationToken) -> Resul
     };
     owner.publish(&paths, &metadata).await?;
     let supervisor = Supervisor::configured(store, &config.runner);
-    let app = api::configured_router(
+    let engineering = autono_core::engineering::EngineeringService::new(
         supervisor.clone(),
+        paths.home.clone(),
+        config.clone(),
+    );
+    let workflow_stop = stop.clone();
+    let workflow_owner = engineering.clone();
+    let watcher = tokio::spawn(async move {
+        workflow_stop.cancelled().await;
+        workflow_owner.signal_shutdown();
+    });
+    let app = api::workflow_router(
+        supervisor.clone(),
+        engineering.clone(),
         metadata.token.clone(),
         address,
         stop.clone(),
@@ -55,8 +72,12 @@ pub async fn run(paths: Paths, config: Config, stop: CancellationToken) -> Resul
         std::time::Duration::from_secs(config.daemon.body_timeout_seconds),
     )
     .await;
+    engineering.signal_shutdown();
+    let workflow_shutdown = engineering.shutdown().await;
+    watcher.abort();
+    let _ = watcher.await;
     owner.unpublish(&paths).await?;
-    result
+    result.and(workflow_shutdown)
 }
 
 pub async fn shutdown_signal() -> Result<()> {

@@ -1,5 +1,6 @@
 mod client;
 mod doctor;
+mod engineering;
 
 use std::{collections::BTreeMap, io::Write, path::PathBuf};
 
@@ -29,6 +30,29 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Plan a Markdown feature in a retained read-only checkout; returns immediately.
+    Plan {
+        specification: PathBuf,
+        #[arg(long)]
+        repository: Option<PathBuf>,
+        #[arg(long, default_value = "HEAD")]
+        base: String,
+        /// Reuse this UUID after an ambiguous submission response.
+        #[arg(long)]
+        plan_id: Option<Uuid>,
+    },
+    /// Inspect the immutable plan, original specification and configured checks.
+    ShowPlan { id: Uuid },
+    /// Approve the persisted plan and start daemon-owned task execution.
+    Execute { id: Uuid },
+    /// Inspect engineering task progress and retained artifacts.
+    Tasks { id: Uuid },
+    /// Inspect independent review findings and manual blockers.
+    Findings { id: Uuid },
+    /// Merge verified task artifacts into a local Autono integration branch and check it.
+    Integrate { id: Uuid },
+    /// Show a detailed engineering run summary.
+    Summary { id: Uuid },
     /// Inspect optional tooling, repository, daemon, database, and host capabilities.
     Doctor,
     /// Run the daemon in the foreground until Ctrl-C or SIGTERM.
@@ -51,6 +75,9 @@ enum Commands {
     },
     /// List recent runs or inspect one run.
     Status {
+        /// Inspect engineering workflows instead of process runs.
+        #[arg(long)]
+        engineering: bool,
         id: Option<Uuid>,
         #[arg(long)]
         json: bool,
@@ -61,6 +88,9 @@ enum Commands {
     },
     /// Replay persisted stdout/stderr; optionally follow until the run finishes.
     Logs {
+        /// Replay durable engineering history and evidence references.
+        #[arg(long)]
+        engineering: bool,
         id: Uuid,
         #[arg(short, long)]
         follow: bool,
@@ -72,7 +102,11 @@ enum Commands {
         after: i64,
     },
     /// Request cancellation of an owned run (completion is asynchronous).
-    Cancel { id: Uuid },
+    Cancel {
+        id: Uuid,
+        #[arg(long)]
+        engineering: bool,
+    },
 }
 
 fn parse_env(value: &str) -> Result<(String, String), String> {
@@ -94,6 +128,18 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
     let paths = Paths::discover(cli.home)?;
     match cli.command {
+        Commands::Plan {
+            specification,
+            repository,
+            base,
+            plan_id,
+        } => engineering::plan(&paths, specification, repository, base, plan_id).await,
+        Commands::ShowPlan { id } => engineering::inspect(&paths, id, "plan").await,
+        Commands::Tasks { id } => engineering::inspect(&paths, id, "tasks").await,
+        Commands::Findings { id } => engineering::inspect(&paths, id, "findings").await,
+        Commands::Summary { id } => engineering::inspect(&paths, id, "summary").await,
+        Commands::Execute { id } => engineering::action(&paths, id, "execute").await,
+        Commands::Integrate { id } => engineering::action(&paths, id, "integrate").await,
         Commands::Doctor => doctor::run(&paths).await,
         Commands::Daemon => {
             let config = Config::load(&paths).await?;
@@ -137,11 +183,15 @@ async fn main() -> Result<()> {
             Ok(())
         }
         Commands::Status {
+            engineering: workflow,
             id,
             json,
             limit,
             offset,
         } => {
+            if workflow {
+                return engineering::status(&paths, id, json, limit, offset).await;
+            }
             let client = Client::connect(&paths).await?;
             if let Some(id) = id {
                 let run: RunView = client.get(&format!("/v1/runs/{id}")).await?;
@@ -173,11 +223,15 @@ async fn main() -> Result<()> {
             Ok(())
         }
         Commands::Logs {
+            engineering: workflow,
             id,
             follow,
             events,
             after,
         } => {
+            if workflow {
+                return engineering::logs(&paths, id, after, follow).await;
+            }
             let mut client = Client::connect(&paths).await?;
             let _: Run = client.get(&format!("/v1/runs/{id}")).await?;
             if follow {
@@ -201,7 +255,13 @@ async fn main() -> Result<()> {
             }
             Ok(())
         }
-        Commands::Cancel { id } => {
+        Commands::Cancel {
+            id,
+            engineering: workflow,
+        } => {
+            if workflow {
+                return engineering::action(&paths, id, "cancel").await;
+            }
             let _: autono_protocol::CancelResponse = Client::connect(&paths)
                 .await?
                 .post(&format!("/v1/runs/{id}/cancel"), &())
