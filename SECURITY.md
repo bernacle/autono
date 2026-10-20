@@ -14,6 +14,14 @@ prompts, diffs, and verification logs are retained locally and can contain
 sensitive project data. Protect the engineering directory with the rest of the
 Autono home.
 
+Preflight checks environment variable nonempty presence by name only and never
+retains or exposes their values or reads credential files. Human resolutions must
+contain nonsecret decisions or
+setup evidence. Configure credentials externally. Permission policy is snapshotted
+and user-only; explicit exact-scope approvals never broaden provider sandboxes.
+The broker governs declared operations, not arbitrary code/syscalls. See
+[preflight limits](docs/preflight.md) before using unattended execution.
+
 The daemon listens on IPv4 loopback only. Every route requires a random 256-bit
 bearer token, published in `daemon.json` inside the user data directory. Tokens
 rotate on startup. Browser Origin headers and nonmatching Host headers are

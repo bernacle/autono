@@ -41,7 +41,27 @@ fn failure(kind: &str, detail: impl Into<String>, blocked: bool) -> anyhow::Erro
 
 /// Providers prepare noninteractive invocations and decode structured event streams.
 /// The caller streams/persists output and owns cancellation/timeout through ProcessRunner.
+pub type ReadinessFuture<'a> =
+    Pin<Box<dyn Future<Output = Result<Vec<super::ReadinessCheck>>> + Send + 'a>>;
 pub trait AgentRuntime: Send + Sync {
+    /// Injected runtimes explicitly own their availability contract; no real CLI calls in CI.
+    fn readiness<'a>(
+        &'a self,
+        _: &'a ProcessRunner,
+        _: &'a std::path::Path,
+        _: &'a super::WorkflowSettings,
+        _: &'a CancellationToken,
+    ) -> ReadinessFuture<'a> {
+        Box::pin(async {
+            Ok(vec![super::ReadinessCheck {
+                id: "injected-provider".into(),
+                ready: Some(true),
+                blocking: true,
+                evidence: "Injected runtime availability contract".into(),
+            }])
+        })
+    }
+
     fn prepare<'a>(
         &'a self,
         request: &'a AgentRequest,
@@ -53,6 +73,27 @@ pub trait AgentRuntime: Send + Sync {
 #[derive(Default)]
 pub struct CliAgentRuntime;
 impl AgentRuntime for CliAgentRuntime {
+    fn readiness<'a>(
+        &'a self,
+        runner: &'a ProcessRunner,
+        cwd: &'a std::path::Path,
+        settings: &'a super::WorkflowSettings,
+        stop: &'a CancellationToken,
+    ) -> ReadinessFuture<'a> {
+        Box::pin(async move {
+            let mut checks = vec![];
+            for (name, config) in [
+                ("coder", &settings.agents.coder),
+                ("reviewer", &settings.agents.reviewer),
+            ] {
+                let ready = self.probe(config.provider, runner, cwd, stop).await.is_ok();
+                checks.push(super::ReadinessCheck { id: format!("provider-{name}"), ready: Some(ready), blocking: true, evidence: "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable".into() });
+                checks.push(super::ReadinessCheck { id: format!("authentication-{name}"), ready: None, blocking: false, evidence: "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login".into() });
+            }
+            Ok(checks)
+        })
+    }
+
     fn prepare<'a>(
         &'a self,
         request: &'a AgentRequest,
@@ -60,73 +101,15 @@ impl AgentRuntime for CliAgentRuntime {
         stop: &'a CancellationToken,
     ) -> AgentFuture<'a> {
         Box::pin(async move {
+            self.probe(request.config.provider, runner, &request.cwd, stop)
+                .await?;
             let program = match request.config.provider {
                 Provider::Codex => "codex",
                 Provider::Claude => "claude",
             };
-            let help_args = if request.config.provider == Provider::Codex {
-                vec![program.into(), "exec".into(), "--help".into()]
-            } else {
-                vec![program.into(), "--help".into()]
-            };
-            let help = runner
-                .run(help_args, &request.cwd, 15, Uuid::new_v4(), stop)
-                .await?;
-            require_probe_outcome(&help)?;
-            if !help.succeeded() {
-                return Err(failure("missing_cli", help.summary(), true));
-            }
-            let help = help.stdout_text()?;
-            let flags = if request.config.provider == Provider::Codex {
-                vec![
-                    "--json",
-                    "--sandbox",
-                    "--output-schema",
-                    "--ignore-user-config",
-                ]
-            } else {
-                vec![
-                    "--print",
-                    "stream-json",
-                    "--json-schema",
-                    "--permission-prompts",
-                    "--safe-mode",
-                    "--tools",
-                    "--strict-mcp-config",
-                ]
-            };
-            for flag in flags {
-                if !help.contains(flag) {
-                    return Err(failure(
-                        "unsupported_cli",
-                        format!(
-                            "{program} does not advertise {flag}; update CLI or choose another provider"
-                        ),
-                        true,
-                    ));
-                }
-            }
             let mut args: Vec<String>;
             match request.config.provider {
                 Provider::Codex => {
-                    // Avoid the shared app-server so Runtime v0 owns this invocation's process tree.
-                    let global = runner
-                        .run(
-                            vec![program.into(), "--help".into()],
-                            &request.cwd,
-                            15,
-                            Uuid::new_v4(),
-                            stop,
-                        )
-                        .await?;
-                    require_probe_outcome(&global)?;
-                    if !global.succeeded() || !global.stdout_text()?.contains("--no-daemon") {
-                        return Err(failure(
-                            "unsupported_cli",
-                            "Codex must support --no-daemon for local process ownership",
-                            true,
-                        ));
-                    }
                     let sandbox = if request.role == AgentRole::Coder {
                         "workspace-write"
                     } else {
@@ -223,6 +206,84 @@ impl AgentRuntime for CliAgentRuntime {
     }
     fn decode(&self, provider: Provider, output: &CommandOutput) -> Result<AgentResponse> {
         decode(provider, output)
+    }
+}
+
+impl CliAgentRuntime {
+    /// Help-only, supervised capability detection. No inference, prompts, schema
+    /// files, or invocation artifacts are required or constructed here.
+    async fn probe(
+        &self,
+        provider: Provider,
+        runner: &ProcessRunner,
+        cwd: &std::path::Path,
+        stop: &CancellationToken,
+    ) -> Result<()> {
+        let program = match provider {
+            Provider::Codex => "codex",
+            Provider::Claude => "claude",
+        };
+        let help_args = if provider == Provider::Codex {
+            vec![program.into(), "exec".into(), "--help".into()]
+        } else {
+            vec![program.into(), "--help".into()]
+        };
+        let help = runner.run(help_args, cwd, 15, Uuid::new_v4(), stop).await?;
+        require_probe_outcome(&help)?;
+        if !help.succeeded() {
+            return Err(failure("missing_cli", help.summary(), true));
+        }
+        let help = help.stdout_text()?;
+        let flags = if provider == Provider::Codex {
+            vec![
+                "--json",
+                "--sandbox",
+                "--output-schema",
+                "--ignore-user-config",
+            ]
+        } else {
+            vec![
+                "--print",
+                "stream-json",
+                "--json-schema",
+                "--permission-prompts",
+                "--safe-mode",
+                "--tools",
+                "--strict-mcp-config",
+            ]
+        };
+        for flag in flags {
+            if !help.contains(flag) {
+                return Err(failure(
+                    "unsupported_cli",
+                    format!(
+                        "{program} does not advertise {flag}; update CLI or choose another provider"
+                    ),
+                    true,
+                ));
+            }
+        }
+        if provider == Provider::Codex {
+            // Avoid the shared app-server so Runtime v0 owns this invocation's process tree.
+            let global = runner
+                .run(
+                    vec![program.into(), "--help".into()],
+                    cwd,
+                    15,
+                    Uuid::new_v4(),
+                    stop,
+                )
+                .await?;
+            require_probe_outcome(&global)?;
+            if !global.succeeded() || !global.stdout_text()?.contains("--no-daemon") {
+                return Err(failure(
+                    "unsupported_cli",
+                    "Codex must support --no-daemon for local process ownership",
+                    true,
+                ));
+            }
+        }
+        Ok(())
     }
 }
 
@@ -391,6 +452,7 @@ pub fn schema(role: AgentRole) -> Value {
     match role {
         AgentRole::Coder => object(json!({"summary":string(), "blocker":string()})),
         AgentRole::Planner => object(json!({
+            "human_requirements":{"type":"array","items":object(json!({"kind":{"type":"string","enum":["environment","product_decision","permission"]},"reason":string(),"requested_action":string(),"affected_tasks":strings(),"blocking":{"type":"boolean"},"evidence":string(),"confidence":{"type":"integer","minimum":0,"maximum":100},"permission":{"anyOf":[{"type":"null"},object(json!({"operation":{"type":"string","enum":["workspace_write","run_checks","outside_workspace","protected_configuration","install_dependencies","environment_change","destructive_migration","external_operation"]},"scope":string()}))]}}))},
             "requirements":{"type":"array","items":object(json!({"id":string(),"text":string()}))},
             "milestones":{"type":"array","items":object(json!({"id":string(),"goal":string(),"task_ids":strings()}))},
             "tasks":{"type":"array","items":object(json!({"id":string(),"goal":string(),"description":string(),"acceptance_criteria":strings(),"dependencies":strings(),"requirement_ids":strings(),"verification_expectations":strings(),"role":{"type":"string","enum":["coder"]}}))}

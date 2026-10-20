@@ -97,6 +97,10 @@ pub struct WorkflowSettings {
     pub agents: AgentsConfig,
     pub execution: ExecutionConfig,
     pub verification: VerificationConfig,
+    #[serde(default)]
+    pub preflight: PreflightConfig,
+    #[serde(default)]
+    pub permissions: PermissionPolicy,
 }
 impl WorkflowSettings {
     pub fn validate(&self) -> Result<()> {
@@ -147,6 +151,7 @@ impl WorkflowSettings {
                 "invalid verification argument"
             );
         }
+        self.preflight.validate()?;
         Ok(())
     }
 }
@@ -179,6 +184,8 @@ pub struct PlannedTask {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ExecutionPlan {
+    #[serde(default)]
+    pub human_requirements: Vec<HumanRequirement>,
     pub requirements: Vec<Requirement>,
     pub milestones: Vec<Milestone>,
     pub tasks: Vec<PlannedTask>,
@@ -303,6 +310,17 @@ impl ExecutionPlan {
             done.insert(next.id.as_str());
             order.push(next.id.clone());
         }
+        for requirement in &self.human_requirements {
+            ensure!(
+                requirement.kind != HumanActionType::Runtime,
+                "planner cannot create runtime authority"
+            );
+            requirement.validate(&self.tasks)?;
+        }
+        ensure!(
+            self.human_requirements.len() <= 64,
+            "too many human requirements"
+        );
         Ok(order)
     }
 }
@@ -338,6 +356,7 @@ impl EngineeringStatus {
                     | Self::Cancelled
                     | Self::Interrupted
             ),
+            Self::Blocked => matches!(next, Self::Running | Self::Cancelled),
             Self::AwaitingApproval => matches!(next, Self::Running | Self::Cancelled),
             Self::Running => matches!(
                 next,
@@ -359,6 +378,7 @@ impl EngineeringStatus {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TaskStatus {
+    BlockedHuman,
     Waiting,
     Ready,
     Running,
@@ -378,14 +398,18 @@ impl TaskStatus {
                     Self::Ready | Self::Blocked | Self::Cancelled | Self::Interrupted
                 ) | (
                     Self::Ready,
-                    Self::Running | Self::Cancelled | Self::Interrupted
+                    Self::BlockedHuman | Self::Running | Self::Cancelled | Self::Interrupted
                 ) | (
                     Self::Running,
-                    Self::Completed
+                    Self::BlockedHuman
+                        | Self::Completed
                         | Self::Blocked
                         | Self::Failed
                         | Self::Cancelled
                         | Self::Interrupted
+                ) | (
+                    Self::BlockedHuman,
+                    Self::Ready | Self::Cancelled | Self::Interrupted
                 )
             )
     }
@@ -599,6 +623,10 @@ pub struct EngineeringRun {
     pub planning_workspace: Workspace,
     pub tasks: Vec<EngineeringTask>,
     pub blockers: Vec<Blocker>,
+    #[serde(default)]
+    pub human_actions: Vec<HumanAction>,
+    #[serde(default)]
+    pub preflight: Option<PreflightReport>,
     pub integration_workspace: Option<Workspace>,
     pub integration_verification: Vec<VerificationResult>,
     pub summary: String,
@@ -634,4 +662,226 @@ pub struct EngineeringEvent {
     pub timestamp: DateTime<Utc>,
     pub kind: String,
     pub detail: String,
+}
+
+/// A small policy vocabulary; approvals never change provider sandbox flags.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PermissionOperation {
+    WorkspaceWrite,
+    RunChecks,
+    OutsideWorkspace,
+    ProtectedConfiguration,
+    InstallDependencies,
+    EnvironmentChange,
+    DestructiveMigration,
+    ExternalOperation,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum PermissionRule {
+    Allow,
+    RequireApproval,
+    Deny,
+}
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct PermissionPolicy {
+    pub rules: BTreeMap<PermissionOperation, PermissionRule>,
+}
+impl PermissionPolicy {
+    pub fn classify(&self, operation: PermissionOperation) -> PermissionRule {
+        self.rules
+            .get(&operation)
+            .copied()
+            .unwrap_or(match operation {
+                PermissionOperation::WorkspaceWrite | PermissionOperation::RunChecks => {
+                    PermissionRule::Allow
+                }
+                PermissionOperation::OutsideWorkspace
+                | PermissionOperation::DestructiveMigration
+                | PermissionOperation::ExternalOperation => PermissionRule::Deny,
+                _ => PermissionRule::RequireApproval,
+            })
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PermissionRequest {
+    pub operation: PermissionOperation,
+    /// Exact operation and target. Never credentials or arbitrary shell commands.
+    pub scope: String,
+}
+impl PermissionRequest {
+    pub fn supported(&self, run_id: Uuid) -> bool {
+        let expected = match self.operation {
+            PermissionOperation::WorkspaceWrite => format!("run {run_id} assigned task worktrees"),
+            PermissionOperation::RunChecks => {
+                format!("run {run_id} immutable configured verification commands")
+            }
+            _ => return false,
+        };
+        self.scope == expected
+    }
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HumanActionType {
+    Environment,
+    ProductDecision,
+    Permission,
+    Runtime,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct HumanRequirement {
+    pub kind: HumanActionType,
+    pub reason: String,
+    pub requested_action: String,
+    pub affected_tasks: Vec<String>,
+    pub blocking: bool,
+    pub evidence: String,
+    pub confidence: u8,
+    pub permission: Option<PermissionRequest>,
+}
+impl HumanRequirement {
+    fn validate(&self, tasks: &[PlannedTask]) -> Result<()> {
+        ensure!(
+            text(&self.reason)
+                && text(&self.requested_action)
+                && text(&self.evidence)
+                && self.confidence <= 100,
+            "invalid human requirement"
+        );
+        ensure!(
+            self.affected_tasks.len() <= 32
+                && self
+                    .affected_tasks
+                    .iter()
+                    .all(|id| tasks.iter().any(|t| &t.id == id)),
+            "unknown affected task"
+        );
+        ensure!(
+            (self.kind == HumanActionType::Permission) == self.permission.is_some(),
+            "permission requires exact operation and scope"
+        );
+        if let Some(permission) = &self.permission {
+            ensure!(text(&permission.scope), "missing permission scope");
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct PreflightConfig {
+    pub required_env: Vec<String>,
+    pub required_tools: Vec<String>,
+    /// Relative directories under the repository, checked without executing code.
+    pub required_directories: Vec<PathBuf>,
+    /// Human-confirmed prerequisites. Names only, never URLs containing credentials.
+    pub external_services: Vec<String>,
+}
+impl PreflightConfig {
+    fn validate(&self) -> Result<()> {
+        ensure!(
+            self.required_env.len() <= 64
+                && self.required_env.iter().all(|s| identifier(s)
+                    && !s.contains('-')
+                    && !s.as_bytes()[0].is_ascii_digit()),
+            "invalid environment variable name"
+        );
+        ensure!(
+            self.required_tools.len() <= 64 && self.required_tools.iter().all(|s| identifier(s)),
+            "invalid required tool"
+        );
+        ensure!(
+            self.required_directories.len() <= 64
+                && self
+                    .required_directories
+                    .iter()
+                    .all(|p| !p.as_os_str().is_empty()
+                        && p.components()
+                            .all(|c| matches!(c, std::path::Component::Normal(_)))),
+            "required directories must be repository-relative"
+        );
+        ensure!(
+            self.external_services.len() <= 64
+                && self.external_services.iter().all(|s| identifier(s)),
+            "external services require simple names"
+        );
+        Ok(())
+    }
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum HumanActionStatus {
+    Pending,
+    Resolved,
+    Deferred,
+    Rejected,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EffectState {
+    NotPerformed,
+    AlreadyPerformed,
+    Unknown,
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ResolutionDisposition {
+    Resolve,
+    Approve,
+    Reject,
+    Defer,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ResolutionRequest {
+    pub request_id: Uuid,
+    pub disposition: ResolutionDisposition,
+    /// Product decisions or evidence of external setup. Never secret material.
+    pub note: String,
+    pub effect: EffectState,
+    pub permission: Option<PermissionRequest>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ActionAudit {
+    pub at: DateTime<Utc>,
+    pub status: HumanActionStatus,
+    /// None identifies a deterministic system check, never an approval.
+    pub request: Option<ResolutionRequest>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HumanAction {
+    pub id: String,
+    pub requirement: HumanRequirement,
+    pub status: HumanActionStatus,
+    pub resolution: Option<ResolutionRequest>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub audit: Vec<ActionAudit>,
+    /// Safe live pause only. Security/integrity failures cannot be continued.
+    pub continuable: bool,
+    pub workspace_snapshot: Option<String>,
+}
+impl HumanAction {
+    pub fn blocks(&self) -> bool {
+        self.requirement.blocking && self.status != HumanActionStatus::Resolved
+    }
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReadinessCheck {
+    pub id: String,
+    pub ready: Option<bool>,
+    pub blocking: bool,
+    pub evidence: String,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PreflightReport {
+    pub checked_at: DateTime<Utc>,
+    pub checks: Vec<ReadinessCheck>,
+    pub action_ids: Vec<String>,
+    pub ready: bool,
+    pub limitation: String,
 }

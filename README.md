@@ -6,7 +6,9 @@ is the source of truth; coding agents are replaceable execution providers.
 
 It can plan a Markdown feature, wait for developer approval, run coding agents
 in isolated Git worktrees, verify changes, request independent review, apply
-bounded fixes, and integrate verified commits into a local branch. Existing
+bounded fixes, preflight human prerequisites, pause tasks for explicit human
+resolution while independent work continues, and integrate verified commits into
+a local branch. Existing
 Runtime v0 command supervision, durable logs, cancellation, timeouts, restart
 reconciliation, and macOS idle-sleep inhibition remain available. Agent workflows
 use installed Codex/Claude CLI login; raw process execution requires neither.
@@ -252,9 +254,10 @@ log reconnect, repeated rapid failures, and live macOS helper replacement. See [
 
 ## Roadmap
 
-The first local planner/coder/verifier/reviewer loop is implemented above Runtime
-v0. Future milestones may add intelligent preflight, permission brokerage,
-autonomous replanning, and a desktop interface. They are not part of this version.
+The local planner/coder/verifier/reviewer loop, autonomous preflight, permission
+policy and explicit human escalation are implemented above Runtime v0. See
+[preflight and human escalation](docs/preflight.md). Future milestones may add
+autonomous replanning and a desktop interface; they are not part of this version.
 
 MIT licensed; see [LICENSE](LICENSE).
 

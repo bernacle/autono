@@ -60,6 +60,7 @@ pub async fn inspect(paths: &Paths, id: Uuid, view: &str) -> Result<()> {
             json!({"id":run.id,"status":run.status,"specification":run.specification,"base_commit":run.base_commit,"settings":run.settings,"plan":run.plan,"approved_at":run.approved_at})
         }
         "tasks" => json!(run.tasks),
+        "blockers" => json!(run.human_actions),
         "findings" => {
             json!({"blockers":run.blockers,"reviews":run.tasks.iter().map(|t|json!({"task":t.plan.id,"attempts":t.attempts.iter().map(|a|json!({"attempt":a.number,"reviewer":a.reviewer,"review":a.review,"detail":a.detail})).collect::<Vec<_>>()})).collect::<Vec<_>>()})
         }
@@ -130,5 +131,36 @@ pub async fn logs(paths: &Paths, id: Uuid, mut after: i64, follow: bool) -> Resu
         }
         tokio::time::sleep(std::time::Duration::from_millis(500)).await;
     }
+    Ok(())
+}
+
+pub async fn preflight(paths: &Paths, id: Uuid) -> Result<()> {
+    let run: EngineeringRun = Client::connect(paths)
+        .await?
+        .post(&format!("/v1/engineering/{id}/preflight"), &())
+        .await?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(
+            &json!({"status": if run.preflight.as_ref().is_some_and(|p| p.ready) {"READY"} else {"NOT READY"}, "preflight":run.preflight, "human_actions":run.human_actions, "permissions":run.settings.permissions})
+        )?
+    );
+    Ok(())
+}
+pub async fn resolve(paths: &Paths, id: Uuid, action: &str, path: PathBuf) -> Result<()> {
+    let request: autono_protocol::engineering::ResolutionRequest =
+        serde_json::from_slice(&tokio::fs::read(path).await?)
+            .context("read resolution JSON (never include credentials)")?;
+    let run: EngineeringRun = Client::connect(paths)
+        .await?
+        .post(
+            &format!("/v1/engineering/{id}/blockers/{action}/resolve"),
+            &request,
+        )
+        .await?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&run.human_actions.iter().find(|a| a.id == action))?
+    );
     Ok(())
 }

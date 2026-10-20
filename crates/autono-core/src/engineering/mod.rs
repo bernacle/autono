@@ -4,6 +4,7 @@ mod artifacts;
 mod engine;
 mod git;
 mod journal;
+mod preflight;
 pub mod process;
 mod review;
 mod service;

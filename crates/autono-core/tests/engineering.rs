@@ -23,6 +23,7 @@ use uuid::Uuid;
 
 fn plan(ids: &[(&str, &[&str])]) -> ExecutionPlan {
     ExecutionPlan {
+        human_requirements: vec![],
         requirements: vec![Requirement {
             id: "r1".into(),
             text: "Implement the requested feature with meaningful errors".into(),
@@ -93,6 +94,11 @@ enum Scenario {
     Fix,
     Reject,
     Human,
+    HumanOnceB,
+    EffectRetry,
+    DecisionRetry,
+    LiveHumanB,
+    ApprovalNeeded,
     ReviewerMutation,
     Concurrent,
     Conflict,
@@ -199,6 +205,73 @@ impl AgentRuntime for FakeAgents {
                 AgentRole::Planner => serde_json::to_value(&self.plan)?,
                 AgentRole::Coder => {
                     let number = self.coder_calls.fetch_add(1, Ordering::SeqCst);
+                    if self.scenario == Scenario::EffectRetry {
+                        if number == 0 || !delivered_prompt.contains("INSPECTED_EFFECT") {
+                            // Original bug: loss of context on the third automatic
+                            // invocation repeats the already-completed external effect.
+                            script.push_str(&format!(
+                                "printf x >> {};\n",
+                                quote(self.root.join("effect-count").to_str().expect("path"))
+                            ));
+                        }
+                        if number == 1 {
+                            ensure!(
+                                delivered_prompt.contains("already_performed")
+                                    && delivered_prompt.contains("INSPECTED_EFFECT"),
+                                "continuation lacks authoritative effect context"
+                            );
+                            script.push_str("exit 42;\n");
+                        }
+                        if number == 2 && delivered_prompt.contains("INSPECTED_EFFECT") {
+                            ensure!(
+                                delivered_prompt.contains("INSPECTED_EFFECT")
+                                    && delivered_prompt.contains("RECONCILED_RETRY"),
+                                "fresh continuation lost effect history"
+                            );
+                            ensure!(
+                                request.resume.is_none(),
+                                "must not replay a failed provider tool call"
+                            );
+                        }
+                    }
+                    if self.scenario == Scenario::DecisionRetry {
+                        ensure!(
+                            delivered_prompt.contains("seven days"),
+                            "fresh retry lost the durable product decision"
+                        );
+                        if number == 0 {
+                            script.push_str("exit 42;\n");
+                        }
+                    }
+                    if self.scenario == Scenario::ApprovalNeeded {
+                        return Err(autono_core::engineering::agent::AgentFailure { kind: "approval_required".into(), detail: "Provider requires an interactive permission prompt with no exact safe grant".into(), blocked: true }.into());
+                    }
+                    if self.scenario == Scenario::LiveHumanB && id == "c" {
+                        script.push_str(&format!("touch {}; i=0; while [ ! -f {} ]; do i=$((i+1)); [ $i -lt 15000 ] || exit 19; sleep 0.01; done;\n", quote(self.root.join("c-running").to_str().expect("path")), quote(self.root.join("release-c").to_str().expect("path"))));
+                    }
+                    if matches!(self.scenario, Scenario::HumanOnceB | Scenario::LiveHumanB)
+                        && id == "b"
+                    {
+                        if !delivered_prompt.contains("INSPECTED_EFFECT") {
+                            script.push_str(&format!(
+                                "printf x >> {};\n",
+                                quote(self.root.join("effect-count").to_str().expect("path"))
+                            ));
+                        } else {
+                            ensure!(
+                                request.resume.is_none(),
+                                "human continuation must be a fresh invocation"
+                            );
+                            ensure!(
+                                delivered_prompt.contains("already_performed"),
+                                "effect resolution not delivered"
+                            );
+                            script.push_str(&format!(
+                                "[ $(wc -c < {}) -eq 1 ] || exit 35;\n",
+                                quote(self.root.join("effect-count").to_str().expect("path"))
+                            ));
+                        }
+                    }
                     if self.scenario == Scenario::CoderFailure {
                         script.push_str("echo 'deterministic coder failure' >&2; exit 42;\n");
                     }
@@ -263,8 +336,12 @@ impl AgentRuntime for FakeAgents {
                             quote(&format!("feature-{dependency}.txt"))
                         ));
                     }
-                    let blocker = if self.scenario == Scenario::Human
+                    let blocker = if (self.scenario == Scenario::EffectRetry && number == 0)
+                        || self.scenario == Scenario::Human
                         || (self.scenario == Scenario::BlockedIndependent && id == "a")
+                        || (matches!(self.scenario, Scenario::HumanOnceB | Scenario::LiveHumanB)
+                            && id == "b"
+                            && !delivered_prompt.contains("INSPECTED_EFFECT"))
                     {
                         "Manual action is required"
                     } else {
@@ -454,6 +531,9 @@ impl Harness {
                 "echo authentication >&2; sleep 30".into(),
             ]];
             config.verification.timeout_seconds = 1;
+        }
+        if scenario == Scenario::LiveHumanB {
+            config.agents.coder.timeout_seconds = 180;
         }
         if scenario == Scenario::Timeout {
             config.agents.coder.timeout_seconds = 1;
@@ -667,7 +747,7 @@ async fn independent_tasks_run_concurrently_without_waiting_on_a_blocked_branch(
     let run = h.execute().await?;
     assert_eq!(run.status, EngineeringStatus::Blocked);
     assert_eq!(run.tasks[3].status, TaskStatus::Completed);
-    assert_eq!(run.tasks[2].status, TaskStatus::Blocked);
+    assert_eq!(run.tasks[2].status, TaskStatus::Waiting);
     assert!(run.tasks[1].attempts.is_empty());
     h.finish().await
 }
@@ -1206,6 +1286,15 @@ async fn verification_infrastructure_is_recorded_without_coder_fix_requests() ->
         (Scenario::VerificationTimeout, VerificationOutcome::Timeout),
     ] {
         let h = Harness::new(scenario, plan(&[("a", &[])]), "true").await?;
+        if scenario == Scenario::VerificationSpawn {
+            let id = h.planned().await?;
+            assert!(h.service.execute(id).await.is_err());
+            let run = h.wait(id).await?;
+            assert!(!run.preflight.expect("preflight").ready);
+            assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 0);
+            h.finish().await?;
+            continue;
+        }
         let run = h.execute().await?;
         assert_eq!(run.status, EngineeringStatus::Blocked);
         assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 1);
@@ -1490,5 +1579,586 @@ async fn context_comes_from_git_blobs_and_metadata_backreferences_remain_pinned(
     );
     std::fs::remove_file(&head)?;
     std::fs::write(head, original)?;
+    h.finish().await
+}
+
+fn resolution(note: &str) -> ResolutionRequest {
+    ResolutionRequest {
+        request_id: Uuid::new_v4(),
+        disposition: ResolutionDisposition::Resolve,
+        note: note.into(),
+        effect: EffectState::AlreadyPerformed,
+        permission: None,
+    }
+}
+fn decision(blocking: bool) -> HumanRequirement {
+    HumanRequirement {
+        kind: HumanActionType::ProductDecision,
+        reason: "Specification omits the expiration behavior required by task a".into(),
+        requested_action: "Decide invitation expiration behavior".into(),
+        affected_tasks: vec!["a".into()],
+        blocking,
+        evidence: "Feature specification describes invitations but omits expiration semantics"
+            .into(),
+        confidence: 95,
+        permission: None,
+    }
+}
+#[tokio::test]
+async fn preflight_material_decisions_are_durable_and_resolutions_are_idempotent() -> Result<()> {
+    let mut p = plan(&[("a", &[])]);
+    p.human_requirements = vec![
+        decision(true),
+        HumanRequirement {
+            reason: "Optional invitation copy preference".into(),
+            requested_action: "Choose optional wording".into(),
+            blocking: false,
+            ..decision(false)
+        },
+    ];
+    let h = Harness::new(Scenario::Success, p, "true").await?;
+    let id = h.planned().await?;
+    let first = h.service.store().engineering_get(id).await?;
+    assert!(!first.preflight.as_ref().expect("report").ready);
+    assert_eq!(first.human_actions.len(), 2);
+    assert!(h.service.execute(id).await.is_err());
+    h.wait(id).await?;
+    let request = resolution("Invitations expire after seven days and require a new invitation");
+    let action = &first.human_actions[0].id;
+    let (a, b) = tokio::join!(
+        h.service.resolve(id, action, request.clone()),
+        h.service.resolve(id, action, request.clone())
+    );
+    let resolved = a?;
+    b?;
+    assert_eq!(resolved.human_actions[0].audit.len(), 2);
+    let mut changed = request.clone();
+    changed.note = "Conflicting payload".into();
+    assert!(h.service.resolve(id, action, changed).await.is_err());
+    let mut defer = resolution("Defer optional wording");
+    defer.disposition = ResolutionDisposition::Defer;
+    h.service
+        .resolve(id, &first.human_actions[1].id, defer)
+        .await?;
+    let checked = h.service.preflight(id).await?;
+    assert!(checked.preflight.expect("ready report").ready);
+    h.wait(id).await?;
+    assert_eq!(
+        h.service.store().engineering_get(id).await?.human_actions[0].id,
+        *action
+    );
+    h.service.execute(id).await?;
+    let complete = h.wait(id).await?;
+    assert_eq!(
+        complete.status,
+        EngineeringStatus::Verified,
+        "{}",
+        complete.summary
+    );
+    assert!(
+        h.agents
+            .requests
+            .lock()
+            .expect("requests")
+            .iter()
+            .any(|(_, _, p)| p.contains("seven days"))
+    );
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM engineering_resolution_requests")
+        .fetch_one(
+            &sqlx::SqlitePool::connect(&format!(
+                "sqlite://{}",
+                h.root.join("runtime.sqlite3").display()
+            ))
+            .await?,
+        )
+        .await?;
+    assert_eq!(count, 2);
+    h.finish().await
+}
+#[tokio::test]
+async fn preflight_checks_missing_credentials_tools_and_cwd_without_persisting_values() -> Result<()>
+{
+    let h = Harness::new(Scenario::Success, plan(&[("a", &[])]), "true").await?;
+    let missing = format!("AUTONO_MISSING_{}", Uuid::new_v4().simple());
+    tokio::fs::write(h.repo.join("autono.toml"), format!("[preflight]\nrequired_env = [\"{missing}\"]\nrequired_tools = [\"autono_nonexistent_tool\"]\nrequired_directories = [\"missing-directory\"]\nexternal_services = [\"smtp\"]\n")).await?;
+    let id = h.planned().await?;
+    let run = h.service.store().engineering_get(id).await?;
+    let report = run.preflight.as_ref().expect("report");
+    assert!(!report.ready);
+    for prefix in ["env-", "tool-", "directory-"] {
+        assert!(
+            report
+                .checks
+                .iter()
+                .any(|c| c.id.starts_with(prefix) && c.ready == Some(false) && c.blocking)
+        );
+    }
+    assert!(
+        run.human_actions
+            .iter()
+            .any(|a| a.requirement.reason.contains(&missing))
+    );
+    assert!(
+        run.human_actions
+            .iter()
+            .any(|a| a.requirement.reason.contains("smtp"))
+    );
+    assert!(h.service.execute(id).await.is_err());
+    h.wait(id).await?;
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 0);
+    // Recognizable credential material is rejected before any resolution event/receipt.
+    let bad = resolution("password=do-not-persist-this");
+    assert!(
+        h.service
+            .resolve(id, &run.human_actions[0].id, bad)
+            .await
+            .is_err()
+    );
+    assert!(
+        !serde_json::to_string(&h.service.store().engineering_get(id).await?)?
+            .contains("do-not-persist-this")
+    );
+    h.finish().await
+}
+#[tokio::test]
+async fn human_pause_acceptance_preserves_completed_work_and_authoritative_integration()
+-> Result<()> {
+    let h = Harness::new(
+        Scenario::HumanOnceB,
+        plan(&[
+            ("a", &[]),
+            ("b", &["a"]),
+            ("d", &["b"]),
+            ("c", &[]),
+            ("e", &["c"]),
+        ]),
+        "true",
+    )
+    .await?;
+    let paused = h.execute().await?;
+    assert_eq!(paused.status, EngineeringStatus::Blocked);
+    for id in ["a", "c", "e"] {
+        assert_eq!(
+            paused
+                .tasks
+                .iter()
+                .find(|t| t.plan.id == id)
+                .expect("task")
+                .status,
+            TaskStatus::Completed
+        );
+    }
+    assert_eq!(paused.tasks[1].status, TaskStatus::BlockedHuman);
+    assert_eq!(paused.tasks[2].status, TaskStatus::Waiting);
+    assert!(paused.tasks[2].attempts.is_empty());
+    assert!(h.service.continue_run(paused.id).await.is_err());
+    h.wait(paused.id).await?;
+    let action = &paused.human_actions[0];
+    let mut unknown = resolution("INSPECTED_EFFECT");
+    unknown.effect = EffectState::Unknown;
+    assert!(
+        h.service
+            .resolve(paused.id, &action.id, unknown)
+            .await
+            .is_err()
+    );
+    let resolved = h
+        .service
+        .resolve(
+            paused.id,
+            &action.id,
+            resolution(
+                "INSPECTED_EFFECT: prerequisite configured externally, existing effect confirmed",
+            ),
+        )
+        .await?;
+    assert_eq!(
+        resolved.human_actions[0].status,
+        HumanActionStatus::Resolved
+    );
+    let (first, second) = tokio::join!(
+        h.service.continue_run(paused.id),
+        h.service.continue_run(paused.id)
+    );
+    assert!(first.is_ok() ^ second.is_ok());
+    let verified = h.wait(paused.id).await?;
+    assert_eq!(
+        verified.status,
+        EngineeringStatus::Verified,
+        "{} {:?}",
+        verified.summary,
+        verified.blockers
+    );
+    for id in ["a", "c", "e"] {
+        let before = paused.tasks.iter().find(|t| t.plan.id == id).expect("task");
+        let after = verified
+            .tasks
+            .iter()
+            .find(|t| t.plan.id == id)
+            .expect("task");
+        assert_eq!(serde_json::to_value(before)?, serde_json::to_value(after)?);
+    }
+    assert_eq!(verified.tasks[1].attempts.len(), 2);
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 6);
+    assert_eq!(tokio::fs::read(h.root.join("effect-count")).await?, b"x");
+    h.service.integrate(paused.id).await?;
+    assert_eq!(
+        h.wait(paused.id).await?.status,
+        EngineeringStatus::Completed
+    );
+    h.finish().await
+}
+#[tokio::test]
+async fn resolved_task_can_continue_while_independent_worker_is_still_healthy() -> Result<()> {
+    let h = Harness::new(
+        Scenario::LiveHumanB,
+        plan(&[("a", &[]), ("b", &["a"]), ("d", &["b"]), ("c", &[])]),
+        "true",
+    )
+    .await?;
+    // Release the controlled worker even when an assertion or deadline fails.
+    struct Release(std::path::PathBuf);
+    impl Drop for Release {
+        fn drop(&mut self) {
+            let _ = std::fs::write(&self.0, b"release");
+        }
+    }
+    let _release = Release(h.root.join("release-c"));
+    let id = h.planned().await?;
+    h.service.execute(id).await?;
+    let paused = tokio::time::timeout(std::time::Duration::from_secs(60), async {
+        loop {
+            let r = h.service.store().engineering_get(id).await?;
+            if r.tasks[1].status == TaskStatus::BlockedHuman {
+                break Ok::<_, anyhow::Error>(r);
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+        }
+    })
+    .await;
+    if paused.is_err() {
+        eprintln!(
+            "Pause deadline: {}",
+            serde_json::to_string_pretty(&h.service.store().engineering_get(id).await?)?
+        );
+    }
+    let paused = paused??;
+    assert_eq!(paused.tasks[3].status, TaskStatus::Running);
+    h.service
+        .resolve(
+            id,
+            &paused.human_actions[0].id,
+            resolution("INSPECTED_EFFECT: existing operation confirmed"),
+        )
+        .await?;
+    h.service.continue_run(id).await?;
+    let progressed = tokio::time::timeout(std::time::Duration::from_secs(60), async {
+        loop {
+            let r = h.service.store().engineering_get(id).await?;
+            if r.tasks[2].status == TaskStatus::Completed {
+                break Ok::<_, anyhow::Error>(r);
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+        }
+    })
+    .await;
+    if progressed.is_err() {
+        eprintln!(
+            "Continuation deadline: {}",
+            serde_json::to_string_pretty(&h.service.store().engineering_get(id).await?)?
+        );
+    }
+    tokio::fs::write(h.root.join("release-c"), "release").await?;
+    assert_eq!(progressed??.tasks[3].status, TaskStatus::Running);
+    assert_eq!(h.wait(id).await?.status, EngineeringStatus::Verified);
+    h.finish().await
+}
+#[tokio::test]
+async fn cancellation_never_authorizes_continuation_or_replay() -> Result<()> {
+    let h = Harness::new(Scenario::Human, plan(&[("a", &[])]), "true").await?;
+    let paused = h.execute().await?;
+    let action = &paused.human_actions[0].id;
+    let (cancelled, resolved) = tokio::join!(
+        h.service.cancel(paused.id),
+        h.service
+            .resolve(paused.id, action, resolution("Externally inspected"))
+    );
+    cancelled?;
+    let _ = resolved;
+    assert_eq!(
+        h.service.store().engineering_get(paused.id).await?.status,
+        EngineeringStatus::Cancelled
+    );
+    assert!(
+        h.service
+            .resolve(paused.id, action, resolution("Another request"))
+            .await
+            .is_err()
+    );
+    assert!(h.service.continue_run(paused.id).await.is_err());
+    h.wait(paused.id).await?;
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 1);
+    h.finish().await
+}
+#[tokio::test]
+async fn provider_interactive_approval_cannot_be_granted_or_bypass_adapter() -> Result<()> {
+    let h = Harness::new(Scenario::ApprovalNeeded, plan(&[("a", &[])]), "true").await?;
+    let paused = h.execute().await?;
+    assert_eq!(paused.status, EngineeringStatus::Blocked);
+    assert!(!paused.human_actions[0].continuable);
+    let mut approve = resolution("I approve");
+    approve.disposition = ResolutionDisposition::Approve;
+    assert!(
+        h.service
+            .resolve(paused.id, &paused.human_actions[0].id, approve)
+            .await
+            .is_err()
+    );
+    h.service
+        .resolve(
+            paused.id,
+            &paused.human_actions[0].id,
+            resolution("External inspection completed"),
+        )
+        .await?;
+    assert!(h.service.continue_run(paused.id).await.is_err());
+    h.wait(paused.id).await?;
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 1);
+    h.finish().await
+}
+
+#[tokio::test]
+async fn permission_broker_requires_exact_user_approval_and_enforces_deny_and_adapter_limits()
+-> Result<()> {
+    for rule in [PermissionRule::RequireApproval, PermissionRule::Deny] {
+        let mut h = Harness::new(Scenario::Success, plan(&[("a", &[])]), "true").await?;
+        let mut config = Config::default();
+        config.verification.commands = vec![vec!["sh".into(), "check.sh".into()]];
+        config
+            .permissions
+            .rules
+            .insert(PermissionOperation::WorkspaceWrite, rule);
+        h.service = EngineeringService::with_agents(
+            h.supervisor.clone(),
+            h.root.join("home"),
+            config,
+            h.agents.clone(),
+        );
+        let id = h.planned().await?;
+        let run = h.service.store().engineering_get(id).await?;
+        assert!(!run.preflight.as_ref().expect("report").ready);
+        let action = run
+            .human_actions
+            .iter()
+            .find(|a| a.requirement.permission.is_some())
+            .expect("permission");
+        let mut approve = resolution("Explicitly approve this exact run operation");
+        approve.disposition = ResolutionDisposition::Approve;
+        approve.permission = action.requirement.permission.clone();
+        let mut forged = approve.clone();
+        forged
+            .permission
+            .as_mut()
+            .expect("permission")
+            .scope
+            .push_str(" plus another workspace");
+        assert!(h.service.resolve(id, &action.id, forged).await.is_err());
+        assert!(
+            h.service
+                .resolve(id, &action.id, resolution("The model says it is approved"))
+                .await
+                .is_err()
+        );
+        if rule == PermissionRule::Deny {
+            assert!(h.service.resolve(id, &action.id, approve).await.is_err());
+            let mut reject = resolution("Denied by developer");
+            reject.disposition = ResolutionDisposition::Reject;
+            h.service.resolve(id, &action.id, reject).await?;
+            assert!(h.service.execute(id).await.is_err());
+            h.wait(id).await?;
+            assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 0);
+        } else {
+            h.service.resolve(id, &action.id, approve).await?;
+            h.service.execute(id).await?;
+            assert_eq!(h.wait(id).await?.status, EngineeringStatus::Verified);
+        }
+        h.finish().await?;
+    }
+    let mut p = plan(&[("a", &[])]);
+    p.human_requirements.push(HumanRequirement {
+        kind: HumanActionType::Permission,
+        permission: Some(PermissionRequest {
+            operation: PermissionOperation::ProtectedConfiguration,
+            scope: "Modify repository AGENTS.md".into(),
+        }),
+        ..decision(true)
+    });
+    let h = Harness::new(Scenario::Success, p, "true").await?;
+    let id = h.planned().await?;
+    let run = h.service.store().engineering_get(id).await?;
+    let mut approve = resolution("Developer requested this operation");
+    approve.disposition = ResolutionDisposition::Approve;
+    approve.permission = run.human_actions[0].requirement.permission.clone();
+    assert!(
+        h.service
+            .resolve(id, &run.human_actions[0].id, approve)
+            .await
+            .is_err()
+    );
+    assert!(h.service.execute(id).await.is_err());
+    h.wait(id).await?;
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 0);
+    h.finish().await
+}
+
+#[tokio::test]
+async fn changed_pause_workspace_cannot_replay_the_provider() -> Result<()> {
+    let h = Harness::new(
+        Scenario::HumanOnceB,
+        plan(&[("a", &[]), ("b", &["a"])]),
+        "true",
+    )
+    .await?;
+    let paused = h.execute().await?;
+    let w = paused.tasks[1].workspace.as_ref().expect("workspace");
+    tokio::fs::write(w.path.join("feature-b.txt"), "external mutation").await?;
+    h.service
+        .resolve(
+            paused.id,
+            &paused.human_actions[0].id,
+            resolution("INSPECTED_EFFECT"),
+        )
+        .await?;
+    h.service.continue_run(paused.id).await?;
+    let stopped = h.wait(paused.id).await?;
+    assert_eq!(stopped.tasks[1].status, TaskStatus::Failed);
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 2);
+    assert_eq!(
+        stopped.tasks[0].artifact_commit,
+        paused.tasks[0].artifact_commit
+    );
+    h.finish().await
+}
+
+#[tokio::test]
+async fn preflight_uses_persisted_git_identity_after_an_inactive_restart() -> Result<()> {
+    let mut h = Harness::new(Scenario::Success, plan(&[("a", &[])]), "true").await?;
+    let id = h.planned().await?;
+    h.service.shutdown().await?;
+    // A new runner has no in-memory Git bindings. It must verify the run's saved
+    // identity before any probe, rather than pinning today's changed metadata.
+    use std::io::Write;
+    std::fs::OpenOptions::new()
+        .append(true)
+        .open(h.repo.join(".git/config"))?
+        .write_all(b"\n[alias]\nchanged = status\n")?;
+    let mut config = Config::default();
+    config.verification.commands = vec![vec!["sh".into(), "check.sh".into()]];
+    h.service = EngineeringService::with_agents(
+        h.supervisor.clone(),
+        h.root.join("home"),
+        config,
+        h.agents.clone(),
+    );
+    let report = h.service.preflight(id).await?.preflight.expect("report");
+    assert!(!report.ready);
+    assert!(
+        report
+            .checks
+            .iter()
+            .any(|c| c.id == "repository" && c.ready == Some(false))
+    );
+    assert!(
+        report
+            .checks
+            .iter()
+            .any(|c| c.id == "provider-probes" && c.ready.is_none())
+    );
+    h.wait(id).await?;
+    assert!(h.service.execute(id).await.is_err());
+    h.wait(id).await?;
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 0);
+    h.finish().await
+}
+
+#[tokio::test]
+async fn effect_counter_cannot_repeat_through_an_automatic_fresh_retry() -> Result<()> {
+    let h = Harness::new(Scenario::EffectRetry, plan(&[("b", &[])]), "true").await?;
+    let first = h.execute().await?;
+    assert_eq!(first.tasks[0].status, TaskStatus::BlockedHuman);
+    assert_eq!(tokio::fs::read(h.root.join("effect-count")).await?, b"x");
+    h.service
+        .resolve(
+            first.id,
+            &first.human_actions[0].id,
+            resolution("INSPECTED_EFFECT: effect already happened"),
+        )
+        .await?;
+    h.service.continue_run(first.id).await?;
+    let reconciled = h.wait(first.id).await?;
+    assert_eq!(
+        tokio::fs::read(h.root.join("effect-count")).await?,
+        b"x",
+        "external counter became xx through automatic retry"
+    );
+    assert_eq!(reconciled.status, EngineeringStatus::Blocked);
+    assert_eq!(reconciled.tasks[0].status, TaskStatus::BlockedHuman);
+    assert_eq!(reconciled.tasks[0].attempts.len(), 2);
+    assert_eq!(
+        h.agents.coder_calls.load(Ordering::SeqCst),
+        2,
+        "unsafe automatic third invocation"
+    );
+    assert_eq!(
+        tokio::fs::read(h.root.join("effect-count")).await?,
+        b"x",
+        "external counter became xx"
+    );
+    let action = reconciled.human_actions.last().expect("reconciliation");
+    assert!(action.requirement.reason.contains("effect_reconciliation"));
+    assert_eq!(action.status, HumanActionStatus::Pending);
+    assert!(h.service.continue_run(first.id).await.is_err());
+    h.wait(first.id).await?;
+    h.service.resolve(first.id, &action.id, resolution("RECONCILED_RETRY: inspected failed invocation; prior effect remains already performed")).await?;
+    h.service.continue_run(first.id).await?;
+    let done = h.wait(first.id).await?;
+    assert_eq!(done.status, EngineeringStatus::Verified, "{}", done.summary);
+    assert_eq!(done.tasks[0].attempts.len(), 3);
+    assert_eq!(done.settings.execution.max_attempts, 3);
+    assert_eq!(tokio::fs::read(h.root.join("effect-count")).await?, b"x");
+    h.finish().await
+}
+
+#[tokio::test]
+async fn product_decision_context_survives_failed_invocation_diagnostics() -> Result<()> {
+    let mut p = plan(&[("a", &[])]);
+    p.human_requirements.push(decision(true));
+    let h = Harness::new(Scenario::DecisionRetry, p, "true").await?;
+    let id = h.planned().await?;
+    let run = h.service.store().engineering_get(id).await?;
+    h.service
+        .resolve(
+            id,
+            &run.human_actions[0].id,
+            resolution("Invitations expire after seven days"),
+        )
+        .await?;
+    h.service.execute(id).await?;
+    let done = h.wait(id).await?;
+    assert_eq!(done.status, EngineeringStatus::Verified, "{}", done.summary);
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 2);
+    {
+        let requests = h.agents.requests.lock().expect("requests");
+        let coders: Vec<_> = requests
+            .iter()
+            .filter(|(role, _, _)| *role == AgentRole::Coder)
+            .collect();
+        assert!(
+            coders
+                .iter()
+                .all(|(_, resumed, p)| resumed.is_none() && p.contains("seven days"))
+        );
+        assert!(coders[1].2.contains("Coder invocation failed"));
+    }
     h.finish().await
 }
