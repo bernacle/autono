@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/autono-core", "crates/autono-protocol", "crates/autono-daemon", "crates/autono-cli"]
+members = ["crates/autono-core", "crates/autono-protocol", "crates/autono-daemon", "crates/autono-cli", "apps/desktop/src-tauri"]
 resolver = "2"
 
 [workspace.package]

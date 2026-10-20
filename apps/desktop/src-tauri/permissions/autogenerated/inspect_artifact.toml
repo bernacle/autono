@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-inspect-artifact"
+description = "Enables the inspect_artifact command without any pre-configured scope."
+commands.allow = ["inspect_artifact"]
+
+[[permission]]
+identifier = "deny-inspect-artifact"
+description = "Denies the inspect_artifact command without any pre-configured scope."
+commands.deny = ["inspect_artifact"]

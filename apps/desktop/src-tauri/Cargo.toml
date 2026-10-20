@@ -1,0 +1,39 @@
+[package]
+name = "autono-desktop"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version = "1.90"
+
+[lib]
+name = "autono_desktop"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[dependencies]
+anyhow.workspace = true
+autono-core = { path = "../../../crates/autono-core" }
+autono-protocol = { path = "../../../crates/autono-protocol" }
+base64.workspace = true
+libc.workspace = true
+regex = "1"
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tokio.workspace = true
+uuid.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dev-dependencies]
+tempfile.workspace = true
+autono-daemon = { path = "../../../crates/autono-daemon" }
+axum.workspace = true
+chrono.workspace = true
+rand.workspace = true
+tokio-util.workspace = true
+
+[lints]
+workspace = true

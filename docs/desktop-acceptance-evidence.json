@@ -1,0 +1,246 @@
+{
+  "captured_at": "2026-10-20T20:46:09.835997+00:00",
+  "platform": "native macOS Tauri 2 WKWebView",
+  "daemon": {
+    "address": "127.0.0.1:53015",
+    "pid": 33398,
+    "api_version": 1,
+    "health": {
+      "api_version": 1,
+      "pid": 33398,
+      "platform": "macos",
+      "database": "available",
+      "admission": {
+        "active_runs": 0,
+        "executing_runs": 0,
+        "finalizing_runs": 0,
+        "pending_submissions": 0,
+        "max_active_runs": 8,
+        "max_pending_submissions": 32
+      },
+      "power": {
+        "enabled": false,
+        "eligible_runs": 0,
+        "held": false,
+        "helper_pid": null,
+        "last_error": null
+      },
+      "persistence": {
+        "healthy": true,
+        "owned_runs": []
+      }
+    }
+  },
+  "provider_runtime": "Injected shell-only AgentRuntime through existing daemon test seam; no Codex/Claude executable or inference API called",
+  "run": {
+    "id": "b690094b-94ce-4329-936c-a7867375a275",
+    "revision": 133,
+    "status": "COMPLETED",
+    "repository": "/private/tmp/autono-native-bru342-acceptance/fixture-repository",
+    "base_commit": "50b236147466075bea470a3a5f0b056838679cae",
+    "fixture_main_unchanged": true,
+    "approved_at": "2026-10-20T20:31:36.712624Z",
+    "preflight_ready": true,
+    "tasks": [
+      {
+        "id": "A",
+        "status": "COMPLETED",
+        "dependencies": [],
+        "attempts": 1,
+        "artifact_commit": "29f18c49aaa54363bab8e7679c9c046e8a0109da",
+        "trees": [
+          {
+            "verified": "fb2d36e9a07fc38c73a1b621a021a553b090167c",
+            "preserved": "fb2d36e9a07fc38c73a1b621a021a553b090167c"
+          }
+        ]
+      },
+      {
+        "id": "B",
+        "status": "COMPLETED",
+        "dependencies": [
+          "A"
+        ],
+        "attempts": 2,
+        "artifact_commit": "42854daca763c899eaa7d64c3a33abef0d88f06e",
+        "trees": [
+          {
+            "verified": null,
+            "preserved": null
+          },
+          {
+            "verified": "74bff7768d9bf3821a67fb313e7b1e23aff460bc",
+            "preserved": "74bff7768d9bf3821a67fb313e7b1e23aff460bc"
+          }
+        ]
+      },
+      {
+        "id": "C",
+        "status": "COMPLETED",
+        "dependencies": [],
+        "attempts": 1,
+        "artifact_commit": "c2ae3486ac3dff061d292d633a3628ce6722c41d",
+        "trees": [
+          {
+            "verified": "db08a3111154a86df6f723bca97efd9de867a3be",
+            "preserved": "db08a3111154a86df6f723bca97efd9de867a3be"
+          }
+        ]
+      },
+      {
+        "id": "D",
+        "status": "COMPLETED",
+        "dependencies": [
+          "B"
+        ],
+        "attempts": 1,
+        "artifact_commit": "11099927212df1c7625850b36ce8e7d352b957d0",
+        "trees": [
+          {
+            "verified": "69f8203430b0d467c2ed206c9424240dcd095f92",
+            "preserved": "69f8203430b0d467c2ed206c9424240dcd095f92"
+          }
+        ]
+      },
+      {
+        "id": "E",
+        "status": "COMPLETED",
+        "dependencies": [
+          "C"
+        ],
+        "attempts": 1,
+        "artifact_commit": "938dde8f2e2b1ecf028b24cacb7137915440f5a2",
+        "trees": [
+          {
+            "verified": "c144edaa8671d4b4dac1a0aff3497c66569c5e3d",
+            "preserved": "c144edaa8671d4b4dac1a0aff3497c66569c5e3d"
+          }
+        ]
+      }
+    ],
+    "human_actions": [
+      {
+        "id": "H-559f2a4cf9e185da907630d02d1ce37f",
+        "kind": "product_decision",
+        "status": "RESOLVED",
+        "permission": null,
+        "resolution": {
+          "request_id": "a534d7d5-377e-4ac8-9b72-dfec8598dd71",
+          "disposition": "resolve",
+          "note": "Use JSON export with deterministic field ordering for this disposable report fixture.",
+          "effect": "unknown",
+          "permission": null
+        },
+        "audit_entries": 2
+      },
+      {
+        "id": "H-671ba5fd38ae1ffa2e9d9eba8030a063",
+        "kind": "permission",
+        "status": "RESOLVED",
+        "permission": {
+          "operation": "run_checks",
+          "scope": "run b690094b-94ce-4329-936c-a7867375a275 immutable configured verification commands"
+        },
+        "resolution": {
+          "request_id": "1a5f4682-369b-4f70-b68c-0e2be9364509",
+          "disposition": "approve",
+          "note": "Approve only the immutable configured shell verification for this disposable run.",
+          "effect": "not_performed",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run b690094b-94ce-4329-936c-a7867375a275 immutable configured verification commands"
+          }
+        },
+        "audit_entries": 2
+      },
+      {
+        "id": "H-00233add00c77b49336bfb0680ab102b",
+        "kind": "runtime",
+        "status": "RESOLVED",
+        "permission": null,
+        "resolution": {
+          "request_id": "6e451bf7-a2b3-491b-93f1-d02a64b5f203",
+          "disposition": "resolve",
+          "note": "Inspected the shell-only fixture: no external report operation occurred. Continue with local JSON export only.",
+          "effect": "not_performed",
+          "permission": null
+        },
+        "audit_entries": 2
+      }
+    ],
+    "integration_workspace": {
+      "path": "/tmp/autono-native-bru342-acceptance/engineering/b690094b-94ce-4329-936c-a7867375a275/integration",
+      "branch": "autono/b690094b-94ce-4329-936c-a7867375a275/integration",
+      "head_commit": "6a56b3432d3fa562b4ee6fbf4ffd7d4a04b4ca26"
+    },
+    "integration_checks": [
+      {
+        "process_run_id": "918fe8a4-7dbc-492d-b48a-d4129a0bc4c6",
+        "command": [
+          "sh",
+          "-c",
+          "printf 'fixture verification: passed\\n'; test -f README.md"
+        ],
+        "passed": true,
+        "exit_code": 0,
+        "output_complete": true
+      }
+    ]
+  },
+  "engineering_events": {
+    "count": 155,
+    "first_cursor": 1,
+    "last_cursor": 155,
+    "kinds": [
+      "agent_finished",
+      "agent_process",
+      "agent_started",
+      "approved",
+      "attempt_started",
+      "completed",
+      "continued",
+      "created",
+      "execution_finished",
+      "human_resolution",
+      "integration_merge",
+      "integration_requested",
+      "integration_workspace_ready",
+      "plan_ready",
+      "planning_workspace_ready",
+      "preflight",
+      "review_finished",
+      "review_reserved",
+      "review_workspace_ready",
+      "scheduler",
+      "task_completed",
+      "task_started",
+      "task_state",
+      "task_stopped",
+      "verification_finished",
+      "verification_passed",
+      "verification_process",
+      "verification_started",
+      "workspace_ready",
+      "workspace_reserved"
+    ]
+  },
+  "window_close_survival": {
+    "id": "80e00b75-a8f8-4a85-9035-8722c19370b1",
+    "daemon_pid": 33398,
+    "before_close": "PENDING",
+    "after_close": "RUNNING",
+    "process_pid": 52352,
+    "same_daemon_pid": true,
+    "desktop_processes": [],
+    "final_status": "SUCCEEDED",
+    "output_complete": true
+  },
+  "release_smoke": {
+    "optimized_bundle_mib": 14.63,
+    "connected": true,
+    "inspected_completed_run": true,
+    "associated_directory_access": true,
+    "permission_denied_directory_rejected": true,
+    "directory_permissions_restored": true
+  }
+}

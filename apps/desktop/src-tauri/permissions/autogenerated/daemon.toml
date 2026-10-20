@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-daemon"
+description = "Enables the daemon command without any pre-configured scope."
+commands.allow = ["daemon"]
+
+[[permission]]
+identifier = "deny-daemon"
+description = "Denies the daemon command without any pre-configured scope."
+commands.deny = ["daemon"]

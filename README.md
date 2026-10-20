@@ -262,3 +262,9 @@ autonomous replanning and a desktop interface; they are not part of this version
 MIT licensed; see [LICENSE](LICENSE).
 
 Review repair details and validation evidence: [runtime review repairs](docs/review-repairs.md).
+
+## Native desktop
+
+The Tauri mission control client supervises the existing daemon from a native window.
+See [desktop setup and architecture](apps/desktop/README.md) and
+[native acceptance evidence](docs/desktop-acceptance.md).
