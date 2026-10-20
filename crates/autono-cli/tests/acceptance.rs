@@ -16,6 +16,102 @@ fn cli(home: &Path) -> Command {
     command
 }
 
+/// Seed the checkpoint after durable task admission but before provider launch.
+/// A real daemon restart must reconcile it without installed agents or login.
+#[tokio::test]
+async fn daemon_restart_reconciles_engineering_checkpoints_without_agent_login() -> Result<()> {
+    use autono_protocol::engineering::*;
+    use sqlx::Connection;
+    let dir = tempfile::tempdir()?;
+    let home = tokio::fs::canonicalize(dir.path()).await?;
+    let mut daemon = Daemon::start(&home)?;
+    let old = ready(&home, None).await?;
+    let id = uuid::Uuid::new_v4();
+    let now = "2026-10-19T00:00:00Z".parse()?;
+    let planner =
+        autono_core::engineering::workspace::reference(&home, id, "planner", &"a".repeat(40));
+    let workspace =
+        autono_core::engineering::workspace::reference(&home, id, "task-t", &"a".repeat(40));
+    tokio::fs::create_dir_all(&workspace.path).await?;
+    tokio::fs::write(workspace.path.join("retained.txt"), "preserved after crash").await?;
+    let task = PlannedTask {
+        id: "t".into(),
+        goal: "Feature".into(),
+        description: "Implement feature".into(),
+        acceptance_criteria: vec!["Feature works".into()],
+        dependencies: vec![],
+        requirement_ids: vec!["r".into()],
+        verification_expectations: vec!["Tests pass".into()],
+        role: AgentRole::Coder,
+    };
+    let run = EngineeringRun {
+        id,
+        revision: 0,
+        status: EngineeringStatus::Running,
+        created_at: now,
+        updated_at: now,
+        repository_git: None,
+        repository: home.clone(),
+        requested_base: "HEAD".into(),
+        base_commit: "a".repeat(40),
+        specification: "Feature".into(),
+        settings: WorkflowSettings::default(),
+        plan: Some(ExecutionPlan {
+            requirements: vec![Requirement {
+                id: "r".into(),
+                text: "Feature".into(),
+            }],
+            milestones: vec![Milestone {
+                id: "m".into(),
+                goal: "Feature".into(),
+                task_ids: vec!["t".into()],
+            }],
+            tasks: vec![task.clone()],
+        }),
+        approved_at: Some(now),
+        planner: None,
+        planning_workspace: planner,
+        tasks: vec![EngineeringTask {
+            plan: task,
+            status: TaskStatus::Running,
+            workspace: Some(workspace.clone()),
+            attempts: vec![],
+            artifact_commit: None,
+        }],
+        blockers: vec![],
+        integration_workspace: None,
+        integration_verification: vec![],
+        summary: "Agent launch checkpoint".into(),
+    };
+    let mut connection = sqlx::SqliteConnection::connect_with(
+        &sqlx::sqlite::SqliteConnectOptions::new().filename(home.join("runtime.sqlite3")),
+    )
+    .await?;
+    sqlx::query(
+        "INSERT INTO engineering_runs(id,revision,status,document) VALUES(?,0,'RUNNING',?)",
+    )
+    .bind(id.to_string())
+    .bind(serde_json::to_string(&run)?)
+    .execute(&mut connection)
+    .await?;
+    daemon.kill().await?;
+    daemon = Daemon::start(&home)?;
+    ready(&home, Some(old.pid)).await?;
+    let result: EngineeringRun =
+        serde_json::from_str(&invoke(&home, &["summary", &id.to_string()]).await?)?;
+    assert_eq!(result.status, EngineeringStatus::Interrupted);
+    assert_eq!(result.tasks[0].status, TaskStatus::Interrupted);
+    assert!(!result.blockers.is_empty());
+    assert_eq!(
+        tokio::fs::read_to_string(workspace.path.join("retained.txt")).await?,
+        "preserved after crash"
+    );
+    let logs = invoke(&home, &["logs", "--engineering", &id.to_string()]).await?;
+    assert!(logs.contains("interrupted"));
+    daemon.kill().await?;
+    Ok(())
+}
+
 struct Daemon {
     child: Child,
 }

@@ -1,4 +1,5 @@
 //! Versioned local API contract. Output event payloads are base64-encoded bytes.
+pub mod engineering;
 mod model;
 pub use model::*;
 use serde::{Deserialize, Serialize};

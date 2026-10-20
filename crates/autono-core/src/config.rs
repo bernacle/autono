@@ -4,6 +4,9 @@ use std::{
 };
 
 use anyhow::{Context, Result};
+use autono_protocol::engineering::{
+    AgentsConfig, ExecutionConfig, VerificationConfig, WorkflowSettings,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone)]
@@ -62,11 +65,17 @@ impl Paths {
 pub struct Config {
     pub runner: RunnerConfig,
     pub daemon: DaemonConfig,
+    pub agents: AgentsConfig,
+    pub execution: ExecutionConfig,
+    pub verification: VerificationConfig,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
+            agents: AgentsConfig::default(),
+            execution: ExecutionConfig::default(),
+            verification: VerificationConfig::default(),
             runner: RunnerConfig {
                 keep_awake: true,
                 max_active_runs: 8,
@@ -102,6 +111,79 @@ pub struct DaemonConfig {
 struct Patch {
     runner: RunnerPatch,
     daemon: DaemonPatch,
+    agents: AgentsPatch,
+    execution: ExecutionPatch,
+    verification: VerificationPatch,
+}
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct AgentsPatch {
+    planner: AgentPatch,
+    coder: AgentPatch,
+    reviewer: AgentPatch,
+}
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct AgentPatch {
+    provider: Option<autono_protocol::engineering::Provider>,
+    model: Option<String>,
+    timeout_seconds: Option<u64>,
+}
+impl AgentPatch {
+    fn apply(self, agent: &mut autono_protocol::engineering::AgentConfig) {
+        if let Some(value) = self.provider {
+            agent.provider = value;
+        }
+        if let Some(value) = self.model {
+            agent.model = Some(value);
+        }
+        if let Some(value) = self.timeout_seconds {
+            agent.timeout_seconds = value;
+        }
+    }
+}
+impl AgentsPatch {
+    fn apply(self, agents: &mut AgentsConfig) {
+        self.planner.apply(&mut agents.planner);
+        self.coder.apply(&mut agents.coder);
+        self.reviewer.apply(&mut agents.reviewer);
+    }
+}
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct ExecutionPatch {
+    max_parallel: Option<usize>,
+    max_attempts: Option<usize>,
+    max_review_cycles: Option<usize>,
+}
+impl ExecutionPatch {
+    fn apply(self, config: &mut ExecutionConfig) {
+        if let Some(v) = self.max_parallel {
+            config.max_parallel = v;
+        }
+        if let Some(v) = self.max_attempts {
+            config.max_attempts = v;
+        }
+        if let Some(v) = self.max_review_cycles {
+            config.max_review_cycles = v;
+        }
+    }
+}
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct VerificationPatch {
+    commands: Option<Vec<Vec<String>>>,
+    timeout_seconds: Option<u64>,
+}
+impl VerificationPatch {
+    fn apply(self, config: &mut VerificationConfig) {
+        if let Some(v) = self.commands {
+            config.commands = v;
+        }
+        if let Some(v) = self.timeout_seconds {
+            config.timeout_seconds = v;
+        }
+    }
 }
 #[derive(Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
@@ -119,9 +201,19 @@ struct DaemonPatch {
 }
 
 impl Config {
+    pub fn workflow(&self) -> WorkflowSettings {
+        WorkflowSettings {
+            agents: self.agents.clone(),
+            execution: self.execution.clone(),
+            verification: self.verification.clone(),
+        }
+    }
     pub async fn load(paths: &Paths) -> Result<Self> {
         let patch = read_patch(&paths.config()).await?;
         let mut config = Self::default();
+        patch.agents.apply(&mut config.agents);
+        patch.execution.apply(&mut config.execution);
+        patch.verification.apply(&mut config.verification);
         if let Some(value) = patch.runner.keep_awake {
             config.runner.keep_awake = value;
         }
@@ -156,6 +248,7 @@ impl Config {
             (1..=30).contains(&config.daemon.drain_timeout_seconds),
             "drain_timeout_seconds must be 1..30"
         );
+        config.workflow().validate()?;
         Ok(config)
     }
 
@@ -168,11 +261,15 @@ impl Config {
                 && patch.daemon.drain_timeout_seconds.is_none()
                 && patch.runner.max_active_runs.is_none()
                 && patch.runner.max_pending_submissions.is_none(),
-            "project autono.toml may only configure runner.keep_awake"
+            "project autono.toml cannot configure daemon settings or process admission limits"
         );
         if let Some(value) = patch.runner.keep_awake {
             self.runner.keep_awake = value;
         }
+        patch.agents.apply(&mut self.agents);
+        patch.execution.apply(&mut self.execution);
+        patch.verification.apply(&mut self.verification);
+        self.workflow().validate()?;
         Ok(self)
     }
 }
