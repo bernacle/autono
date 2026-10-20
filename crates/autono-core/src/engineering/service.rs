@@ -29,22 +29,29 @@ struct Inner {
     registry: Mutex<Registry>,
     jobs: TaskTracker,
     shutdown: CancellationToken,
+    control: tokio::sync::Mutex<()>,
+    wakeup: Arc<tokio::sync::Notify>,
 }
 struct Registry {
     accepting: bool,
     active: Option<(Uuid, CancellationToken)>,
     error: Option<String>,
+    journal: Option<Journal>,
 }
 enum Operation {
     Plan(Box<PlanSubmission>),
     Execute(Uuid),
+    Preflight(Uuid),
+    Continue(Uuid),
     Integrate(Uuid),
 }
 impl Operation {
     fn id(&self) -> Uuid {
         match self {
             Self::Plan(s) => s.id,
-            Self::Execute(id) | Self::Integrate(id) => *id,
+            Self::Execute(id) | Self::Integrate(id) | Self::Preflight(id) | Self::Continue(id) => {
+                *id
+            }
         }
     }
 }
@@ -70,9 +77,12 @@ impl EngineeringService {
                     accepting: true,
                     active: None,
                     error: None,
+                    journal: None,
                 }),
                 jobs: TaskTracker::new(),
                 shutdown: CancellationToken::new(),
+                control: tokio::sync::Mutex::new(()),
+                wakeup: Arc::new(tokio::sync::Notify::new()),
             }),
         }
     }
@@ -116,6 +126,108 @@ impl EngineeringService {
             EngineeringConflict("execute requires AWAITING_APPROVAL".into())
         );
         self.launch(Operation::Execute(id)).await
+    }
+    pub async fn preflight(&self, id: Uuid) -> Result<EngineeringRun> {
+        self.launch(Operation::Preflight(id)).await
+    }
+    pub async fn continue_run(&self, id: Uuid) -> Result<EngineeringRun> {
+        {
+            let _gate = self.inner.control.lock().await;
+            let active = {
+                let registry = self.registry();
+                registry
+                    .active
+                    .as_ref()
+                    .filter(|(active, token)| *active == id && !token.is_cancelled())
+                    .and(registry.journal.clone())
+            };
+            if let Some(journal) = active {
+                journal
+                    .change(
+                        "continued",
+                        "Developer continued eligible live pauses alongside independent workers",
+                        |r| {
+                            // Serialize this check with the scheduler's final checkpoint.
+                            // Once drained, a new owned execution must be admitted instead.
+                            ensure!(r.status == EngineeringStatus::Running, EngineeringConflict("scheduler has drained; retry continue after the run becomes inactive".into()));
+                            mark_continued(r)
+                        },
+                    )
+                    .await?;
+                self.inner.wakeup.notify_one();
+                return Ok(journal.read().await);
+            }
+        }
+        self.launch(Operation::Continue(id)).await
+    }
+    pub async fn resolve(
+        &self,
+        id: Uuid,
+        action_id: &str,
+        request: ResolutionRequest,
+    ) -> Result<EngineeringRun> {
+        // One gate for inactive mutations and launch preparation. Active workers use
+        // the same journal, so API requests cannot overwrite scheduler checkpoints.
+        let _gate = self.inner.control.lock().await;
+        let journal = {
+            let registry = self.registry();
+            registry
+                .active
+                .as_ref()
+                .filter(|(active, _)| *active == id)
+                .and(registry.journal.clone())
+        };
+        let journal = match journal {
+            Some(j) => j,
+            None => Journal::new(
+                self.store().clone(),
+                self.store().engineering_get(id).await?,
+            ),
+        };
+        let existing = journal.read().await;
+        if let Some((stored_action, stored)) = existing
+            .human_actions
+            .iter()
+            .flat_map(|a| {
+                a.audit
+                    .iter()
+                    .filter_map(move |audit| audit.request.as_ref().map(|r| (&a.id, r)))
+            })
+            .find(|(_, r)| r.request_id == request.request_id)
+        {
+            ensure!(
+                stored_action == action_id && stored == &request,
+                EngineeringConflict("resolution key has another payload or action".into())
+            );
+            return Ok(existing);
+        }
+        super::preflight::safe_text(&request.note)?;
+        journal.change("human_resolution", "Explicit developer resolution recorded; no operation was executed", |r| {
+            ensure!(matches!(r.status, EngineeringStatus::AwaitingApproval | EngineeringStatus::Running | EngineeringStatus::Blocked), EngineeringConflict("cannot resolve a terminal or interrupted workflow".into()));
+            let action = r.human_actions.iter_mut().find(|a| a.id == action_id).context("unknown human action")?;
+            ensure!(action.status != HumanActionStatus::Resolved, EngineeringConflict("action already resolved; reuse the original request key".into()));
+            match request.disposition {
+                ResolutionDisposition::Approve => {
+                    let permission = action.requirement.permission.as_ref().context("action is not a permission request")?;
+                    ensure!(request.permission.as_ref() == Some(permission), EngineeringConflict("approval must identify the exact requested operation and scope".into()));
+                    ensure!(r.settings.permissions.classify(permission.operation) == PermissionRule::RequireApproval, EngineeringConflict("policy does not permit approval".into()));
+                    ensure!(permission.supported(r.id), EngineeringConflict("adapter cannot safely grant this operation; configure it externally, retain the blocker, or use a new trusted base".into()));
+                }
+                ResolutionDisposition::Resolve => {
+                    ensure!(action.requirement.permission.is_none() && request.permission.is_none(), EngineeringConflict("permission requires an explicit approval, never a textual resolution".into()));
+                }
+                _ => { ensure!(request.permission.is_none(), "defer/reject must not carry an approval"); }
+            }
+            if matches!(request.disposition, ResolutionDisposition::Approve | ResolutionDisposition::Resolve) && action.continuable {
+                ensure!(request.effect != EffectState::Unknown, EngineeringConflict("inspect operation effects before continuation".into()));
+            }
+            action.status = match request.disposition { ResolutionDisposition::Resolve | ResolutionDisposition::Approve => HumanActionStatus::Resolved, ResolutionDisposition::Defer => HumanActionStatus::Deferred, ResolutionDisposition::Reject => HumanActionStatus::Rejected };
+            action.resolution = Some(request.clone());
+            action.updated_at = Utc::now();
+            action.audit.push(ActionAudit { at: action.updated_at, status: action.status, request: Some(request) });
+            Ok(())
+        }).await?;
+        Ok(journal.read().await)
     }
     pub async fn integrate(&self, id: Uuid) -> Result<EngineeringRun> {
         ensure!(
@@ -168,7 +280,9 @@ impl EngineeringService {
                 self.registry().error = Some(format!("run {id}: {error:#}"));
             }
         }
-        self.registry().active = None;
+        let mut registry = self.registry();
+        registry.active = None;
+        registry.journal = None;
     }
     async fn record_failure(
         &self,
@@ -176,15 +290,56 @@ impl EngineeringService {
         error: &anyhow::Error,
         externally_cancelled: bool,
     ) -> Result<()> {
+        let _gate = self.inner.control.lock().await;
         let run = match self.store().engineering_get(id).await {
             Ok(run) => run,
             Err(e) if e.is::<EngineeringNotFound>() => return Ok(()),
             Err(e) => return Err(e),
         };
         if !run.status.active() {
+            if externally_cancelled
+                && !self.inner.shutdown.is_cancelled()
+                && matches!(
+                    run.status,
+                    EngineeringStatus::AwaitingApproval
+                        | EngineeringStatus::Verified
+                        | EngineeringStatus::Blocked
+                )
+            {
+                let journal = self
+                    .registry()
+                    .journal
+                    .clone()
+                    .unwrap_or_else(|| Journal::new(self.store().clone(), run));
+                journal
+                    .change(
+                        "cancelled",
+                        "Developer cancelled during workflow preparation; no work will be launched",
+                        |r| {
+                            r.status = EngineeringStatus::Cancelled;
+                            for task in &mut r.tasks {
+                                if matches!(
+                                    task.status,
+                                    TaskStatus::Waiting
+                                        | TaskStatus::Ready
+                                        | TaskStatus::BlockedHuman
+                                ) {
+                                    task.status = TaskStatus::Cancelled;
+                                }
+                            }
+                            r.summary = "Cancelled by developer; artifacts retained".into();
+                            Ok(())
+                        },
+                    )
+                    .await?;
+            }
             return Ok(());
         }
-        let journal = Journal::new(self.store().clone(), run);
+        let journal = self
+            .registry()
+            .journal
+            .clone()
+            .unwrap_or_else(|| Journal::new(self.store().clone(), run));
         let shutdown = self.inner.shutdown.is_cancelled();
         let manual = error
             .downcast_ref::<AgentFailure>()
@@ -193,11 +348,15 @@ impl EngineeringService {
         journal.change("workflow_stopped",&detail,|r| {
             r.status=if shutdown {EngineeringStatus::Interrupted} else if manual {EngineeringStatus::Blocked} else if error.is::<UserCancelled>() {EngineeringStatus::Cancelled} else {EngineeringStatus::Failed};
             for task in &mut r.tasks {
-                if matches!(task.status,TaskStatus::Running|TaskStatus::Ready|TaskStatus::Waiting) {
+                if matches!(task.status,TaskStatus::Running|TaskStatus::Ready|TaskStatus::Waiting|TaskStatus::BlockedHuman) {
                     task.status=if r.status==EngineeringStatus::Cancelled {TaskStatus::Cancelled} else {TaskStatus::Interrupted};
                 }
             }
             r.summary=detail.clone();
+            if manual {
+                let requirement = HumanRequirement { kind: HumanActionType::Runtime, reason: "Workflow stage needs external intervention".into(), affected_tasks: vec![], requested_action: "Inspect the stage and configure the prerequisite externally. Planning/integration/integrity failures require a new trusted plan; they are not live task pauses.".into(), blocking: true, evidence: "Workflow stage failed; retained process IDs and workspaces identify its evidence".into(), confidence: 100, permission: None };
+                r.human_actions.push(super::preflight::action(requirement, &format!("stage-{}-{}", r.id, r.revision), false, None));
+            }
             if manual||shutdown||externally_cancelled {
                 r.blockers.push(Blocker {task_id:None,kind:if manual {"manual_action"} else {"interrupted"}.into(),detail:detail.clone(),action:"Inspect retained workspaces and process logs before submitting a new plan".into(),created_at:Utc::now()});
             }
@@ -210,7 +369,14 @@ impl EngineeringService {
         stop: CancellationToken,
         reply: oneshot::Sender<Result<EngineeringRun>>,
     ) -> Result<()> {
-        let prepared = self.prepare(op, &stop).await;
+        let prepared = {
+            let _gate = self.inner.control.lock().await;
+            let result = self.prepare(op, &stop).await;
+            if let Ok((journal, _)) = &result {
+                self.registry().journal = Some(journal.clone());
+            }
+            result
+        };
         let (journal, operation) = match prepared {
             Ok(value) => value,
             Err(error) => {
@@ -228,11 +394,13 @@ impl EngineeringService {
             stop: stop.child_token(),
             artifacts: Default::default(),
             trusted_context: Default::default(),
+            wakeup: self.inner.wakeup.clone(),
         };
         let result = match operation {
             0 => engine.plan().await,
             1 => engine.execute().await,
-            _ => engine.integrate().await,
+            2 => engine.integrate().await,
+            _ => Ok(()),
         };
         if stop.is_cancelled() && !self.inner.shutdown.is_cancelled() {
             return Err(UserCancelled.into());
@@ -275,6 +443,8 @@ impl EngineeringService {
                     planning_workspace: w,
                     tasks: vec![],
                     blockers: vec![],
+                    human_actions: vec![],
+                    preflight: None,
                     integration_workspace: None,
                     integration_verification: vec![],
                     summary: "Planning requested".into(),
@@ -298,6 +468,15 @@ impl EngineeringService {
                     "stored max_parallel exceeds runtime process capacity"
                 );
                 let journal = Journal::new(self.store().clone(), run);
+                super::preflight::inspect(&journal, &self.inner.runner, &self.inner.agents, stop)
+                    .await?;
+                ensure!(
+                    journal.read().await.preflight.is_some_and(|p| p.ready),
+                    EngineeringConflict(
+                        "preflight is NOT READY; inspect preflight and human actions".into()
+                    )
+                );
+                ensure!(!stop.is_cancelled(), "execution cancelled during preflight");
                 journal
                     .change(
                         "approved",
@@ -310,6 +489,35 @@ impl EngineeringService {
                         },
                     )
                     .await?;
+                Ok((journal, 1))
+            }
+            Operation::Preflight(id) => {
+                let run = self.store().engineering_get(id).await?;
+                ensure!(
+                    run.plan.is_some()
+                        && matches!(
+                            run.status,
+                            EngineeringStatus::AwaitingApproval | EngineeringStatus::Blocked
+                        ),
+                    EngineeringConflict("preflight requires a planned inactive run".into())
+                );
+                let journal = Journal::new(self.store().clone(), run);
+                super::preflight::inspect(&journal, &self.inner.runner, &self.inner.agents, stop)
+                    .await?;
+                Ok((journal, 3))
+            }
+            Operation::Continue(id) => {
+                let run = self.store().engineering_get(id).await?;
+                ensure!(run.status == EngineeringStatus::Blocked && run.approved_at.is_some(), EngineeringConflict("continue requires a live-pause BLOCKED run; interrupted workflows cannot resume".into()));
+                let journal = Journal::new(self.store().clone(), run);
+                super::preflight::inspect(&journal, &self.inner.runner, &self.inner.agents, stop)
+                    .await?;
+                ensure!(
+                    journal.read().await.preflight.is_some_and(|p| p.ready),
+                    EngineeringConflict("preflight is NOT READY".into())
+                );
+                ensure!(!stop.is_cancelled(), "continuation cancelled");
+                journal.change("continued", "Developer explicitly continued eligible live pauses; completed artifacts retained", mark_continued).await?;
                 Ok((journal, 1))
             }
             Operation::Integrate(id) => {
@@ -347,11 +555,14 @@ impl EngineeringService {
             token.cancel();
             return Ok(());
         }
+        let _gate = self.inner.control.lock().await;
         let run = self.store().engineering_get(id).await?;
         ensure!(
             matches!(
                 run.status,
-                EngineeringStatus::AwaitingApproval | EngineeringStatus::Verified
+                EngineeringStatus::AwaitingApproval
+                    | EngineeringStatus::Verified
+                    | EngineeringStatus::Blocked
             ),
             EngineeringConflict("run is terminal or not owned by this daemon".into())
         );
@@ -363,7 +574,10 @@ impl EngineeringService {
                 |r| {
                     r.status = EngineeringStatus::Cancelled;
                     for t in &mut r.tasks {
-                        if matches!(t.status, TaskStatus::Ready | TaskStatus::Waiting) {
+                        if matches!(
+                            t.status,
+                            TaskStatus::Ready | TaskStatus::Waiting | TaskStatus::BlockedHuman
+                        ) {
                             t.status = TaskStatus::Cancelled;
                         }
                     }
@@ -395,3 +609,54 @@ impl EngineeringService {
 #[derive(Debug, thiserror::Error)]
 #[error("Workflow cancelled by developer; workspaces and logs retained")]
 struct UserCancelled;
+
+fn mark_continued(r: &mut EngineeringRun) -> Result<()> {
+    ensure!(
+        matches!(
+            r.status,
+            EngineeringStatus::Running | EngineeringStatus::Blocked
+        ) && r.approved_at.is_some(),
+        EngineeringConflict(
+            "only approved live pauses can continue; interrupted workflows cannot resume".into()
+        )
+    );
+    let mut eligible = vec![];
+    for task in &r.tasks {
+        if task.status != TaskStatus::BlockedHuman
+            || task.attempts.len() >= r.settings.execution.max_attempts
+        {
+            continue;
+        }
+        let actions: Vec<_> = r
+            .human_actions
+            .iter()
+            .filter(|a| {
+                a.requirement.affected_tasks.contains(&task.plan.id)
+                    && a.requirement.kind == HumanActionType::Runtime
+            })
+            .collect();
+        if !actions.is_empty()
+            && actions.iter().all(|a| {
+                a.continuable
+                    && a.status == HumanActionStatus::Resolved
+                    && a.resolution
+                        .as_ref()
+                        .is_some_and(|q| q.effect != EffectState::Unknown)
+            })
+        {
+            eligible.push(task.plan.id.clone());
+        }
+    }
+    ensure!(
+        !eligible.is_empty(),
+        EngineeringConflict("no eligible resolved human-paused tasks".into())
+    );
+    for task in &mut r.tasks {
+        if eligible.contains(&task.plan.id) {
+            task.status = TaskStatus::Ready;
+        }
+    }
+    r.status = EngineeringStatus::Running;
+    r.summary = "Continuing explicitly resolved live pauses".into();
+    Ok(())
+}

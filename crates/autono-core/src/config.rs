@@ -5,7 +5,8 @@ use std::{
 
 use anyhow::{Context, Result};
 use autono_protocol::engineering::{
-    AgentsConfig, ExecutionConfig, VerificationConfig, WorkflowSettings,
+    AgentsConfig, ExecutionConfig, PermissionPolicy, PreflightConfig, VerificationConfig,
+    WorkflowSettings,
 };
 use serde::{Deserialize, Serialize};
 
@@ -68,6 +69,8 @@ pub struct Config {
     pub agents: AgentsConfig,
     pub execution: ExecutionConfig,
     pub verification: VerificationConfig,
+    pub preflight: PreflightConfig,
+    pub permissions: PermissionPolicy,
 }
 
 impl Default for Config {
@@ -76,6 +79,8 @@ impl Default for Config {
             agents: AgentsConfig::default(),
             execution: ExecutionConfig::default(),
             verification: VerificationConfig::default(),
+            preflight: PreflightConfig::default(),
+            permissions: PermissionPolicy::default(),
             runner: RunnerConfig {
                 keep_awake: true,
                 max_active_runs: 8,
@@ -114,6 +119,8 @@ struct Patch {
     agents: AgentsPatch,
     execution: ExecutionPatch,
     verification: VerificationPatch,
+    preflight: Option<PreflightConfig>,
+    permissions: Option<PermissionPolicy>,
 }
 #[derive(Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
@@ -206,6 +213,8 @@ impl Config {
             agents: self.agents.clone(),
             execution: self.execution.clone(),
             verification: self.verification.clone(),
+            preflight: self.preflight.clone(),
+            permissions: self.permissions.clone(),
         }
     }
     pub async fn load(paths: &Paths) -> Result<Self> {
@@ -214,6 +223,12 @@ impl Config {
         patch.agents.apply(&mut config.agents);
         patch.execution.apply(&mut config.execution);
         patch.verification.apply(&mut config.verification);
+        if let Some(v) = patch.preflight {
+            config.preflight = v;
+        }
+        if let Some(v) = patch.permissions {
+            config.permissions = v;
+        }
         if let Some(value) = patch.runner.keep_awake {
             config.runner.keep_awake = value;
         }
@@ -256,12 +271,13 @@ impl Config {
     pub async fn with_project(mut self, directory: &Path) -> Result<Self> {
         let patch = read_patch(&directory.join("autono.toml")).await?;
         anyhow::ensure!(
-            patch.daemon.port.is_none()
+            patch.permissions.is_none()
+                && patch.daemon.port.is_none()
                 && patch.daemon.body_timeout_seconds.is_none()
                 && patch.daemon.drain_timeout_seconds.is_none()
                 && patch.runner.max_active_runs.is_none()
                 && patch.runner.max_pending_submissions.is_none(),
-            "project autono.toml cannot configure daemon settings or process admission limits"
+            "project autono.toml cannot configure daemon settings, process admission limits or permission policy"
         );
         if let Some(value) = patch.runner.keep_awake {
             self.runner.keep_awake = value;
@@ -269,6 +285,12 @@ impl Config {
         patch.agents.apply(&mut self.agents);
         patch.execution.apply(&mut self.execution);
         patch.verification.apply(&mut self.verification);
+        if let Some(v) = patch.preflight {
+            self.preflight = v;
+        }
+        if let Some(v) = patch.permissions {
+            self.permissions = v;
+        }
         self.workflow().validate()?;
         Ok(self)
     }

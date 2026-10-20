@@ -45,6 +45,19 @@ enum Commands {
     ShowPlan { id: Uuid },
     /// Approve the persisted plan and start daemon-owned task execution.
     Execute { id: Uuid },
+    /// Refresh durable host checks and inspect preflight readiness.
+    Preflight { id: Uuid },
+    /// List durable human actions, resolutions and audit history.
+    Blockers { id: Uuid },
+    /// Resolve a human action using a JSON request file (never include credentials).
+    Resolve {
+        id: Uuid,
+        blocker_id: String,
+        #[arg(long)]
+        request: PathBuf,
+    },
+    /// Continue eligible explicitly resolved live pauses; never resumes interrupted runs.
+    Continue { id: Uuid },
     /// Inspect engineering task progress and retained artifacts.
     Tasks { id: Uuid },
     /// Inspect independent review findings and manual blockers.
@@ -138,6 +151,14 @@ async fn main() -> Result<()> {
         Commands::Tasks { id } => engineering::inspect(&paths, id, "tasks").await,
         Commands::Findings { id } => engineering::inspect(&paths, id, "findings").await,
         Commands::Summary { id } => engineering::inspect(&paths, id, "summary").await,
+        Commands::Preflight { id } => engineering::preflight(&paths, id).await,
+        Commands::Blockers { id } => engineering::inspect(&paths, id, "blockers").await,
+        Commands::Resolve {
+            id,
+            blocker_id,
+            request,
+        } => engineering::resolve(&paths, id, &blocker_id, request).await,
+        Commands::Continue { id } => engineering::action(&paths, id, "continue").await,
         Commands::Execute { id } => engineering::action(&paths, id, "execute").await,
         Commands::Integrate { id } => engineering::action(&paths, id, "integrate").await,
         Commands::Doctor => doctor::run(&paths).await,

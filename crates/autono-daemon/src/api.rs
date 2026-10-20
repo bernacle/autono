@@ -1,6 +1,8 @@
 use std::{convert::Infallible, net::SocketAddr, sync::Arc, time::Duration};
 
-use autono_core::engineering::{EngineeringRun, EngineeringService, PlanSubmission};
+use autono_core::engineering::{
+    EngineeringRun, EngineeringService, HumanAction, PlanSubmission, ResolutionRequest,
+};
 use autono_core::{
     Run, Supervisor,
     store::{InvalidTransition, RunNotFound},
@@ -98,6 +100,16 @@ fn build_router(
         .route("/v1/engineering/{id}", get(engineering_inspect))
         .route("/v1/engineering/{id}/execute", post(engineering_execute))
         .route(
+            "/v1/engineering/{id}/preflight",
+            post(engineering_preflight),
+        )
+        .route("/v1/engineering/{id}/blockers", get(engineering_blockers))
+        .route(
+            "/v1/engineering/{id}/blockers/{action}/resolve",
+            post(engineering_resolve),
+        )
+        .route("/v1/engineering/{id}/continue", post(engineering_continue))
+        .route(
             "/v1/engineering/{id}/integrate",
             post(engineering_integrate),
         )
@@ -161,7 +173,10 @@ async fn authenticate(State(app): State<Arc<App>>, request: Request, next: Next)
         && (request.uri().path() == "/v1/runs"
             || request.uri().path() == "/v1/engineering"
             || request.uri().path().ends_with("/execute")
-            || request.uri().path().ends_with("/integrate"))
+            || request.uri().path().ends_with("/integrate")
+            || request.uri().path().ends_with("/preflight")
+            || request.uri().path().ends_with("/continue")
+            || request.uri().path().ends_with("/resolve"))
     {
         match app.submissions.clone().try_acquire_owned() {
             Ok(slot) => Some(slot),
@@ -328,6 +343,39 @@ async fn engineering_execute(
     Path(id): Path<Uuid>,
 ) -> Result<Json<EngineeringRun>, Failure> {
     Ok(Json(engineering(&app)?.execute(id).await?))
+}
+async fn engineering_preflight(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<EngineeringRun>, Failure> {
+    Ok(Json(engineering(&app)?.preflight(id).await?))
+}
+async fn engineering_continue(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<EngineeringRun>, Failure> {
+    Ok(Json(engineering(&app)?.continue_run(id).await?))
+}
+async fn engineering_blockers(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Vec<HumanAction>>, Failure> {
+    Ok(Json(
+        engineering(&app)?
+            .store()
+            .engineering_get(id)
+            .await?
+            .human_actions,
+    ))
+}
+async fn engineering_resolve(
+    State(app): State<Arc<App>>,
+    Path((id, action)): Path<(Uuid, String)>,
+    Json(request): Json<ResolutionRequest>,
+) -> Result<Json<EngineeringRun>, Failure> {
+    Ok(Json(
+        engineering(&app)?.resolve(id, &action, request).await?,
+    ))
 }
 async fn engineering_integrate(
     State(app): State<Arc<App>>,

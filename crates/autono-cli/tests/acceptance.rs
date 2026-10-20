@@ -57,6 +57,7 @@ async fn daemon_restart_reconciles_engineering_checkpoints_without_agent_login()
         specification: "Feature".into(),
         settings: WorkflowSettings::default(),
         plan: Some(ExecutionPlan {
+            human_requirements: vec![],
             requirements: vec![Requirement {
                 id: "r".into(),
                 text: "Feature".into(),
@@ -79,6 +80,8 @@ async fn daemon_restart_reconciles_engineering_checkpoints_without_agent_login()
             artifact_commit: None,
         }],
         blockers: vec![],
+        human_actions: vec![],
+        preflight: None,
         integration_workspace: None,
         integration_verification: vec![],
         summary: "Agent launch checkpoint".into(),

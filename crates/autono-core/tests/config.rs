@@ -67,3 +67,39 @@ async fn engineering_config_merges_fields_and_validates_limits() -> Result<()> {
     assert!(Config::load(&paths).await.is_err());
     Ok(())
 }
+
+#[tokio::test]
+async fn preflight_names_and_user_only_permission_policy_are_validated_and_snapshotted()
+-> Result<()> {
+    use autono_protocol::engineering::{PermissionOperation, PermissionRule};
+    let dir = tempfile::tempdir()?;
+    let paths = Paths {
+        home: dir.path().join("home"),
+    };
+    paths.prepare().await?;
+    tokio::fs::write(paths.config(), "[preflight]\nrequired_env=['SMTP_PASSWORD']\nrequired_tools=['git']\nexternal_services=['smtp']\n[permissions.rules]\nworkspace_write='REQUIRE_APPROVAL'\nexternal_operation='DENY'\n").await?;
+    let config = Config::load(&paths).await?;
+    assert_eq!(
+        config
+            .workflow()
+            .permissions
+            .classify(PermissionOperation::WorkspaceWrite),
+        PermissionRule::RequireApproval
+    );
+    assert_eq!(config.workflow().preflight.required_env, ["SMTP_PASSWORD"]);
+    tokio::fs::write(
+        dir.path().join("autono.toml"),
+        "[permissions.rules]\nexternal_operation='ALLOW'\n",
+    )
+    .await?;
+    assert!(config.clone().with_project(dir.path()).await.is_err());
+    for invalid in [
+        "[preflight]\nrequired_env=['PASSWORD=value']\n",
+        "[preflight]\nrequired_directories=['../outside']\n",
+        "[preflight]\nexternal_services=['https://credentials@example.test']\n",
+    ] {
+        tokio::fs::write(paths.config(), invalid).await?;
+        assert!(Config::load(&paths).await.is_err());
+    }
+    Ok(())
+}

@@ -41,7 +41,27 @@ fn failure(kind: &str, detail: impl Into<String>, blocked: bool) -> anyhow::Erro
 
 /// Providers prepare noninteractive invocations and decode structured event streams.
 /// The caller streams/persists output and owns cancellation/timeout through ProcessRunner.
+pub type ReadinessFuture<'a> =
+    Pin<Box<dyn Future<Output = Result<Vec<super::ReadinessCheck>>> + Send + 'a>>;
 pub trait AgentRuntime: Send + Sync {
+    /// Injected runtimes explicitly own their availability contract; no real CLI calls in CI.
+    fn readiness<'a>(
+        &'a self,
+        _: &'a ProcessRunner,
+        _: &'a std::path::Path,
+        _: &'a super::WorkflowSettings,
+        _: &'a CancellationToken,
+    ) -> ReadinessFuture<'a> {
+        Box::pin(async {
+            Ok(vec![super::ReadinessCheck {
+                id: "injected-provider".into(),
+                ready: Some(true),
+                blocking: true,
+                evidence: "Injected runtime availability contract".into(),
+            }])
+        })
+    }
+
     fn prepare<'a>(
         &'a self,
         request: &'a AgentRequest,
@@ -53,6 +73,40 @@ pub trait AgentRuntime: Send + Sync {
 #[derive(Default)]
 pub struct CliAgentRuntime;
 impl AgentRuntime for CliAgentRuntime {
+    fn readiness<'a>(
+        &'a self,
+        runner: &'a ProcessRunner,
+        cwd: &'a std::path::Path,
+        settings: &'a super::WorkflowSettings,
+        stop: &'a CancellationToken,
+    ) -> ReadinessFuture<'a> {
+        Box::pin(async move {
+            let mut checks = vec![];
+            for (name, config) in [
+                ("coder", &settings.agents.coder),
+                ("reviewer", &settings.agents.reviewer),
+            ] {
+                let request = AgentRequest {
+                    config: config.clone(),
+                    role: if name == "coder" {
+                        AgentRole::Coder
+                    } else {
+                        AgentRole::Reviewer
+                    },
+                    cwd: cwd.into(),
+                    prompt: String::new(),
+                    schema_path: cwd.join("unused-preflight-schema"),
+                    resume: None,
+                };
+                // prepare probes advertised noninteractive capabilities only, never starts inference.
+                let ready = self.prepare(&request, runner, stop).await.is_ok();
+                checks.push(super::ReadinessCheck { id: format!("provider-{name}"), ready: Some(ready), blocking: true, evidence: "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable".into() });
+                checks.push(super::ReadinessCheck { id: format!("authentication-{name}"), ready: None, blocking: false, evidence: "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login".into() });
+            }
+            Ok(checks)
+        })
+    }
+
     fn prepare<'a>(
         &'a self,
         request: &'a AgentRequest,
@@ -391,6 +445,7 @@ pub fn schema(role: AgentRole) -> Value {
     match role {
         AgentRole::Coder => object(json!({"summary":string(), "blocker":string()})),
         AgentRole::Planner => object(json!({
+            "human_requirements":{"type":"array","items":object(json!({"kind":{"type":"string","enum":["environment","product_decision","permission"]},"reason":string(),"requested_action":string(),"affected_tasks":strings(),"blocking":{"type":"boolean"},"evidence":string(),"confidence":{"type":"integer","minimum":0,"maximum":100},"permission":{"anyOf":[{"type":"null"},object(json!({"operation":{"type":"string","enum":["workspace_write","run_checks","outside_workspace","protected_configuration","install_dependencies","environment_change","destructive_migration","external_operation"]},"scope":string()}))]}}))},
             "requirements":{"type":"array","items":object(json!({"id":string(),"text":string()}))},
             "milestones":{"type":"array","items":object(json!({"id":string(),"goal":string(),"task_ids":strings()}))},
             "tasks":{"type":"array","items":object(json!({"id":string(),"goal":string(),"description":string(),"acceptance_criteria":strings(),"dependencies":strings(),"requirement_ids":strings(),"verification_expectations":strings(),"role":{"type":"string","enum":["coder"]}}))}

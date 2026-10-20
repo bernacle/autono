@@ -16,7 +16,9 @@ autono plan feature.md --repository /absolute/project --base HEAD
 autono status --engineering
 autono show-plan <id>
 # Inspect original requirements, task graph, acceptance criteria, and exact checks.
-autono execute <id>              # Explicitly approves that immutable plan.
+autono preflight <id>            # Inspect/resolve the durable human checklist.
+autono blockers <id>
+autono execute <id>              # Approves the plan only after ready preflight.
 autono tasks <id>
 autono findings <id>
 autono logs --engineering --follow <id>
@@ -121,11 +123,16 @@ Run lifecycle:
 `PLANNING → AWAITING_APPROVAL → RUNNING → VERIFIED → INTEGRATING → COMPLETED`
 
 Active stages can stop as FAILED, BLOCKED, CANCELLED, or INTERRUPTED. Tasks use
-WAITING, READY, RUNNING, BLOCKED, FAILED, COMPLETED, CANCELLED, and INTERRUPTED.
+WAITING, READY, RUNNING, BLOCKED_HUMAN, BLOCKED, FAILED, COMPLETED, CANCELLED,
+and INTERRUPTED.
 Only completed dependencies unblock a task. Failed/blocked dependency states
-propagate to descendants; independent tasks can finish. A blocked run does not
-leave an agent waiting for interactive stdin. There is no unblock/resume command:
-inspect retained work and submit a new plan after resolving prerequisites.
+propagate to descendants; independent tasks can finish. Human-paused dependencies
+leave descendants WAITING while independent tasks finish.
+A blocked run does not leave an agent waiting for interactive stdin. Explicit
+`resolve` and `continue` support safe live task pauses while retaining artifacts;
+interrupted workflows and integrity failures remain nonresumable. See the
+[preflight and human escalation workflow](preflight.md) for checks, policy,
+resolution JSON, API semantics and limits.
 
 Plans require 1..32 tasks, 1..64 requirements, 1..8 milestones, unique IDs, known
 dependencies, no cycles, acceptance criteria, verification expectations, full
@@ -286,7 +293,11 @@ All routes use the existing bearer/Host/Origin/body-deadline protection:
 - `GET /v1/engineering?limit=20&offset=0`: run documents (limit capped at 100).
 - `GET /v1/engineering/health`: active run and workflow persistence error.
 - `GET /v1/engineering/{id}`: complete run, tasks, attempts, evidence, blockers.
-- `POST /v1/engineering/{id}/execute`: approve/start the stored plan.
+- `POST /v1/engineering/{id}/execute`: require ready preflight, approve/start the stored plan.
+- `POST /v1/engineering/{id}/preflight`: refresh the durable report/checklist.
+- `GET /v1/engineering/{id}/blockers`: human actions and complete audit history.
+- `POST /v1/engineering/{id}/blockers/{action}/resolve`: idempotent ResolutionRequest.
+- `POST /v1/engineering/{id}/continue`: explicitly schedule eligible resolved live pauses.
 - `POST /v1/engineering/{id}/integrate`: controlled local integration.
 - `POST /v1/engineering/{id}/cancel`: asynchronous owned-work cancellation.
 - `GET /v1/engineering/{id}/events?after=0&limit=500`: durable lifecycle history.

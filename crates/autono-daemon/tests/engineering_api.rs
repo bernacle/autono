@@ -25,7 +25,7 @@ impl AgentRuntime for Fake {
         Box::pin(async move {
             let value = match r.role {
                 AgentRole::Planner => {
-                    json!({"requirements":[{"id":"r","text":"Feature"}],"milestones":[{"id":"m","goal":"Feature","task_ids":["t"]}],"tasks":[{"id":"t","goal":"Feature","description":"Implement feature","acceptance_criteria":["Feature exists"],"dependencies":[],"requirement_ids":["r"],"verification_expectations":["Check feature"],"role":"coder"}]})
+                    json!({"human_requirements":[{"kind":"product_decision","reason":"Feature behavior needs a concrete developer choice","requested_action":"Choose the feature mode","affected_tasks":["t"],"blocking":true,"evidence":"Specification does not name the feature mode","confidence":90,"permission":null}],"requirements":[{"id":"r","text":"Feature"}],"milestones":[{"id":"m","goal":"Feature","task_ids":["t"]}],"tasks":[{"id":"t","goal":"Feature","description":"Implement feature","acceptance_criteria":["Feature exists"],"dependencies":[],"requirement_ids":["r"],"verification_expectations":["Check feature"],"role":"coder"}]})
                 }
                 AgentRole::Coder => json!({"summary":"Implemented feature","blocker":""}),
                 AgentRole::Reviewer => {
@@ -136,6 +136,72 @@ async fn authenticated_api_owns_planning_execution_evidence_and_integration() ->
         EngineeringStatus::AwaitingApproval,
         "{}",
         run.summary
+    );
+    let report: EngineeringRun = http
+        .post(format!("{base}/v1/engineering/{id}/preflight"))
+        .bearer_auth(token)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    inactive(&service, id).await?;
+    assert!(!report.preflight.expect("report").ready);
+    let actions: Vec<HumanAction> = http
+        .get(format!("{base}/v1/engineering/{id}/blockers"))
+        .bearer_auth(token)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    assert_eq!(actions.len(), 1);
+    assert_eq!(
+        http.post(format!("{base}/v1/engineering/{id}/execute"))
+            .bearer_auth(token)
+            .send()
+            .await?
+            .status(),
+        reqwest::StatusCode::CONFLICT
+    );
+    inactive(&service, id).await?;
+    let request = ResolutionRequest {
+        request_id: Uuid::new_v4(),
+        disposition: ResolutionDisposition::Resolve,
+        note: "Use the local feature mode".into(),
+        effect: EffectState::NotPerformed,
+        permission: None,
+    };
+    let route = format!(
+        "{base}/v1/engineering/{id}/blockers/{}/resolve",
+        actions[0].id
+    );
+    assert_eq!(
+        http.post(&route).json(&request).send().await?.status(),
+        reqwest::StatusCode::UNAUTHORIZED
+    );
+    let (first, duplicate) = tokio::join!(
+        http.post(&route).bearer_auth(token).json(&request).send(),
+        http.post(&route).bearer_auth(token).json(&request).send()
+    );
+    first?.error_for_status()?;
+    duplicate?.error_for_status()?;
+    assert_eq!(
+        service.store().engineering_get(id).await?.human_actions[0]
+            .audit
+            .len(),
+        2
+    );
+    let mut conflict = request.clone();
+    conflict.note = "Different decision".into();
+    assert_eq!(
+        http.post(&route)
+            .bearer_auth(token)
+            .json(&conflict)
+            .send()
+            .await?
+            .status(),
+        reqwest::StatusCode::CONFLICT
     );
     let response = http
         .post(format!("{base}/v1/engineering/{id}/execute"))

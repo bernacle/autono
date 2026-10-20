@@ -95,6 +95,15 @@ impl Store {
                 && old.settings == run.settings,
             "immutable run inputs changed"
         );
+        if old.status != EngineeringStatus::Running && run.status == EngineeringStatus::Running {
+            ensure!(
+                run.preflight
+                    .as_ref()
+                    .is_some_and(|p| p.ready
+                        && !p.checks.iter().any(|c| c.blocking && c.ready != Some(true))),
+                "execution requires a ready preflight report"
+            );
+        }
         if old.plan.is_some() {
             ensure!(old.plan == run.plan, "approved plan cannot be rewritten");
         }
@@ -107,6 +116,31 @@ impl Store {
         }
         for task in &run.tasks {
             if let Some(previous) = old.tasks.iter().find(|t| t.plan.id == task.plan.id) {
+                if previous.status == TaskStatus::BlockedHuman && task.status == TaskStatus::Ready {
+                    let actions: Vec<_> = run
+                        .human_actions
+                        .iter()
+                        .filter(|a| {
+                            a.requirement.kind == HumanActionType::Runtime
+                                && a.requirement.affected_tasks.contains(&task.plan.id)
+                        })
+                        .collect();
+                    ensure!(
+                        !actions.is_empty()
+                            && actions.iter().all(|a| a.continuable
+                                && a.status == HumanActionStatus::Resolved
+                                && a.resolution
+                                    .as_ref()
+                                    .is_some_and(|r| r.effect != EffectState::Unknown)),
+                        "human pause requires explicit resolved action and inspected effects"
+                    );
+                }
+                if previous.status == TaskStatus::Completed {
+                    ensure!(
+                        serde_json::to_value(previous)? == serde_json::to_value(task)?,
+                        "completed task evidence is immutable"
+                    );
+                }
                 ensure!(
                     previous.status.can_transition(task.status),
                     "illegal task transition"
@@ -223,6 +257,38 @@ impl Store {
             );
             verify_checks(&mut tx, &run.settings, &run.integration_verification).await?;
         }
+        // Human checklist projections and idempotency receipts commit with the run/event.
+        ensure!(
+            old.human_actions
+                .iter()
+                .all(|a| run.human_actions.iter().any(|b| b.id == a.id
+                    && b.requirement == a.requirement
+                    && b.created_at == a.created_at
+                    && b.continuable == a.continuable
+                    && b.workspace_snapshot == a.workspace_snapshot
+                    && b.audit.starts_with(&a.audit))),
+            "human action identity/history is immutable"
+        );
+        for action in &run.human_actions {
+            sqlx::query("INSERT INTO engineering_human_actions(run_id,action_id,status,document) VALUES(?,?,?,?) ON CONFLICT(run_id,action_id) DO UPDATE SET status=excluded.status,document=excluded.document")
+                .bind(run.id.to_string()).bind(&action.id).bind(serde_json::to_value(action.status)?.as_str().context("action status")?).bind(serde_json::to_string(action)?).execute(&mut *tx).await?;
+            for request in action.audit.iter().filter_map(|a| a.request.as_ref()) {
+                let payload = serde_json::to_string(request)?;
+                sqlx::query("INSERT INTO engineering_resolution_requests(request_id,run_id,action_id,document) VALUES(?,?,?,?) ON CONFLICT(request_id) DO NOTHING")
+                    .bind(request.request_id.to_string()).bind(run.id.to_string()).bind(&action.id).bind(&payload).execute(&mut *tx).await?;
+                let row = sqlx::query("SELECT run_id,action_id,document FROM engineering_resolution_requests WHERE request_id=?").bind(request.request_id.to_string()).fetch_one(&mut *tx).await?;
+                ensure!(
+                    row.try_get::<String, _>("run_id")? == run.id.to_string()
+                        && row.try_get::<String, _>("action_id")? == action.id
+                        && row.try_get::<String, _>("document")? == payload,
+                    EngineeringConflict("resolution request ID has another payload".into())
+                );
+            }
+        }
+        if let Some(report) = &run.preflight {
+            sqlx::query("INSERT INTO engineering_preflight(run_id,revision,document) VALUES(?,?,?) ON CONFLICT(run_id) DO UPDATE SET revision=excluded.revision,document=excluded.document")
+                .bind(run.id.to_string()).bind(run.revision).bind(serde_json::to_string(report)?).execute(&mut *tx).await?;
+        }
         sqlx::query(
             "UPDATE engineering_runs SET revision=?,status=?,document=? WHERE id=? AND revision=?",
         )
@@ -288,7 +354,10 @@ impl Store {
             for task in &mut run.tasks {
                 if matches!(
                     task.status,
-                    TaskStatus::Waiting | TaskStatus::Ready | TaskStatus::Running
+                    TaskStatus::Waiting
+                        | TaskStatus::Ready
+                        | TaskStatus::Running
+                        | TaskStatus::BlockedHuman
                 ) {
                     task.status = TaskStatus::Interrupted;
                 }
@@ -419,6 +488,8 @@ mod tests {
             ),
             tasks: vec![],
             blockers: vec![],
+            human_actions: vec![],
+            preflight: None,
             integration_workspace: None,
             integration_verification: vec![],
             summary: "Planning".into(),
@@ -426,6 +497,7 @@ mod tests {
     }
     fn plan() -> ExecutionPlan {
         ExecutionPlan {
+            human_requirements: vec![],
             requirements: vec![Requirement {
                 id: "r".into(),
                 text: "Original requirement".into(),
@@ -473,6 +545,13 @@ mod tests {
         journal
             .change("approved", "Developer approved", |r| {
                 r.approved_at = Some(Utc::now());
+                r.preflight = Some(PreflightReport {
+                    checked_at: Utc::now(),
+                    checks: vec![],
+                    action_ids: vec![],
+                    ready: true,
+                    limitation: "Fake deterministic fixture".into(),
+                });
                 r.status = EngineeringStatus::Running;
                 r.tasks[0].status = TaskStatus::Running;
                 Ok(())
@@ -486,6 +565,32 @@ mod tests {
         let path = dir.path().join("db");
         let store = Store::open(&path).await?;
         let journal = approved(&store, dir.path()).await?;
+        journal
+            .change(
+                "human_pause",
+                "A task paused before the daemon stopped",
+                |r| {
+                    r.tasks[0].status = TaskStatus::BlockedHuman;
+                    let requirement = HumanRequirement {
+                        kind: HumanActionType::Runtime,
+                        reason: "Needs external configuration".into(),
+                        requested_action: "Configure externally".into(),
+                        affected_tasks: vec!["t".into()],
+                        blocking: true,
+                        evidence: "Fake runtime".into(),
+                        confidence: 100,
+                        permission: None,
+                    };
+                    r.human_actions.push(super::super::preflight::action(
+                        requirement,
+                        "restart-paused",
+                        true,
+                        Some("snapshot".into()),
+                    ));
+                    Ok(())
+                },
+            )
+            .await?;
         let run = journal.read().await;
         assert!(
             store
@@ -512,6 +617,9 @@ mod tests {
         let run = reopened.engineering_get(run.id).await?;
         assert_eq!(run.status, EngineeringStatus::Interrupted);
         assert_eq!(run.tasks[0].status, TaskStatus::Interrupted);
+        assert_eq!(run.human_actions.len(), 1);
+        assert_eq!(run.human_actions[0].status, HumanActionStatus::Pending);
+        assert!(!run.status.can_transition(EngineeringStatus::Running));
         assert!(!run.blockers.is_empty());
         assert!(run.planning_workspace.path.parent().is_some());
         assert_eq!(reopened.engineering_reconcile().await?, 0);
