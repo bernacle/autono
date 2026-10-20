@@ -4,7 +4,7 @@ use anyhow::{Context, Result, ensure};
 use fs2::FileExt;
 use sha2::{Digest, Sha256};
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs::File,
     path::{Component, Path},
 };
@@ -106,6 +106,7 @@ pub async fn create(
         )
         .await?;
     workspace.git = Some(runner.git_ownership(&workspace.path)?);
+    validate_index(runner, &workspace.path, stop).await?;
     Ok(())
 }
 pub async fn head(runner: &ProcessRunner, path: &Path, stop: &CancellationToken) -> Result<String> {
@@ -157,23 +158,255 @@ pub async fn merge(
     Ok(())
 }
 pub async fn stage(runner: &ProcessRunner, path: &Path, stop: &CancellationToken) -> Result<()> {
+    validate_index(runner, path, stop).await?;
     runner.git(path, &["add", "--all", "--", "."], stop).await?;
     Ok(())
 }
-pub async fn commit(
+/// Reject preexisting suppression flags, not merely mutations to index bytes.
+/// -v exposes assume-unchanged; -f exposes fsmonitor-valid. Skip-worktree,
+/// unmerged and sparse entries are also rejected instead of silently normalized.
+pub async fn validate_index(
     runner: &ProcessRunner,
     path: &Path,
+    stop: &CancellationToken,
+) -> Result<()> {
+    let owned = runner.git_ownership(path)?;
+    ensure!(
+        owned.git_dir.join("index").is_file(),
+        "missing workspace Git index"
+    );
+    for flag in ["-v", "-f"] {
+        let entries = runner.git(path, &["ls-files", flag, "-z"], stop).await?;
+        ensure!(
+            entries
+                .split('\0')
+                .filter(|s| !s.is_empty())
+                .all(|s| s.starts_with("H ")),
+            "unsafe Git index flags/state; inspect the retained workspace"
+        );
+    }
+    Ok(())
+}
+
+/// Establish a safe baseline before any coder is admitted.
+pub async fn coder_state(
+    runner: &ProcessRunner,
+    path: &Path,
+    stop: &CancellationToken,
+) -> Result<String> {
+    validate_index(runner, path, stop).await?;
+    git_state(runner, path)
+}
+
+/// Bind actual filesystem bytes and executable bits to an immutable staged tree.
+/// Deliberately bypass stat-cache shortcuts and all clean/EOL filters. Unsupported
+/// transformations, submodules, missing entries and nonignored unstaged files fail
+/// closed. This may populate Git's cache-tree extension, but never stages files.
+pub async fn candidate_tree(
+    runner: &ProcessRunner,
+    path: &Path,
+    stop: &CancellationToken,
+) -> Result<String> {
+    validate_index(runner, path, stop).await?;
+    let tree = runner
+        .git(path, &["write-tree"], stop)
+        .await?
+        .trim()
+        .to_owned();
+    // write-tree may populate Git's cache-tree extension. Pin control state after
+    // that harness-owned update, and reject mutations during the actual audit.
+    let control = git_state(runner, path)?;
+    let entries = runner
+        .git(path, &["ls-files", "--stage", "-z"], stop)
+        .await?;
+    // Compare complete manifests, including stage/mode/OID. write-tree and the
+    // index read are separate operations; raw control hashes alone cannot bind
+    // them. This also rejects intent-to-add entries omitted by write-tree.
+    let immutable = runner
+        .git(path, &["ls-tree", "-r", "--full-tree", "-z", &tree], stop)
+        .await?;
+    let mut expected = BTreeMap::new();
+    for entry in immutable.split('\0').filter(|s| !s.is_empty()) {
+        let (header, name) = entry.split_once('\t').context("invalid tree entry")?;
+        let fields: Vec<_> = header.split(' ').collect();
+        ensure!(
+            fields.len() == 3 && fields[1] == "blob",
+            "unsupported candidate tree entry"
+        );
+        expected.insert(name, (fields[0], fields[2]));
+        ensure!(expected.len() <= 4096, "candidate audit exceeds 4096 files");
+    }
+    let root = tokio::fs::canonicalize(path).await?;
+    let mut regular = Vec::new();
+    let mut total = 0u64;
+    for (index, entry) in entries.split('\0').filter(|s| !s.is_empty()).enumerate() {
+        ensure!(index < 4096, "candidate audit exceeds 4096 files");
+        let (header, name) = entry.split_once('\t').context("invalid Git index entry")?;
+        let fields: Vec<_> = header.split(' ').collect();
+        ensure!(fields.len() == 3 && fields[2] == "0", "unmerged Git index");
+        ensure!(
+            expected.remove(name) == Some((fields[0], fields[1])),
+            "index inventory/content/mode differs from immutable candidate tree"
+        );
+        let relative = Path::new(name);
+        ensure!(
+            relative
+                .components()
+                .all(|c| matches!(c, Component::Normal(_))),
+            "unsafe Git index path"
+        );
+        let file = path.join(relative);
+        ensure!(
+            tokio::fs::canonicalize(file.parent().context("missing parent")?)
+                .await?
+                .starts_with(&root),
+            "Git index path escapes checkout"
+        );
+        let metadata = tokio::fs::symlink_metadata(&file)
+            .await
+            .context("staged file missing from candidate")?;
+        total = total.saturating_add(metadata.len());
+        ensure!(total <= 64 * 1024 * 1024, "candidate audit exceeds 64 MiB");
+        if metadata.file_type().is_symlink() {
+            ensure!(
+                fields[0] == "120000",
+                "staged symlink mode differs from candidate"
+            );
+            let blob = runner
+                .git(path, &["cat-file", "blob", fields[1]], stop)
+                .await?;
+            ensure!(
+                blob.as_bytes()
+                    == tokio::fs::read_link(&file)
+                        .await?
+                        .as_os_str()
+                        .as_encoded_bytes(),
+                "staged symlink differs from candidate"
+            );
+        } else {
+            ensure!(metadata.is_file(), "unsupported candidate file type");
+            #[cfg(unix)]
+            let mode = {
+                use std::os::unix::fs::PermissionsExt;
+                let bits = metadata.permissions().mode();
+                ensure!(
+                    (bits & 0o111 != 0) == (bits & 0o100 != 0),
+                    "candidate executable bits cannot be represented by Git"
+                );
+                if bits & 0o100 != 0 {
+                    "100755"
+                } else {
+                    "100644"
+                }
+            };
+            #[cfg(not(unix))]
+            let mode = {
+                anyhow::bail!("candidate executable-mode auditing requires Unix");
+            };
+            ensure!(
+                fields[0] == mode,
+                "staged executable mode differs from candidate: {name}"
+            );
+            regular.push((name, fields[1]));
+        }
+    }
+    ensure!(expected.is_empty(), "index omits candidate tree files");
+    // One process per bounded batch, never one process per source file. Hash the
+    // bytes on disk even when Git's stat cache considers the file unchanged.
+    for batch in regular.chunks(64) {
+        let mut args = vec!["hash-object", "--no-filters", "--"];
+        args.extend(batch.iter().map(|(name, _)| *name));
+        let hashes = runner.git(path, &args, stop).await?;
+        ensure!(
+            hashes.lines().eq(batch.iter().map(|(_, oid)| *oid)),
+            "staged content differs from candidate"
+        );
+    }
+    ensure!(
+        runner
+            .git(
+                path,
+                &["ls-files", "--others", "--exclude-standard", "-z"],
+                stop
+            )
+            .await?
+            .is_empty(),
+        "candidate contains unstaged files"
+    );
+    validate_index(runner, path, stop).await?;
+    ensure!(
+        control == git_state(runner, path)?,
+        "Git control state changed during candidate audit"
+    );
+    Ok(tree)
+}
+
+/// Preserve exactly the reviewed immutable tree, rather than letting `commit`
+/// reread a mutable index. Publish with compare-and-swap on the owned branch.
+pub async fn commit(
+    runner: &ProcessRunner,
+    workspace: &Workspace,
+    tree: &str,
+    snapshot: &str,
     message: &str,
     stop: &CancellationToken,
 ) -> Result<String> {
+    let path = &workspace.path;
+    assert_owned(runner, workspace, &workspace.base_commit, stop).await?;
+    ensure!(
+        candidate_tree(runner, path, stop).await? == tree,
+        "candidate tree changed after review"
+    );
+    ensure!(
+        self::snapshot(runner, path, stop).await? == snapshot,
+        "candidate changed after verification/review"
+    );
+    let commit = runner
+        .git(
+            path,
+            &[
+                "commit-tree",
+                tree,
+                "-p",
+                &workspace.base_commit,
+                "-m",
+                message,
+            ],
+            stop,
+        )
+        .await?
+        .trim()
+        .to_owned();
+    ensure!(
+        self::snapshot(runner, path, stop).await? == snapshot,
+        "candidate changed during commit creation"
+    );
     runner
         .git(
             path,
-            &["commit", "--allow-empty", "--no-gpg-sign", "-m", message],
+            &[
+                "update-ref",
+                &format!("refs/heads/{}", workspace.branch),
+                &commit,
+                &workspace.base_commit,
+            ],
             stop,
         )
         .await?;
-    head(runner, path, stop).await
+    assert_owned(runner, workspace, &commit, stop).await?;
+    ensure!(
+        runner
+            .git(path, &["rev-parse", &format!("{commit}^{{tree}}")], stop)
+            .await?
+            .trim()
+            == tree,
+        "preserved commit tree differs from reviewed tree"
+    );
+    ensure!(
+        candidate_tree(runner, path, stop).await? == tree,
+        "candidate changed during artifact preservation"
+    );
+    Ok(commit)
 }
 /// The coder may edit source, but not HEAD/index control state (including index flags).
 pub fn git_state(runner: &ProcessRunner, path: &Path) -> Result<String> {
@@ -199,6 +432,7 @@ pub async fn snapshot(
     path: &Path,
     stop: &CancellationToken,
 ) -> Result<String> {
+    validate_index(runner, path, stop).await?;
     let root_metadata = tokio::fs::symlink_metadata(path).await?;
     ensure!(
         root_metadata.is_dir() && !root_metadata.file_type().is_symlink(),

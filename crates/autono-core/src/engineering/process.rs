@@ -293,6 +293,10 @@ impl ProcessRunner {
         }
         for setting in [
             "core.hooksPath=/dev/null",
+            // Command-line config also reaches worktree-add's child checkout.
+            // These must apply BEFORE Git creates an index, not just at staging.
+            "core.ignoreStat=false",
+            "core.fileMode=true",
             "core.fsmonitor=false",
             "core.untrackedCache=false",
             "core.attributesFile=/dev/null",

@@ -563,6 +563,12 @@ pub struct TaskAttempt {
     pub reviews: Vec<ReviewAttempt>,
     pub review: Option<ReviewResult>,
     pub snapshot: Option<String>,
+    /// Immutable tree audited against actual bytes/modes before verification.
+    #[serde(default)]
+    pub verified_tree: Option<String>,
+    /// Tree resolved from the preserved commit, checked against verified_tree.
+    #[serde(default)]
+    pub preserved_tree: Option<String>,
     pub detail: Option<String>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]

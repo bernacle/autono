@@ -494,6 +494,9 @@ impl Engine {
             }
         }
         w.base_commit = workspace::head(&self.runner, &w.path, &self.stop).await?;
+        workspace::validate_index(&self.runner, &w.path, &self.stop)
+            .await
+            .map_err(workspace_blocker)?;
         self.journal
             .change("workspace_ready", id, |r| {
                 task_mut(r, id)?.workspace = Some(w.clone());
@@ -526,6 +529,8 @@ impl Engine {
                         reviews: vec![],
                         review: None,
                         snapshot: None,
+                        verified_tree: None,
+                        preserved_tree: None,
                         detail: None,
                     });
                     Ok(())
@@ -553,7 +558,9 @@ impl Engine {
                     serde_json::to_string(&feedback)?
                 )
             };
-            let git_state = workspace::git_state(&self.runner, &w.path)?;
+            let git_state = workspace::coder_state(&self.runner, &w.path, &self.stop)
+                .await
+                .map_err(workspace_blocker)?;
             let coder = self
                 .call_agent(
                     SessionTarget::Coder(id.into(), number),
@@ -571,6 +578,7 @@ impl Engine {
                 &self.runner,
                 &w.path,
                 &run.base_commit,
+                None,
                 &run.settings.verification.commands,
                 &self.stop,
             )
@@ -619,12 +627,19 @@ impl Engine {
                     continue;
                 }
             }
+            let tree = workspace::candidate_tree(&self.runner, &w.path, &self.stop)
+                .await
+                .map_err(workspace_blocker)?;
             let snapshot = workspace::snapshot(&self.runner, &w.path, &self.stop).await?;
             let checks = self.checks(Some((id, number)), &w.path).await?;
             let after = workspace::snapshot(&self.runner, &w.path, &self.stop).await?;
             if after != snapshot {
                 return Err(AgentFailure{kind:"verification_mutation".into(),detail:"Verification changed tracked or nonignored workspace contents; refusing stale evidence".into(),blocked:true}.into());
             }
+            ensure!(
+                workspace::candidate_tree(&self.runner, &w.path, &self.stop).await? == tree,
+                "verification changed the candidate tree"
+            );
             if checks.iter().any(|c| !c.passed) {
                 feedback = format!(
                     "Required verification failed. Fix the implementation without weakening checks:\n{}",
@@ -636,6 +651,7 @@ impl Engine {
             self.journal
                 .change("verification_passed", id, |r| {
                     task_mut(r, id)?.attempts[number - 1].snapshot = Some(snapshot.clone());
+                    task_mut(r, id)?.attempts[number - 1].verified_tree = Some(tree.clone());
                     Ok(())
                 })
                 .await?;
@@ -663,11 +679,28 @@ impl Engine {
             workspace::assert_owned(&self.runner, &w, &w.base_commit, &self.stop).await?;
             let commit = workspace::commit(
                 &self.runner,
-                &w.path,
+                &w,
+                &tree,
+                &snapshot,
                 &format!("Autono {}: {}", id, task.goal),
                 &self.stop,
             )
-            .await?;
+            .await
+            .map_err(workspace_blocker)?;
+            let preserved_tree = self
+                .runner
+                .git(
+                    &w.path,
+                    &["rev-parse", &format!("{commit}^{{tree}}")],
+                    &self.stop,
+                )
+                .await?
+                .trim()
+                .to_owned();
+            ensure!(
+                preserved_tree == tree,
+                "preserved tree does not match verified tree"
+            );
             ensure!(
                 self.runner
                     .git(&w.path, &["status", "--porcelain"], &self.stop)
@@ -680,6 +713,7 @@ impl Engine {
                     let t = task_mut(r, id)?;
                     t.status = TaskStatus::Completed;
                     t.artifact_commit = Some(commit.clone());
+                    t.attempts[number - 1].preserved_tree = Some(preserved_tree);
                     t.workspace
                         .as_mut()
                         .context("workspace missing")?
@@ -701,6 +735,19 @@ impl Engine {
         count: &mut usize,
     ) -> Result<ReviewResult> {
         let run = self.journal.read().await;
+        let tree = run
+            .tasks
+            .iter()
+            .find(|t| t.plan.id == task.id)
+            .context("missing task")?
+            .attempts[number - 1]
+            .verified_tree
+            .as_deref()
+            .context("missing verified tree")?;
+        ensure!(
+            workspace::snapshot(&self.runner, &w.path, &self.stop).await? == snapshot,
+            "candidate changed before review"
+        );
         let trusted = self.project_context().await?;
         let requirements: Vec<_> = run
             .plan
@@ -714,6 +761,7 @@ impl Engine {
             &self.runner,
             &w.path,
             &run.base_commit,
+            Some(tree),
             &run.settings.verification.commands,
             &self.stop,
         )
@@ -726,10 +774,10 @@ impl Engine {
                     "diff",
                     "--no-ext-diff",
                     "--no-textconv",
-                    "--cached",
                     "--binary",
                     "--no-renames",
                     &run.base_commit,
+                    tree,
                     "--",
                 ],
                 &self.stop,
@@ -743,9 +791,9 @@ impl Engine {
                     "diff",
                     "--no-ext-diff",
                     "--no-textconv",
-                    "--cached",
                     "--stat",
                     &run.base_commit,
+                    tree,
                     "--",
                 ],
                 &self.stop,
@@ -753,6 +801,7 @@ impl Engine {
             .await?;
         let excerpt: String = diff.chars().take(48_000).collect();
         let data = serde_json::json!({
+            "verified_tree":tree,
             "changed_files":inventory, "diff_statistics":stats,
             "diff_truncated":excerpt.len() < diff.len(), "diff_excerpt":excerpt,
             "full_diff_artifact":"{ARTIFACT_DIR}/changes.diff", "diff_sha256":review::digest(&diff),
@@ -1035,6 +1084,19 @@ impl Engine {
             let commit = task.artifact_commit.as_ref().context("missing artifact")?;
             workspace::assert_owned(&self.runner, owned, commit, &self.stop).await?;
             ensure!(
+                workspace::candidate_tree(&self.runner, &owned.path, &self.stop).await?
+                    == self
+                        .runner
+                        .git(
+                            &owned.path,
+                            &["rev-parse", &format!("{commit}^{{tree}}")],
+                            &self.stop
+                        )
+                        .await?
+                        .trim(),
+                "completed task bytes/modes differ from preserved artifact"
+            );
+            ensure!(
                 self.runner
                     .git(&owned.path, &["status", "--porcelain"], &self.stop)
                     .await?
@@ -1056,6 +1118,15 @@ impl Engine {
                 .change("integration_merge", &format!("{id}: {commit}"), |_| Ok(()))
                 .await?;
         }
+        let tree = workspace::candidate_tree(&self.runner, &w.path, &self.stop).await?;
+        ensure!(
+            tree == self
+                .runner
+                .git(&w.path, &["rev-parse", "HEAD^{tree}"], &self.stop)
+                .await?
+                .trim(),
+            "integration candidate differs from preserved tree"
+        );
         let snapshot = workspace::snapshot(&self.runner, &w.path, &self.stop).await?;
         let checks = self.checks(None, &w.path).await?;
         ensure!(
@@ -1067,6 +1138,10 @@ impl Engine {
             "combined verification mutated integration workspace"
         );
         let commit = workspace::head(&self.runner, &w.path, &self.stop).await?;
+        ensure!(
+            workspace::candidate_tree(&self.runner, &w.path, &self.stop).await? == tree,
+            "integration candidate changed before completion"
+        );
         self.journal.change("completed",&format!("Verified integration commit {commit}"),|r|{r.integration_workspace.as_mut().context("missing workspace")?.head_commit=Some(commit.clone());r.status=EngineeringStatus::Completed;r.summary=format!("All {} tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch {} at {} ({}). No merge to main was performed.",r.tasks.len(),w.branch,commit,w.path.display());Ok(())}).await
     }
 }

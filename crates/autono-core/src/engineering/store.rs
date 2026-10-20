@@ -149,6 +149,22 @@ impl Store {
                     review.accepts() && last.snapshot.is_some(),
                     "completed task lacks acceptance evidence"
                 );
+                // Existing completed records remain readable. Every new completion
+                // must carry matching immutable verified/preserved tree evidence.
+                let legacy_completed = old.tasks.iter().any(|t| {
+                    t.plan.id == task.plan.id
+                        && t.status == TaskStatus::Completed
+                        && t.attempts.last().is_some_and(|a| {
+                            a.verified_tree.is_none() && a.preserved_tree.is_none()
+                        })
+                }) && last.verified_tree.is_none()
+                    && last.preserved_tree.is_none();
+                ensure!(
+                    legacy_completed
+                        || (last.verified_tree.is_some()
+                            && last.verified_tree == last.preserved_tree),
+                    "completed task lacks matching verified/preserved trees"
+                );
                 let reviewer = last
                     .reviewer
                     .as_ref()
@@ -584,9 +600,30 @@ mod tests {
                 blocker: String::new(),
             }),
             snapshot: Some("snapshot".into()),
+            verified_tree: Some("c".repeat(40)),
+            preserved_tree: Some("c".repeat(40)),
             detail: None,
         });
         run.revision += 1;
+        for (verified, preserved) in [
+            (None, None),
+            (Some("c".repeat(40)), None),
+            (Some("c".repeat(40)), Some("d".repeat(40))),
+        ] {
+            let mut incomplete = run.clone();
+            let attempt = &mut incomplete.tasks[0].attempts[0];
+            attempt.verified_tree = verified;
+            attempt.preserved_tree = preserved;
+            let error = store
+                .engineering_save(&incomplete, "completed", "reject missing/mismatched trees")
+                .await
+                .expect_err("accepted incomplete tree evidence");
+            assert!(
+                error
+                    .to_string()
+                    .contains("matching verified/preserved trees")
+            );
+        }
         assert!(
             store
                 .engineering_save(&run, "completed", "must reject forged evidence")

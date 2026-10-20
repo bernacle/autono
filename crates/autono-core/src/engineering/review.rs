@@ -110,27 +110,28 @@ pub(super) async fn inventory(
     runner: &ProcessRunner,
     cwd: &Path,
     base: &str,
+    candidate: Option<&str>,
     commands: &[Vec<String>],
     stop: &CancellationToken,
 ) -> Result<Vec<Change>> {
     // No rename heuristics: both removed and added paths remain visible and flagged.
-    let raw = runner
-        .git(
-            cwd,
-            &[
-                "diff",
-                "--no-ext-diff",
-                "--no-textconv",
-                "--cached",
-                "--no-renames",
-                "--name-status",
-                "-z",
-                base,
-                "--",
-            ],
-            stop,
-        )
-        .await?;
+    let mut args = vec![
+        "diff",
+        "--no-ext-diff",
+        "--no-textconv",
+        "--no-renames",
+        "--name-status",
+        "-z",
+    ];
+    if candidate.is_none() {
+        args.push("--cached");
+    }
+    args.push(base);
+    if let Some(tree) = candidate {
+        args.push(tree);
+    }
+    args.push("--");
+    let raw = runner.git(cwd, &args, stop).await?;
     let fields: Vec<_> = raw.split('\0').filter(|s| !s.is_empty()).collect();
     ensure!(fields.len() % 2 == 0, "invalid changed-file inventory");
     Ok(fields
