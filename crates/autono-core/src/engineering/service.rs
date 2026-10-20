@@ -31,6 +31,7 @@ struct Inner {
     shutdown: CancellationToken,
     control: tokio::sync::Mutex<()>,
     wakeup: Arc<tokio::sync::Notify>,
+    mutations: Arc<tokio::sync::Semaphore>,
 }
 struct Registry {
     accepting: bool,
@@ -67,6 +68,9 @@ impl EngineeringService {
         config: Config,
         agents: Arc<dyn AgentRuntime>,
     ) -> Self {
+        let mutations = Arc::new(tokio::sync::Semaphore::new(
+            config.runner.max_pending_submissions,
+        ));
         Self {
             inner: Arc::new(Inner {
                 runner: ProcessRunner::new(supervisor),
@@ -83,6 +87,7 @@ impl EngineeringService {
                 shutdown: CancellationToken::new(),
                 control: tokio::sync::Mutex::new(()),
                 wakeup: Arc::new(tokio::sync::Notify::new()),
+                mutations,
             }),
         }
     }
@@ -166,6 +171,59 @@ impl EngineeringService {
         action_id: &str,
         request: ResolutionRequest,
     ) -> Result<EngineeringRun> {
+        // Registration is synchronous with shutdown admission. The HTTP future
+        // owns only the reply receiver, never the commit/publication lifecycle.
+        let (reply, response) = oneshot::channel();
+        let action_id = action_id.to_owned();
+        if !self.registry().accepting {
+            if let Some(result) = self
+                .store()
+                .engineering_resolution_result(id, &action_id, &request)
+                .await?
+            {
+                return Ok(result);
+            }
+            return Err(crate::supervisor::ShuttingDown.into());
+        }
+        {
+            let registry = self.registry();
+            ensure!(registry.accepting, crate::supervisor::ShuttingDown);
+            ensure!(
+                registry.error.is_none(),
+                EngineeringConflict("workflow persistence is degraded".into())
+            );
+            let permit = self
+                .inner
+                .mutations
+                .clone()
+                .try_acquire_owned()
+                .map_err(|_| crate::supervisor::Overloaded("pending engineering mutations"))?;
+            let this = self.clone();
+            self.inner.jobs.spawn(async move {
+                let owner = this.clone();
+                let job = tokio::spawn(async move { owner.apply_resolution(id, &action_id, request).await });
+                let result = match job.await {
+                    Ok(result) => result,
+                    Err(_) => {
+                        this.registry().error = Some("Resolution controller stopped before confirming publication; inspect durable receipts and restart reconciliation".into());
+                        this.signal_shutdown();
+                        Err(anyhow::anyhow!("resolution publication is uncertain; workflow stopped safely"))
+                    }
+                };
+                let _ = reply.send(result);
+                drop(permit);
+            });
+        }
+        response
+            .await
+            .context("resolution controller stopped before responding")?
+    }
+    async fn apply_resolution(
+        &self,
+        id: Uuid,
+        action_id: &str,
+        request: ResolutionRequest,
+    ) -> Result<EngineeringRun> {
         // One gate for inactive mutations and launch preparation. Active workers use
         // the same journal, so API requests cannot overwrite scheduler checkpoints.
         let _gate = self.inner.control.lock().await;
@@ -184,25 +242,18 @@ impl EngineeringService {
                 self.store().engineering_get(id).await?,
             ),
         };
-        let existing = journal.read().await;
-        if let Some((stored_action, stored)) = existing
-            .human_actions
-            .iter()
-            .flat_map(|a| {
-                a.audit
-                    .iter()
-                    .filter_map(move |audit| audit.request.as_ref().map(|r| (&a.id, r)))
-            })
-            .find(|(_, r)| r.request_id == request.request_id)
+        if let Some(result) = self
+            .store()
+            .engineering_resolution_result(id, action_id, &request)
+            .await?
         {
-            ensure!(
-                stored_action == action_id && stored == &request,
-                EngineeringConflict("resolution key has another payload or action".into())
-            );
-            return Ok(existing);
+            // Even an ambiguous earlier commit must be published before returning.
+            self.reconcile_resolution_journal(&journal).await?;
+            return Ok(result);
         }
         super::preflight::safe_text(&request.note)?;
-        journal.change("human_resolution", "Explicit developer resolution recorded; no operation was executed", |r| {
+        let receipt_request = request.clone();
+        let committed = journal.change("human_resolution", "Explicit developer resolution recorded; no operation was executed", |r| {
             ensure!(matches!(r.status, EngineeringStatus::AwaitingApproval | EngineeringStatus::Running | EngineeringStatus::Blocked), EngineeringConflict("cannot resolve a terminal or interrupted workflow".into()));
             let action = r.human_actions.iter_mut().find(|a| a.id == action_id).context("unknown human action")?;
             ensure!(action.status != HumanActionStatus::Resolved, EngineeringConflict("action already resolved; reuse the original request key".into()));
@@ -226,8 +277,32 @@ impl EngineeringService {
             action.updated_at = Utc::now();
             action.audit.push(ActionAudit { at: action.updated_at, status: action.status, request: Some(request) });
             Ok(())
-        }).await?;
-        Ok(journal.read().await)
+        }).await;
+        if let Err(error) = committed {
+            // A commit error is not proof of rollback. Confirm the durable state
+            // while holding the mutation gate, publish it, then consult the receipt.
+            self.reconcile_resolution_journal(&journal).await?;
+            if let Some(result) = self
+                .store()
+                .engineering_resolution_result(id, action_id, &receipt_request)
+                .await?
+            {
+                return Ok(result);
+            }
+            return Err(error);
+        }
+        self.store()
+            .engineering_resolution_result(id, action_id, &receipt_request)
+            .await?
+            .context("committed resolution receipt missing")
+    }
+    async fn reconcile_resolution_journal(&self, journal: &Journal) -> Result<()> {
+        if let Err(error) = journal.reconcile().await {
+            self.registry().error = Some("Cannot establish durable resolution state; accepted mutation reconciliation failed. Inspect receipts and restart after storage repair.".into());
+            self.signal_shutdown();
+            return Err(error.context("resolution state uncertain; workflow stopped safely"));
+        }
+        Ok(())
     }
     pub async fn integrate(&self, id: Uuid) -> Result<EngineeringRun> {
         ensure!(
@@ -659,4 +734,394 @@ fn mark_continued(r: &mut EngineeringRun) -> Result<()> {
     r.status = EngineeringStatus::Running;
     r.summary = "Continuing explicitly resolved live pauses".into();
     Ok(())
+}
+
+#[cfg(all(test, unix))]
+mod tests {
+    use super::super::agent::{AgentFuture, AgentRequest, AgentResponse};
+    use super::super::process::CommandOutput;
+    use super::*;
+    use crate::Store;
+    use serde_json::json;
+
+    struct Fake {
+        root: PathBuf,
+    }
+    fn quote(value: &str) -> String {
+        format!("'{}'", value.replace('\'', "'\\''"))
+    }
+    impl AgentRuntime for Fake {
+        fn prepare<'a>(
+            &'a self,
+            request: &'a AgentRequest,
+            _: &'a ProcessRunner,
+            _: &'a CancellationToken,
+        ) -> AgentFuture<'a> {
+            Box::pin(async move {
+                let mut prefix = String::new();
+                let result = match request.role {
+                    AgentRole::Planner => {
+                        let tasks: Vec<_> = ["b", "c"].iter().map(|id| json!({"id":id,"goal":"Feature","description":"Implement behavior","acceptance_criteria":["Works"],"dependencies":[],"requirement_ids":["r"],"verification_expectations":["Checks pass"],"role":"coder"})).collect();
+                        json!({"human_requirements":[],"requirements":[{"id":"r","text":"Feature"}],"milestones":[{"id":"m","goal":"Feature","task_ids":["b","c"]}],"tasks":tasks})
+                    }
+                    AgentRole::Coder => {
+                        if request.cwd.ends_with("task-c") {
+                            prefix = format!(
+                                "touch {}; sleep 60; ",
+                                quote(self.root.join("c-started").to_str().expect("path"))
+                            );
+                            json!({"summary":"Implemented","blocker":""})
+                        } else {
+                            json!({"summary":"Needs a decision","blocker":"Choose behavior before proceeding"})
+                        }
+                    }
+                    AgentRole::Reviewer => anyhow::bail!("review must not run in this fixture"),
+                };
+                let events = match request.config.provider {
+                    Provider::Claude => format!(
+                        "{}\n",
+                        json!({"type":"result","subtype":"success","session_id":Uuid::new_v4(),"structured_output":result})
+                    ),
+                    Provider::Codex => format!(
+                        "{}\n{}\n{}\n",
+                        json!({"type":"thread.started","thread_id":Uuid::new_v4()}),
+                        json!({"type":"item.completed","item":{"type":"agent_message","text":result.to_string()}}),
+                        json!({"type":"turn.completed"})
+                    ),
+                };
+                Ok(vec![
+                    "sh".into(),
+                    "-c".into(),
+                    format!("{prefix}printf '%s' {}", quote(&events)),
+                ])
+            })
+        }
+        fn decode(&self, provider: Provider, output: &CommandOutput) -> Result<AgentResponse> {
+            CliAgentRuntime.decode(provider, output)
+        }
+    }
+    struct Fixture {
+        _dir: tempfile::TempDir,
+        root: PathBuf,
+        service: EngineeringService,
+        supervisor: Supervisor,
+        config: Config,
+        id: Uuid,
+    }
+    impl Fixture {
+        async fn planned(mut config: Config) -> Result<Self> {
+            let dir = tempfile::tempdir()?;
+            let root = tokio::fs::canonicalize(dir.path()).await?;
+            let repository = root.join("repo");
+            tokio::fs::create_dir(&repository).await?;
+            let supervisor = Supervisor::new(Store::open(&root.join("db")).await?, false);
+            let runner = ProcessRunner::new(supervisor.clone());
+            let stop = CancellationToken::new();
+            runner
+                .git(&repository, &["init", "-b", "main"], &stop)
+                .await?;
+            tokio::fs::write(repository.join("README.md"), "Feature").await?;
+            runner.git(&repository, &["add", "."], &stop).await?;
+            runner
+                .git(&repository, &["commit", "-m", "seed"], &stop)
+                .await?;
+            config.verification.commands = vec![vec!["true".into()]];
+            config.agents.coder.timeout_seconds = 120;
+            let service = EngineeringService::with_agents(
+                supervisor.clone(),
+                root.join("home"),
+                config.clone(),
+                Arc::new(Fake { root: root.clone() }),
+            );
+            let id = Uuid::new_v4();
+            service
+                .plan(PlanSubmission {
+                    id,
+                    repository,
+                    base: "HEAD".into(),
+                    specification: "Implement a feature".into(),
+                })
+                .await?;
+            tokio::time::timeout(Duration::from_secs(60), async {
+                loop {
+                    if service.health().0.is_none() {
+                        break;
+                    }
+                    tokio::task::yield_now().await;
+                }
+            })
+            .await?;
+            ensure!(
+                service.store().engineering_get(id).await?.status
+                    == EngineeringStatus::AwaitingApproval,
+                "planning failed"
+            );
+            Ok(Self {
+                _dir: dir,
+                root,
+                service,
+                supervisor,
+                config,
+                id,
+            })
+        }
+    }
+
+    #[tokio::test]
+    async fn cancelled_resolution_waiter_cannot_strand_commit_publication_or_shutdown() -> Result<()>
+    {
+        let f = Fixture::planned(Config::default()).await?;
+        f.service.execute(f.id).await?;
+        let paused = tokio::time::timeout(Duration::from_secs(60), async {
+            let mut changed = f.service.store().subscribe();
+            loop {
+                let run = f.service.store().engineering_get(f.id).await?;
+                if run.tasks[0].status == TaskStatus::BlockedHuman
+                    && f.root.join("c-started").exists()
+                {
+                    break Ok::<_, anyhow::Error>(run);
+                }
+                changed.changed().await?;
+            }
+        })
+        .await??;
+        let journal = f
+            .service
+            .registry()
+            .journal
+            .clone()
+            .expect("active journal");
+        let gate = journal.pause_resolution_publication().await;
+        struct Release(Arc<super::super::journal::PublicationGate>);
+        impl Drop for Release {
+            fn drop(&mut self) {
+                self.0.publish.notify_one();
+            }
+        }
+        let _release = Release(gate.clone());
+        let request = ResolutionRequest {
+            request_id: Uuid::new_v4(),
+            disposition: ResolutionDisposition::Resolve,
+            note: "Use the selected behavior; inspected all effects".into(),
+            effect: EffectState::NotPerformed,
+            permission: None,
+        };
+        let action_id = paused.human_actions[0].id.clone();
+        let caller = {
+            let service = f.service.clone();
+            let request = request.clone();
+            let action_id = action_id.clone();
+            tokio::spawn(async move { service.resolve(f.id, &action_id, request).await })
+        };
+        tokio::time::timeout(Duration::from_secs(10), gate.committed.notified()).await?;
+        let committed = f.service.store().engineering_get(f.id).await?;
+        assert_eq!(
+            committed.human_actions[0].status,
+            HumanActionStatus::Resolved
+        );
+        caller.abort();
+        assert!(
+            caller
+                .await
+                .expect_err("request should be cancelled")
+                .is_cancelled()
+        );
+        let duplicate = {
+            let service = f.service.clone();
+            let request = request.clone();
+            let action_id = action_id.clone();
+            tokio::spawn(async move { service.resolve(f.id, &action_id, request).await })
+        };
+        tokio::time::timeout(Duration::from_secs(5), async {
+            while f.service.inner.mutations.available_permits()
+                != f.config.runner.max_pending_submissions - 2
+            {
+                tokio::task::yield_now().await;
+            }
+        })
+        .await?;
+        let shutdown = {
+            let service = f.service.clone();
+            tokio::spawn(async move { service.shutdown().await })
+        };
+        tokio::time::timeout(Duration::from_secs(5), async {
+            while f.service.registry().accepting {
+                tokio::task::yield_now().await;
+            }
+        })
+        .await?;
+        assert!(
+            !shutdown.is_finished(),
+            "shutdown abandoned the accepted mutation"
+        );
+        gate.publish.notify_one();
+        let retried = duplicate.await??;
+        assert_eq!(
+            serde_json::to_value(&retried)?,
+            serde_json::to_value(&committed)?,
+            "retry must return the original result"
+        );
+        shutdown.await??;
+        let durable = f.service.store().engineering_get(f.id).await?;
+        assert_eq!(durable.status, EngineeringStatus::Interrupted);
+        assert!(
+            durable
+                .tasks
+                .iter()
+                .all(|t| t.status != TaskStatus::Running)
+        );
+        assert_eq!(f.service.health(), (None, None));
+        assert_eq!(
+            serde_json::to_value(journal.read().await)?,
+            serde_json::to_value(&durable)?
+        );
+        let retry = f.service.resolve(f.id, &action_id, request.clone()).await?;
+        assert_eq!(
+            serde_json::to_value(retry)?,
+            serde_json::to_value(&committed)?
+        );
+        let count: i64 = sqlx::query_scalar(
+            "SELECT count(*) FROM engineering_resolution_requests WHERE request_id=?",
+        )
+        .bind(request.request_id.to_string())
+        .fetch_one(&f.service.store().readers)
+        .await?;
+        assert_eq!(count, 1);
+        assert_eq!(durable.human_actions[0].audit.len(), 2);
+        f.supervisor.shutdown().await
+    }
+
+    #[tokio::test]
+    async fn production_preflight_uses_fake_claude_and_codex_help_only() -> Result<()> {
+        use std::os::unix::fs::PermissionsExt;
+        let root = tempfile::tempdir()?;
+        let bin = root.path().join("bin");
+        std::fs::create_dir(&bin)?;
+        let script = r#"#!/bin/sh
+printf '%s %s\n' "$0" "$*" >> "$AUTONO_FAKE_PROBE_LOG"
+case "$*" in
+  '--help')
+    case "$0" in
+      */codex) printf '%s\n' '--no-daemon' ;;
+      */claude)
+        if [ "$AUTONO_BAD_CLAUDE_HELP" = 1 ]; then printf '%s\n' '--print stream-json --json-schema --permission-prompts --tools --strict-mcp-config'
+        else printf '%s\n' '--print stream-json --json-schema --permission-prompts --safe-mode --tools --strict-mcp-config'; fi ;;
+    esac ;;
+  'exec --help') printf '%s\n' '--json --sandbox --output-schema --ignore-user-config' ;;
+  *) printf '%s\n' 'UNEXPECTED INFERENCE ATTEMPT' >> "$AUTONO_FAKE_PROBE_LOG"; exit 91 ;;
+esac
+"#;
+        for name in ["codex", "claude"] {
+            let path = bin.join(name);
+            std::fs::write(&path, script)?;
+            std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755))?;
+        }
+        let mut paths = vec![bin];
+        paths.extend(std::env::split_paths(
+            &std::env::var_os("PATH").unwrap_or_default(),
+        ));
+        for incompatible in [false, true] {
+            let output = tokio::process::Command::new(std::env::current_exe()?)
+                .args([
+                    "--exact",
+                    "engineering::service::tests::production_preflight_child",
+                    "--ignored",
+                    "--nocapture",
+                ])
+                .env("PATH", std::env::join_paths(&paths)?)
+                .env("AUTONO_FAKE_PROBE_ROOT", root.path())
+                .env("AUTONO_FAKE_PROBE_LOG", root.path().join("probe.log"))
+                .env(
+                    "AUTONO_PROBE_SECRET",
+                    "synthetic-preflight-value-never-persist",
+                )
+                .env(
+                    "AUTONO_BAD_CLAUDE_HELP",
+                    if incompatible { "1" } else { "0" },
+                )
+                .output()
+                .await?;
+            ensure!(
+                output.status.success(),
+                "fake production preflight child failed: {} {}",
+                String::from_utf8_lossy(&output.stdout),
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+        let log = std::fs::read_to_string(root.path().join("probe.log"))?;
+        assert!(log.lines().all(|line| line.ends_with(" --help")));
+        assert_eq!(
+            log.lines().count(),
+            12,
+            "both provider/role combinations must use help probes only"
+        );
+        Ok(())
+    }
+    #[tokio::test]
+    #[ignore = "isolated subprocess helper; parent supplies fake provider executables"]
+    async fn production_preflight_child() -> Result<()> {
+        ensure!(
+            std::env::var_os("AUTONO_FAKE_PROBE_ROOT").is_some(),
+            "refuse to probe real provider executables"
+        );
+        for reverse in [false, true] {
+            let mut config = Config::default();
+            config.preflight.required_env = vec!["AUTONO_PROBE_SECRET".into()];
+            if reverse {
+                config.agents.coder.provider = Provider::Claude;
+                config.agents.reviewer.provider = Provider::Codex;
+            }
+            let mut f = Fixture::planned(config).await?;
+            f.service.shutdown().await?;
+            f.service = EngineeringService::new(
+                f.supervisor.clone(),
+                f.root.join("home"),
+                f.config.clone(),
+            );
+            let before = f.service.store().engineering_get(f.id).await?;
+            let artifacts = f
+                .root
+                .join("home/engineering")
+                .join(f.id.to_string())
+                .join("artifacts");
+            let sessions = std::fs::read_dir(&artifacts)?.count();
+            let run = f.service.preflight(f.id).await?;
+            let report = run.preflight.expect("report");
+            let compatible = std::env::var("AUTONO_BAD_CLAUDE_HELP")? == "0";
+            assert_eq!(report.ready, compatible, "{report:?}");
+            for (role, provider) in [
+                ("coder", f.config.agents.coder.provider),
+                ("reviewer", f.config.agents.reviewer.provider),
+            ] {
+                assert_eq!(
+                    report
+                        .checks
+                        .iter()
+                        .find(|c| c.id == format!("provider-{role}"))
+                        .expect("provider check")
+                        .ready,
+                    Some(compatible || provider == Provider::Codex)
+                );
+            }
+            assert!(
+                !before
+                    .planning_workspace
+                    .path
+                    .join("unused-preflight-schema")
+                    .exists()
+            );
+            assert_eq!(
+                std::fs::read_dir(artifacts)?.count(),
+                sessions,
+                "readiness created invocation artifacts"
+            );
+            assert!(
+                !serde_json::to_string(&report)?
+                    .contains("synthetic-preflight-value-never-persist")
+            );
+            f.service.shutdown().await?;
+            f.supervisor.shutdown().await?;
+        }
+        Ok(())
+    }
 }

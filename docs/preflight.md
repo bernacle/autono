@@ -42,7 +42,9 @@ Authentication is reported as UNKNOWN when it cannot be established safely.
 Autono does not inspect credential files or run potentially credential-bearing
 login diagnostics. The existing provider login mechanism remains authoritative;
 a structured authentication error during execution produces a human pause.
-Capability probes are supervised, noninteractive, time bounded and inference free.
+Capability probes are help-only, supervised, noninteractive, time bounded and
+inference free. They are separate from invocation construction and require no
+prompt/schema artifacts; Claude readiness never opens a placeholder schema.
 Missing or incompatible CLIs block readiness. Both installed provider executables
 are reported; only configured execution providers gate readiness.
 
@@ -120,10 +122,20 @@ Existing process/provider logs retain their Runtime v0 behavior, so providers an
 trusted commands must obey the prohibition on printing secrets.
 
 Retry an ambiguous resolution with exactly the same UUID and payload. Matching
-retries are no-ops; a reused UUID with another payload/action/run conflicts.
+retries return the original accepted response snapshot; a reused UUID with
+another payload/action/run conflicts. Inspect `summary` for current workflow
+liveness: the resolution response describes the revision that accepted it.
+Receipts predating migration 0005 have no historical response snapshot and return
+the current run view while retaining their original request identity.
 State, resolution receipt, checklist projections and lifecycle event commit in
 one SQLite transaction. Active requests share the workers' serialized journal;
-inactive requests serialize with admission/cancellation. Cancellation never waits
+inactive requests serialize with admission/cancellation. Once accepted, resolution
+mutations are bounded and tracked by the daemon through commit, in-memory
+publication and reply delivery, even if the HTTP/CLI waiter disconnects. Shutdown
+drains accepted mutations. Ambiguous commit errors trigger a durable reread and
+journal reconciliation; if the state cannot be established, the workflow stops,
+health reports the failure and shutdown fails honestly. This does not replay
+agents or resume an interrupted workflow. Cancellation never waits
 for a resolution/database lock before signalling active processes.
 
 A resolution alone never launches a worker. `continue` explicitly schedules
@@ -139,9 +151,23 @@ required after continuation; integration still runs combined verification.
 Before a live pause can continue, the developer must inspect the operation and
 explicitly state whether its external effect happened. UNKNOWN effects keep it
 blocked. An `already_performed` resolution is delivered to the fresh provider with
-an instruction not to repeat that effect. Autono does not claim exactly-once
-external effects or independently verify the developer's statement. Privileged
+an instruction not to repeat that effect. Applicable resolutions are reconstructed
+from durable actions as authoritative context for every invocation, including
+fresh sessions and retries, separately from mutable diagnostics. Autono does not
+claim exactly-once external effects or independently verify the developer's
+statement. Privileged
 external operations are unsupported and stay blocked by the broker/adapter.
+
+After a task has required runtime effect reconciliation, a failed invocation,
+failed verification, or review rejection cannot automatically start another
+coding invocation. The adapters provide no authoritative external-effect receipt.
+The task returns to BLOCKED_HUMAN with an `effect_reconciliation` action; inspect
+the last invocation and provide a new resolution before explicitly continuing.
+This rule applies even when the previous resolution said `already_performed`:
+that statement describes the inspected checkpoint, not proof about later
+invocations. Attempt and review budgets are preserved, including after a new
+resolution; exhausted budgets cannot be bypassed. Ordinary retries without
+runtime effect context still receive all applicable product decisions.
 
 Generic missing prerequisites and coder-requested human decisions can continue
 within existing bounds. Provider permission denials without a safely grantable
@@ -189,8 +215,9 @@ providers and configured commands as required by SECURITY.md.
 ## Persistence and interruption
 
 Additive migration 0004 adds inspectable preflight/action projections and immutable
-resolution receipts. The versioned run document, history and projections commit
-atomically. Existing migrations and process supervisor state machines are intact.
+resolution receipts. Migration 0005 adds immutable original resolution response
+snapshots to those receipts, in the same run/event transaction. The versioned run
+document, history and projections commit atomically. Existing migrations and process supervisor state machines are intact.
 
 There is no generalized crash-safe resume. Startup still reconciles active
 PLANNING/RUNNING/INTEGRATING runs to INTERRUPTED, including human-paused tasks in
@@ -207,3 +234,23 @@ duplicate/concurrent requests, cancellation/restart, live continuation, dependen
 waiting, unchanged completed evidence, effect checks and authoritative integration.
 No normal test consumes inference. The existing paid real-agent acceptance test
 remains explicitly opt-in and is not part of this milestone's automatic checks.
+
+## Reproduced M3 review regressions
+
+The deterministic counter regression creates an external `x`, pauses for a human,
+then fails the first continued invocation. The harness stops before an automatic
+fresh retry can turn it into `xx`; a new human checkpoint is required. A separate
+fresh-session retry test checks that product decisions survive overwritten error
+diagnostics.
+
+A test-only journal barrier stops resolution publication after SQLite commit.
+Cancelling the request waiter at that exact point leaves the owned mutation
+running. A concurrent duplicate and shutdown both wait; releasing the barrier
+publishes the committed state, returns the original receipt, drains shutdown and
+leaves no RUNNING workflow or stale controller journal.
+
+Production preflight tests run in isolated subprocess environments with fake
+Claude/Codex executables first on PATH. Both coder/reviewer provider combinations
+are checked, compatible Claude reports READY without dummy artifacts, and
+missing safety capabilities block readiness. An argv log permits only help
+commands. These tests never invoke installed providers or inference APIs.

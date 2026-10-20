@@ -21,6 +21,31 @@ impl Store {
                 .await?;
         serde_json::from_str(&doc.ok_or(EngineeringNotFound(id))?).context("decode engineering run")
     }
+    pub(crate) async fn engineering_resolution_result(
+        &self,
+        id: Uuid,
+        action: &str,
+        request: &ResolutionRequest,
+    ) -> Result<Option<EngineeringRun>> {
+        let row = sqlx::query("SELECT run_id,action_id,document,result FROM engineering_resolution_requests WHERE request_id=?").bind(request.request_id.to_string()).fetch_optional(&self.readers).await?;
+        let Some(row) = row else {
+            return Ok(None);
+        };
+        ensure!(
+            row.try_get::<String, _>("run_id")? == id.to_string()
+                && row.try_get::<String, _>("action_id")? == action
+                && serde_json::from_str::<ResolutionRequest>(
+                    &row.try_get::<String, _>("document")?
+                )? == *request,
+            EngineeringConflict("resolution key has another payload, action or run".into())
+        );
+        Ok(Some(match row.try_get::<Option<String>, _>("result")? {
+            Some(result) => serde_json::from_str(&result)?,
+            // Older receipts predate response snapshots. They remain idempotent;
+            // only their current run view is available, never a fabricated history.
+            None => self.engineering_get(id).await?,
+        }))
+    }
     pub async fn engineering_list(&self, limit: u32, offset: u32) -> Result<Vec<EngineeringRun>> {
         let docs: Vec<String> = sqlx::query_scalar(
             "SELECT document FROM engineering_runs ORDER BY rowid DESC LIMIT ? OFFSET ?",
@@ -274,8 +299,8 @@ impl Store {
                 .bind(run.id.to_string()).bind(&action.id).bind(serde_json::to_value(action.status)?.as_str().context("action status")?).bind(serde_json::to_string(action)?).execute(&mut *tx).await?;
             for request in action.audit.iter().filter_map(|a| a.request.as_ref()) {
                 let payload = serde_json::to_string(request)?;
-                sqlx::query("INSERT INTO engineering_resolution_requests(request_id,run_id,action_id,document) VALUES(?,?,?,?) ON CONFLICT(request_id) DO NOTHING")
-                    .bind(request.request_id.to_string()).bind(run.id.to_string()).bind(&action.id).bind(&payload).execute(&mut *tx).await?;
+                sqlx::query("INSERT INTO engineering_resolution_requests(request_id,run_id,action_id,document,result) VALUES(?,?,?,?,?) ON CONFLICT(request_id) DO NOTHING")
+                    .bind(request.request_id.to_string()).bind(run.id.to_string()).bind(&action.id).bind(&payload).bind(serde_json::to_string(run)?).execute(&mut *tx).await?;
                 let row = sqlx::query("SELECT run_id,action_id,document FROM engineering_resolution_requests WHERE request_id=?").bind(request.request_id.to_string()).fetch_one(&mut *tx).await?;
                 ensure!(
                     row.try_get::<String, _>("run_id")? == run.id.to_string()

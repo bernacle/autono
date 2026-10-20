@@ -95,6 +95,8 @@ enum Scenario {
     Reject,
     Human,
     HumanOnceB,
+    EffectRetry,
+    DecisionRetry,
     LiveHumanB,
     ApprovalNeeded,
     ReviewerMutation,
@@ -203,6 +205,44 @@ impl AgentRuntime for FakeAgents {
                 AgentRole::Planner => serde_json::to_value(&self.plan)?,
                 AgentRole::Coder => {
                     let number = self.coder_calls.fetch_add(1, Ordering::SeqCst);
+                    if self.scenario == Scenario::EffectRetry {
+                        if number == 0 || !delivered_prompt.contains("INSPECTED_EFFECT") {
+                            // Original bug: loss of context on the third automatic
+                            // invocation repeats the already-completed external effect.
+                            script.push_str(&format!(
+                                "printf x >> {};\n",
+                                quote(self.root.join("effect-count").to_str().expect("path"))
+                            ));
+                        }
+                        if number == 1 {
+                            ensure!(
+                                delivered_prompt.contains("already_performed")
+                                    && delivered_prompt.contains("INSPECTED_EFFECT"),
+                                "continuation lacks authoritative effect context"
+                            );
+                            script.push_str("exit 42;\n");
+                        }
+                        if number == 2 && delivered_prompt.contains("INSPECTED_EFFECT") {
+                            ensure!(
+                                delivered_prompt.contains("INSPECTED_EFFECT")
+                                    && delivered_prompt.contains("RECONCILED_RETRY"),
+                                "fresh continuation lost effect history"
+                            );
+                            ensure!(
+                                request.resume.is_none(),
+                                "must not replay a failed provider tool call"
+                            );
+                        }
+                    }
+                    if self.scenario == Scenario::DecisionRetry {
+                        ensure!(
+                            delivered_prompt.contains("seven days"),
+                            "fresh retry lost the durable product decision"
+                        );
+                        if number == 0 {
+                            script.push_str("exit 42;\n");
+                        }
+                    }
                     if self.scenario == Scenario::ApprovalNeeded {
                         return Err(autono_core::engineering::agent::AgentFailure { kind: "approval_required".into(), detail: "Provider requires an interactive permission prompt with no exact safe grant".into(), blocked: true }.into());
                     }
@@ -296,7 +336,8 @@ impl AgentRuntime for FakeAgents {
                             quote(&format!("feature-{dependency}.txt"))
                         ));
                     }
-                    let blocker = if self.scenario == Scenario::Human
+                    let blocker = if (self.scenario == Scenario::EffectRetry && number == 0)
+                        || self.scenario == Scenario::Human
                         || (self.scenario == Scenario::BlockedIndependent && id == "a")
                         || (matches!(self.scenario, Scenario::HumanOnceB | Scenario::LiveHumanB)
                             && id == "b"
@@ -2037,5 +2078,87 @@ async fn preflight_uses_persisted_git_identity_after_an_inactive_restart() -> Re
     assert!(h.service.execute(id).await.is_err());
     h.wait(id).await?;
     assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 0);
+    h.finish().await
+}
+
+#[tokio::test]
+async fn effect_counter_cannot_repeat_through_an_automatic_fresh_retry() -> Result<()> {
+    let h = Harness::new(Scenario::EffectRetry, plan(&[("b", &[])]), "true").await?;
+    let first = h.execute().await?;
+    assert_eq!(first.tasks[0].status, TaskStatus::BlockedHuman);
+    assert_eq!(tokio::fs::read(h.root.join("effect-count")).await?, b"x");
+    h.service
+        .resolve(
+            first.id,
+            &first.human_actions[0].id,
+            resolution("INSPECTED_EFFECT: effect already happened"),
+        )
+        .await?;
+    h.service.continue_run(first.id).await?;
+    let reconciled = h.wait(first.id).await?;
+    assert_eq!(
+        tokio::fs::read(h.root.join("effect-count")).await?,
+        b"x",
+        "external counter became xx through automatic retry"
+    );
+    assert_eq!(reconciled.status, EngineeringStatus::Blocked);
+    assert_eq!(reconciled.tasks[0].status, TaskStatus::BlockedHuman);
+    assert_eq!(reconciled.tasks[0].attempts.len(), 2);
+    assert_eq!(
+        h.agents.coder_calls.load(Ordering::SeqCst),
+        2,
+        "unsafe automatic third invocation"
+    );
+    assert_eq!(
+        tokio::fs::read(h.root.join("effect-count")).await?,
+        b"x",
+        "external counter became xx"
+    );
+    let action = reconciled.human_actions.last().expect("reconciliation");
+    assert!(action.requirement.reason.contains("effect_reconciliation"));
+    assert_eq!(action.status, HumanActionStatus::Pending);
+    assert!(h.service.continue_run(first.id).await.is_err());
+    h.wait(first.id).await?;
+    h.service.resolve(first.id, &action.id, resolution("RECONCILED_RETRY: inspected failed invocation; prior effect remains already performed")).await?;
+    h.service.continue_run(first.id).await?;
+    let done = h.wait(first.id).await?;
+    assert_eq!(done.status, EngineeringStatus::Verified, "{}", done.summary);
+    assert_eq!(done.tasks[0].attempts.len(), 3);
+    assert_eq!(done.settings.execution.max_attempts, 3);
+    assert_eq!(tokio::fs::read(h.root.join("effect-count")).await?, b"x");
+    h.finish().await
+}
+
+#[tokio::test]
+async fn product_decision_context_survives_failed_invocation_diagnostics() -> Result<()> {
+    let mut p = plan(&[("a", &[])]);
+    p.human_requirements.push(decision(true));
+    let h = Harness::new(Scenario::DecisionRetry, p, "true").await?;
+    let id = h.planned().await?;
+    let run = h.service.store().engineering_get(id).await?;
+    h.service
+        .resolve(
+            id,
+            &run.human_actions[0].id,
+            resolution("Invitations expire after seven days"),
+        )
+        .await?;
+    h.service.execute(id).await?;
+    let done = h.wait(id).await?;
+    assert_eq!(done.status, EngineeringStatus::Verified, "{}", done.summary);
+    assert_eq!(h.agents.coder_calls.load(Ordering::SeqCst), 2);
+    {
+        let requests = h.agents.requests.lock().expect("requests");
+        let coders: Vec<_> = requests
+            .iter()
+            .filter(|(role, _, _)| *role == AgentRole::Coder)
+            .collect();
+        assert!(
+            coders
+                .iter()
+                .all(|(_, resumed, p)| resumed.is_none() && p.contains("seven days"))
+        );
+        assert!(coders[1].2.contains("Coder invocation failed"));
+    }
     h.finish().await
 }

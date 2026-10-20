@@ -86,20 +86,7 @@ impl AgentRuntime for CliAgentRuntime {
                 ("coder", &settings.agents.coder),
                 ("reviewer", &settings.agents.reviewer),
             ] {
-                let request = AgentRequest {
-                    config: config.clone(),
-                    role: if name == "coder" {
-                        AgentRole::Coder
-                    } else {
-                        AgentRole::Reviewer
-                    },
-                    cwd: cwd.into(),
-                    prompt: String::new(),
-                    schema_path: cwd.join("unused-preflight-schema"),
-                    resume: None,
-                };
-                // prepare probes advertised noninteractive capabilities only, never starts inference.
-                let ready = self.prepare(&request, runner, stop).await.is_ok();
+                let ready = self.probe(config.provider, runner, cwd, stop).await.is_ok();
                 checks.push(super::ReadinessCheck { id: format!("provider-{name}"), ready: Some(ready), blocking: true, evidence: "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable".into() });
                 checks.push(super::ReadinessCheck { id: format!("authentication-{name}"), ready: None, blocking: false, evidence: "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login".into() });
             }
@@ -114,73 +101,15 @@ impl AgentRuntime for CliAgentRuntime {
         stop: &'a CancellationToken,
     ) -> AgentFuture<'a> {
         Box::pin(async move {
+            self.probe(request.config.provider, runner, &request.cwd, stop)
+                .await?;
             let program = match request.config.provider {
                 Provider::Codex => "codex",
                 Provider::Claude => "claude",
             };
-            let help_args = if request.config.provider == Provider::Codex {
-                vec![program.into(), "exec".into(), "--help".into()]
-            } else {
-                vec![program.into(), "--help".into()]
-            };
-            let help = runner
-                .run(help_args, &request.cwd, 15, Uuid::new_v4(), stop)
-                .await?;
-            require_probe_outcome(&help)?;
-            if !help.succeeded() {
-                return Err(failure("missing_cli", help.summary(), true));
-            }
-            let help = help.stdout_text()?;
-            let flags = if request.config.provider == Provider::Codex {
-                vec![
-                    "--json",
-                    "--sandbox",
-                    "--output-schema",
-                    "--ignore-user-config",
-                ]
-            } else {
-                vec![
-                    "--print",
-                    "stream-json",
-                    "--json-schema",
-                    "--permission-prompts",
-                    "--safe-mode",
-                    "--tools",
-                    "--strict-mcp-config",
-                ]
-            };
-            for flag in flags {
-                if !help.contains(flag) {
-                    return Err(failure(
-                        "unsupported_cli",
-                        format!(
-                            "{program} does not advertise {flag}; update CLI or choose another provider"
-                        ),
-                        true,
-                    ));
-                }
-            }
             let mut args: Vec<String>;
             match request.config.provider {
                 Provider::Codex => {
-                    // Avoid the shared app-server so Runtime v0 owns this invocation's process tree.
-                    let global = runner
-                        .run(
-                            vec![program.into(), "--help".into()],
-                            &request.cwd,
-                            15,
-                            Uuid::new_v4(),
-                            stop,
-                        )
-                        .await?;
-                    require_probe_outcome(&global)?;
-                    if !global.succeeded() || !global.stdout_text()?.contains("--no-daemon") {
-                        return Err(failure(
-                            "unsupported_cli",
-                            "Codex must support --no-daemon for local process ownership",
-                            true,
-                        ));
-                    }
                     let sandbox = if request.role == AgentRole::Coder {
                         "workspace-write"
                     } else {
@@ -277,6 +206,84 @@ impl AgentRuntime for CliAgentRuntime {
     }
     fn decode(&self, provider: Provider, output: &CommandOutput) -> Result<AgentResponse> {
         decode(provider, output)
+    }
+}
+
+impl CliAgentRuntime {
+    /// Help-only, supervised capability detection. No inference, prompts, schema
+    /// files, or invocation artifacts are required or constructed here.
+    async fn probe(
+        &self,
+        provider: Provider,
+        runner: &ProcessRunner,
+        cwd: &std::path::Path,
+        stop: &CancellationToken,
+    ) -> Result<()> {
+        let program = match provider {
+            Provider::Codex => "codex",
+            Provider::Claude => "claude",
+        };
+        let help_args = if provider == Provider::Codex {
+            vec![program.into(), "exec".into(), "--help".into()]
+        } else {
+            vec![program.into(), "--help".into()]
+        };
+        let help = runner.run(help_args, cwd, 15, Uuid::new_v4(), stop).await?;
+        require_probe_outcome(&help)?;
+        if !help.succeeded() {
+            return Err(failure("missing_cli", help.summary(), true));
+        }
+        let help = help.stdout_text()?;
+        let flags = if provider == Provider::Codex {
+            vec![
+                "--json",
+                "--sandbox",
+                "--output-schema",
+                "--ignore-user-config",
+            ]
+        } else {
+            vec![
+                "--print",
+                "stream-json",
+                "--json-schema",
+                "--permission-prompts",
+                "--safe-mode",
+                "--tools",
+                "--strict-mcp-config",
+            ]
+        };
+        for flag in flags {
+            if !help.contains(flag) {
+                return Err(failure(
+                    "unsupported_cli",
+                    format!(
+                        "{program} does not advertise {flag}; update CLI or choose another provider"
+                    ),
+                    true,
+                ));
+            }
+        }
+        if provider == Provider::Codex {
+            // Avoid the shared app-server so Runtime v0 owns this invocation's process tree.
+            let global = runner
+                .run(
+                    vec![program.into(), "--help".into()],
+                    cwd,
+                    15,
+                    Uuid::new_v4(),
+                    stop,
+                )
+                .await?;
+            require_probe_outcome(&global)?;
+            if !global.succeeded() || !global.stdout_text()?.contains("--no-daemon") {
+                return Err(failure(
+                    "unsupported_cli",
+                    "Codex must support --no-daemon for local process ownership",
+                    true,
+                ));
+            }
+        }
+        Ok(())
     }
 }
 
