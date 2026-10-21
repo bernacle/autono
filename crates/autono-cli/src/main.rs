@@ -41,6 +41,26 @@ enum Commands {
         #[arg(long)]
         plan_id: Option<Uuid>,
     },
+    /// Inspect a bounded autonomous contract without invoking any agent. Save stdout for consent.
+    ProposeDelegation {
+        specification: PathBuf,
+        #[arg(long)]
+        repository: Option<PathBuf>,
+        #[arg(long, default_value = "HEAD")]
+        base: String,
+        #[arg(long)]
+        plan_id: Option<Uuid>,
+        #[arg(long = "allow-file", required = true)]
+        writable_files: Vec<String>,
+        #[arg(long, default_value_t = 1800)]
+        max_runtime_seconds: u64,
+        #[arg(long)]
+        local_integration: bool,
+    },
+    /// Consent to exactly the previously inspected JSON contract; starts one unattended run.
+    AuthorizeDelegation { contract: PathBuf },
+    /// Inspect the durable delegation proposal (summary also includes recorded consent).
+    ShowDelegation { id: Uuid },
     /// Inspect the immutable plan, original specification and configured checks.
     ShowPlan { id: Uuid },
     /// Approve the persisted plan and start daemon-owned task execution.
@@ -147,6 +167,36 @@ async fn main() -> Result<()> {
             base,
             plan_id,
         } => engineering::plan(&paths, specification, repository, base, plan_id).await,
+        Commands::ProposeDelegation {
+            specification,
+            repository,
+            base,
+            plan_id,
+            writable_files,
+            max_runtime_seconds,
+            local_integration,
+        } => {
+            engineering::propose_delegation(
+                &paths,
+                specification,
+                autono_protocol::engineering::DelegationProposalRequest {
+                    submission: autono_protocol::engineering::PlanSubmission {
+                        id: plan_id.unwrap_or_else(Uuid::new_v4),
+                        repository: repository.unwrap_or(std::env::current_dir()?),
+                        base,
+                        specification: String::new(),
+                    },
+                    writable_files,
+                    max_runtime_seconds,
+                    local_integration,
+                },
+            )
+            .await
+        }
+        Commands::AuthorizeDelegation { contract } => {
+            engineering::authorize_delegation(&paths, contract).await
+        }
+        Commands::ShowDelegation { id } => engineering::show_delegation(&paths, id).await,
         Commands::ShowPlan { id } => engineering::inspect(&paths, id, "plan").await,
         Commands::Tasks { id } => engineering::inspect(&paths, id, "tasks").await,
         Commands::Findings { id } => engineering::inspect(&paths, id, "findings").await,

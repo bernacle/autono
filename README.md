@@ -268,3 +268,5 @@ Review repair details and validation evidence: [runtime review repairs](docs/rev
 The Tauri mission control client supervises the existing daemon from a native window.
 See [desktop setup and architecture](apps/desktop/README.md) and
 [native acceptance evidence](docs/desktop-acceptance.md).
+
+Bounded autonomous runs and the existing Supervised workflow: [M5 delegation contract and acceptance](docs/m5-bounded-delegation.md).

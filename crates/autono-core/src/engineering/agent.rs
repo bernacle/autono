@@ -11,6 +11,7 @@ use uuid::Uuid;
 
 pub type AgentFuture<'a> = Pin<Box<dyn Future<Output = Result<Vec<String>>> + Send + 'a>>;
 pub struct AgentRequest {
+    pub bounded: bool,
     pub config: AgentConfig,
     pub role: AgentRole,
     pub cwd: PathBuf,
@@ -101,8 +102,42 @@ impl AgentRuntime for CliAgentRuntime {
         stop: &'a CancellationToken,
     ) -> AgentFuture<'a> {
         Box::pin(async move {
+            if request.bounded && request.config.provider != Provider::Claude {
+                return Err(super::delegation::denied(
+                    "provider cannot enforce tool-free bounded mode",
+                ));
+            }
             self.probe(request.config.provider, runner, &request.cwd, stop)
                 .await?;
+            if request.bounded {
+                let help = runner
+                    .run(
+                        vec!["claude".into(), "--help".into()],
+                        &request.cwd,
+                        15,
+                        Uuid::new_v4(),
+                        stop,
+                    )
+                    .await?;
+                require_probe_outcome(&help)?;
+                let text = help.stdout_text()?;
+                if !help.succeeded()
+                    || [
+                        "--restricted",
+                        "--bare",
+                        "--disallowedTools",
+                        "--disable-slash-commands",
+                        "--settings",
+                        "--setting-sources",
+                    ]
+                    .iter()
+                    .any(|flag| !text.contains(flag))
+                {
+                    return Err(super::delegation::denied(
+                        "Claude lacks required restricted/tool-free settings controls",
+                    ));
+                }
+            }
             let program = match request.config.provider {
                 Provider::Codex => "codex",
                 Provider::Claude => "claude",
@@ -168,18 +203,24 @@ impl AgentRuntime for CliAgentRuntime {
                         "--output-format".into(),
                         "stream-json".into(),
                         "--verbose".into(),
-                        "--safe-mode".into(),
+                        if request.bounded {
+                            "--bare".into()
+                        } else {
+                            "--safe-mode".into()
+                        },
                         "--strict-mcp-config".into(),
                         "--permission-prompts".into(),
                         "none".into(),
                         "--permission-mode".into(),
-                        if request.role == AgentRole::Coder {
+                        if !request.bounded && request.role == AgentRole::Coder {
                             "acceptEdits".into()
                         } else {
                             "dontAsk".into()
                         },
                         "--tools".into(),
-                        if request.role == AgentRole::Coder {
+                        if request.bounded {
+                            "".into()
+                        } else if request.role == AgentRole::Coder {
                             "Read,Glob,Grep,Edit,Write".into()
                         } else {
                             "Read,Glob,Grep".into()
@@ -187,7 +228,21 @@ impl AgentRuntime for CliAgentRuntime {
                         "--json-schema".into(),
                         tokio::fs::read_to_string(&request.schema_path).await?,
                     ];
-                    if let Some(parent) = request.schema_path.parent() {
+                    if request.bounded {
+                        args.extend([
+                            "--restricted".into(),
+                            "--setting-sources".into(),
+                            "".into(),
+                            "--settings".into(),
+                            "{\"disableAllHooks\":true}".into(),
+                            "--disable-slash-commands".into(),
+                            "--disallowedTools".into(),
+                            "mcp__*".into(),
+                        ]);
+                    }
+                    if !request.bounded
+                        && let Some(parent) = request.schema_path.parent()
+                    {
                         args.extend(["--add-dir".into(), parent.to_string_lossy().into_owned()]);
                     }
                     if let Some(session) = &request.resume {

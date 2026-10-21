@@ -1,7 +1,8 @@
 use std::{convert::Infallible, net::SocketAddr, sync::Arc, time::Duration};
 
 use autono_core::engineering::{
-    EngineeringRun, EngineeringService, HumanAction, PlanSubmission, ResolutionRequest,
+    DelegationContract, DelegationProposalRequest, EngineeringRun, EngineeringService, HumanAction,
+    PlanSubmission, ResolutionRequest,
 };
 use autono_core::{
     Run, Supervisor,
@@ -96,6 +97,9 @@ fn build_router(
             "/v1/engineering",
             get(engineering_list).post(engineering_plan),
         )
+        .route("/v1/delegations/propose", post(delegation_propose))
+        .route("/v1/delegations/{id}", get(delegation_inspect))
+        .route("/v1/delegations/{id}/authorize", post(delegation_authorize))
         .route("/v1/engineering/health", get(engineering_health))
         .route("/v1/engineering/{id}", get(engineering_inspect))
         .route("/v1/engineering/{id}/execute", post(engineering_execute))
@@ -172,6 +176,7 @@ async fn authenticate(State(app): State<Arc<App>>, request: Request, next: Next)
     let _submission = if request.method() == axum::http::Method::POST
         && (request.uri().path() == "/v1/runs"
             || request.uri().path() == "/v1/engineering"
+            || request.uri().path().starts_with("/v1/delegations/")
             || request.uri().path().ends_with("/execute")
             || request.uri().path().ends_with("/integrate")
             || request.uri().path().ends_with("/preflight")
@@ -311,6 +316,40 @@ async fn engineering_inspect(
     Path(id): Path<Uuid>,
 ) -> Result<Json<EngineeringRun>, Failure> {
     Ok(Json(engineering(&app)?.store().engineering_get(id).await?))
+}
+async fn delegation_propose(
+    State(app): State<Arc<App>>,
+    Json(request): Json<DelegationProposalRequest>,
+) -> Result<Json<DelegationContract>, Failure> {
+    Ok(Json(engineering(&app)?.propose_delegation(request).await?))
+}
+async fn delegation_inspect(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<DelegationContract>, Failure> {
+    Ok(Json(
+        engineering(&app)?
+            .store()
+            .engineering_delegation_proposal(id)
+            .await?,
+    ))
+}
+async fn delegation_authorize(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+    Json(contract): Json<DelegationContract>,
+) -> Result<Json<EngineeringRun>, Failure> {
+    if contract.request.submission.id != id {
+        return Err(Failure(
+            autono_core::engineering::EngineeringConflict(
+                "route and contract run IDs differ".into(),
+            )
+            .into(),
+        ));
+    }
+    Ok(Json(
+        engineering(&app)?.authorize_delegation(contract).await?,
+    ))
 }
 async fn engineering_plan(
     State(app): State<Arc<App>>,

@@ -56,3 +56,8 @@ issue requesting a private reporting channel without exploit details, tokens,
 logs, or personal data. Do not post sensitive reproductions publicly. Runtime
 v0 is pre-1.0; security fixes target the latest main branch, with no guaranteed
 backport schedule.
+
+M5 bounded delegations add a narrower autonomous path: tool-free provider responses,
+daemon-validated exact file edits, and OS-sandboxed configured verification. This
+does not turn the general Runtime/Supervised APIs into a sandbox. See the
+[delegation authority and limitations](docs/m5-bounded-delegation.md) before consent.

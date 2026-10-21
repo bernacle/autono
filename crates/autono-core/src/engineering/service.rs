@@ -31,6 +31,7 @@ struct Inner {
     shutdown: CancellationToken,
     control: tokio::sync::Mutex<()>,
     wakeup: Arc<tokio::sync::Notify>,
+    idle: tokio::sync::Notify,
     mutations: Arc<tokio::sync::Semaphore>,
 }
 struct Registry {
@@ -41,6 +42,7 @@ struct Registry {
 }
 enum Operation {
     Plan(Box<PlanSubmission>),
+    Autonomous(Box<DelegationContract>),
     Execute(Uuid),
     Preflight(Uuid),
     Continue(Uuid),
@@ -50,6 +52,7 @@ impl Operation {
     fn id(&self) -> Uuid {
         match self {
             Self::Plan(s) => s.id,
+            Self::Autonomous(c) => c.request.submission.id,
             Self::Execute(id) | Self::Integrate(id) | Self::Preflight(id) | Self::Continue(id) => {
                 *id
             }
@@ -68,6 +71,7 @@ impl EngineeringService {
         config: Config,
         agents: Arc<dyn AgentRuntime>,
     ) -> Self {
+        let home = std::fs::canonicalize(&home).unwrap_or(home);
         let mutations = Arc::new(tokio::sync::Semaphore::new(
             config.runner.max_pending_submissions,
         ));
@@ -87,6 +91,7 @@ impl EngineeringService {
                 shutdown: CancellationToken::new(),
                 control: tokio::sync::Mutex::new(()),
                 wakeup: Arc::new(tokio::sync::Notify::new()),
+                idle: Default::default(),
                 mutations,
             }),
         }
@@ -103,6 +108,56 @@ impl EngineeringService {
     pub fn health(&self) -> (Option<Uuid>, Option<String>) {
         let r = self.registry();
         (r.active.as_ref().map(|(id, _)| *id), r.error.clone())
+    }
+    pub async fn propose_delegation(
+        &self,
+        request: DelegationProposalRequest,
+    ) -> Result<DelegationContract> {
+        let _gate = self.inner.control.lock().await;
+        if let Ok(existing) = self
+            .store()
+            .engineering_delegation_proposal(request.submission.id)
+            .await
+        {
+            ensure!(
+                existing.request == request,
+                EngineeringConflict("delegation ID has a different request".into())
+            );
+            return Ok(existing);
+        }
+        let contract = super::delegation::contract(
+            &self.inner.runner,
+            &self.inner.config,
+            &self.inner.home,
+            request,
+            &self.inner.shutdown,
+        )
+        .await?;
+        self.store().engineering_propose(&contract).await?;
+        Ok(contract)
+    }
+    pub async fn authorize_delegation(
+        &self,
+        contract: DelegationContract,
+    ) -> Result<EngineeringRun> {
+        let id = contract.request.submission.id;
+        ensure!(
+            self.store().engineering_delegation_proposal(id).await? == contract,
+            EngineeringConflict("consent must match the complete stored proposal".into())
+        );
+        if let Ok(existing) = self.store().engineering_get(id).await {
+            ensure!(
+                existing
+                    .delegation
+                    .as_ref()
+                    .is_some_and(|a| a.contract == contract),
+                EngineeringConflict(
+                    "run ID already has another authorization or supervised workflow".into()
+                )
+            );
+            return Ok(existing);
+        }
+        self.launch(Operation::Autonomous(Box::new(contract))).await
     }
     pub async fn plan(&self, submission: PlanSubmission) -> Result<EngineeringRun> {
         ensure!(
@@ -147,10 +202,11 @@ impl EngineeringService {
                     .and(registry.journal.clone())
             };
             if let Some(journal) = active {
+                let delegated = journal.read().await.delegation.is_some();
                 journal
                     .change(
-                        "continued",
-                        "Developer continued eligible live pauses alongside independent workers",
+                        if delegated { "delegation_continued" } else { "continued" },
+                        if delegated { "Original delegation continues precisely resolved live pauses alongside independent workers" } else { "Developer continued eligible live pauses alongside independent workers" },
                         |r| {
                             // Serialize this check with the scheduler's final checkpoint.
                             // Once drained, a new owned execution must be admitted instead.
@@ -210,13 +266,75 @@ impl EngineeringService {
                         Err(anyhow::anyhow!("resolution publication is uncertain; workflow stopped safely"))
                     }
                 };
+                let autonomous = result.as_ref().is_ok_and(|r| r.delegation.is_some());
                 let _ = reply.send(result);
+                if autonomous {
+                    // The receipt keeps its original response. Scheduling is separately
+                    // admitted under the same immutable authorization, never a new grant.
+                    this.wake_delegated_resolution(id).await;
+                }
                 drop(permit);
             });
         }
         response
             .await
             .context("resolution controller stopped before responding")?
+    }
+    /// A resolution can race the scheduler's final checkpoint. Retain ownership
+    /// until the current controller drains, then retry only admission, never an
+    /// agent/process/effect. Shutdown and the original grant deadline bound waits.
+    async fn wake_delegated_resolution(&self, id: Uuid) {
+        loop {
+            let wake = self.inner.idle.notified();
+            tokio::pin!(wake);
+            wake.as_mut().enable();
+            let run = match self.store().engineering_get(id).await {
+                Ok(run) => run,
+                Err(_) => return,
+            };
+            let Some(auth) = &run.delegation else {
+                return;
+            };
+            let remaining = (auth.expires_at - Utc::now()).to_std().unwrap_or_default();
+            if remaining.is_zero()
+                || self.inner.shutdown.is_cancelled()
+                || self.registry().error.is_some()
+            {
+                return;
+            }
+            let active = self.registry().active.as_ref().map(|(id, _)| *id);
+            if active == Some(id) && run.status == EngineeringStatus::Running {
+                let mut candidate = run.clone();
+                if mark_continued(&mut candidate).is_ok() {
+                    match self.continue_run(id).await {
+                        Ok(_) => return,
+                        Err(error)
+                            if error.is::<EngineeringConflict>()
+                                || error.is::<crate::supervisor::Overloaded>() =>
+                        {
+                            continue;
+                        }
+                        Err(_) => return,
+                    }
+                }
+            }
+            if active.is_some() {
+                tokio::select! {
+                    _ = wake.as_mut() => {},
+                    _ = self.inner.shutdown.cancelled() => return,
+                    _ = tokio::time::sleep(remaining) => return,
+                }
+                continue;
+            }
+            let result = match run.status {
+                EngineeringStatus::AwaitingApproval => self.preflight(id).await,
+                EngineeringStatus::Blocked => self.continue_run(id).await,
+                _ => return,
+            };
+            if !result.is_err_and(|e| e.is::<crate::supervisor::Overloaded>()) {
+                return;
+            }
+        }
     }
     async fn apply_resolution(
         &self,
@@ -358,6 +476,8 @@ impl EngineeringService {
         let mut registry = self.registry();
         registry.active = None;
         registry.journal = None;
+        drop(registry);
+        self.inner.idle.notify_waiters();
     }
     async fn record_failure(
         &self,
@@ -372,6 +492,25 @@ impl EngineeringService {
             Err(e) => return Err(e),
         };
         if !run.status.active() {
+            if run.delegation.is_some()
+                && !externally_cancelled
+                && error
+                    .downcast_ref::<AgentFailure>()
+                    .is_some_and(|e| e.blocked)
+            {
+                let journal = self
+                    .registry()
+                    .journal
+                    .clone()
+                    .unwrap_or_else(|| Journal::new(self.store().clone(), run.clone()));
+                let detail = format!("{error:#}");
+                journal.change("delegation_stopped", &detail, |r| {
+                    let requirement = HumanRequirement { kind: HumanActionType::Runtime, reason: detail.clone(), affected_tasks: vec![], requested_action: "Inspect the denied or expired operation; new authority requires a new proposal and consent".into(), blocking: true, evidence: "Daemon stage admission".into(), confidence: 100, permission: None };
+                    r.human_actions.push(super::preflight::action(requirement, &format!("denied-stage-{}", r.revision), false, None));
+                    r.summary = detail.clone();
+                    Ok(())
+                }).await?;
+            }
             if externally_cancelled
                 && !self.inner.shutdown.is_cancelled()
                 && matches!(
@@ -456,8 +595,20 @@ impl EngineeringService {
             Ok(value) => value,
             Err(error) => {
                 let diagnostic = format!("{error:#}");
+                // The caller receives the original error, while the owned workflow
+                // retains structured denial classification for a durable reason.
+                let owned_error =
+                    error
+                        .downcast_ref::<AgentFailure>()
+                        .map(|failure| AgentFailure {
+                            kind: failure.kind.clone(),
+                            detail: failure.detail.clone(),
+                            blocked: failure.blocked,
+                        });
                 let _ = reply.send(Err(error));
-                return Err(anyhow::anyhow!(diagnostic));
+                return Err(owned_error
+                    .map(anyhow::Error::from)
+                    .unwrap_or_else(|| anyhow::anyhow!(diagnostic)));
             }
         };
         let _ = reply.send(Ok(journal.read().await));
@@ -470,13 +621,36 @@ impl EngineeringService {
             artifacts: Default::default(),
             trusted_context: Default::default(),
             wakeup: self.inner.wakeup.clone(),
+            config: self.inner.config.clone(),
         };
-        let result = match operation {
+        let watchdog_done = CancellationToken::new();
+        let auth = engine.journal.read().await.delegation;
+        if let Some(auth) = &auth {
+            let remaining = (auth.expires_at - Utc::now()).to_std().unwrap_or_default();
+            let token = engine.stop.clone();
+            let done = watchdog_done.clone();
+            self.inner.jobs.spawn(async move {
+                tokio::select! {
+                    _ = done.cancelled() => {},
+                    _ = tokio::time::sleep(remaining) => token.cancel(),
+                }
+            });
+        }
+        let mut result = match operation {
             0 => engine.plan().await,
             1 => engine.execute().await,
             2 => engine.integrate().await,
             _ => Ok(()),
         };
+        if result.is_ok() && auth.is_some() && operation != 4 {
+            result = engine.advance_delegated().await;
+        }
+        watchdog_done.cancel();
+        if auth.is_some_and(|a| Utc::now() >= a.expires_at) && !stop.is_cancelled() {
+            result = Err(super::delegation::denied(
+                "total runtime budget exhausted; active processes cancelled, completed evidence retained",
+            ));
+        }
         if stop.is_cancelled() && !self.inner.shutdown.is_cancelled() {
             return Err(UserCancelled.into());
         }
@@ -484,7 +658,46 @@ impl EngineeringService {
     }
     async fn prepare(&self, op: Operation, stop: &CancellationToken) -> Result<(Journal, u8)> {
         match op {
-            Operation::Plan(submission) => {
+            Operation::Plan(_) | Operation::Autonomous(_) => {
+                let (submission, delegation) = match op {
+                    Operation::Plan(s) => (s, None),
+                    Operation::Autonomous(c) => {
+                        // Do not reset a deadline or replay a planner after an ambiguous request.
+                        if let Ok(existing) =
+                            self.store().engineering_get(c.request.submission.id).await
+                        {
+                            ensure!(
+                                existing
+                                    .delegation
+                                    .as_ref()
+                                    .is_some_and(|a| a.contract == *c),
+                                EngineeringConflict("authorization replay conflicts".into())
+                            );
+                            return Ok((Journal::new(self.store().clone(), existing), 4));
+                        }
+                        let current = super::delegation::contract(
+                            &self.inner.runner,
+                            &self.inner.config,
+                            &self.inner.home,
+                            c.request.clone(),
+                            stop,
+                        )
+                        .await?;
+                        ensure!(current == *c, EngineeringConflict("repository, base or settings changed since proposal; create a new proposal".into()));
+                        let now = Utc::now();
+                        let auth = DelegationAuthorization {
+                            expires_at: now
+                                + chrono::Duration::seconds(c.request.max_runtime_seconds as i64),
+                            authorized_at: now,
+                            contract: *c,
+                        };
+                        (
+                            Box::new(auth.contract.request.submission.clone()),
+                            Some(auth),
+                        )
+                    }
+                    _ => unreachable!(),
+                };
                 let (repo, base) = workspace::repository(
                     &self.inner.runner,
                     &submission.repository,
@@ -501,6 +714,7 @@ impl EngineeringService {
                 let w = workspace::reference(&self.inner.home, submission.id, "planner", &base);
                 let now = Utc::now();
                 let run = EngineeringRun {
+                    delegation,
                     id: submission.id,
                     revision: 0,
                     status: EngineeringStatus::Planning,
@@ -529,6 +743,14 @@ impl EngineeringService {
             }
             Operation::Execute(id) => {
                 let run = self.store().engineering_get(id).await?;
+                super::delegation::validate(
+                    &run,
+                    &self.inner.runner,
+                    &self.inner.config,
+                    &self.inner.home,
+                    stop,
+                )
+                .await?;
                 ensure!(
                     run.status == EngineeringStatus::AwaitingApproval,
                     EngineeringConflict(
@@ -546,7 +768,8 @@ impl EngineeringService {
                 super::preflight::inspect(&journal, &self.inner.runner, &self.inner.agents, stop)
                     .await?;
                 ensure!(
-                    journal.read().await.preflight.is_some_and(|p| p.ready),
+                    journal.read().await.preflight.is_some_and(|p| p.ready)
+                        || journal.read().await.autonomous_preflight_ready(),
                     EngineeringConflict(
                         "preflight is NOT READY; inspect preflight and human actions".into()
                     )
@@ -568,6 +791,14 @@ impl EngineeringService {
             }
             Operation::Preflight(id) => {
                 let run = self.store().engineering_get(id).await?;
+                super::delegation::validate(
+                    &run,
+                    &self.inner.runner,
+                    &self.inner.config,
+                    &self.inner.home,
+                    stop,
+                )
+                .await?;
                 ensure!(
                     run.plan.is_some()
                         && matches!(
@@ -583,20 +814,38 @@ impl EngineeringService {
             }
             Operation::Continue(id) => {
                 let run = self.store().engineering_get(id).await?;
+                super::delegation::validate(
+                    &run,
+                    &self.inner.runner,
+                    &self.inner.config,
+                    &self.inner.home,
+                    stop,
+                )
+                .await?;
                 ensure!(run.status == EngineeringStatus::Blocked && run.approved_at.is_some(), EngineeringConflict("continue requires a live-pause BLOCKED run; interrupted workflows cannot resume".into()));
                 let journal = Journal::new(self.store().clone(), run);
                 super::preflight::inspect(&journal, &self.inner.runner, &self.inner.agents, stop)
                     .await?;
                 ensure!(
-                    journal.read().await.preflight.is_some_and(|p| p.ready),
+                    journal.read().await.preflight.is_some_and(|p| p.ready)
+                        || journal.read().await.autonomous_preflight_ready(),
                     EngineeringConflict("preflight is NOT READY".into())
                 );
                 ensure!(!stop.is_cancelled(), "continuation cancelled");
-                journal.change("continued", "Developer explicitly continued eligible live pauses; completed artifacts retained", mark_continued).await?;
+                let delegated = journal.read().await.delegation.is_some();
+                journal.change(if delegated { "delegation_continued" } else { "continued" }, if delegated { "Original delegation continues precisely resolved pauses; completed artifacts retained" } else { "Developer explicitly continued eligible live pauses; completed artifacts retained" }, mark_continued).await?;
                 Ok((journal, 1))
             }
             Operation::Integrate(id) => {
                 let run = self.store().engineering_get(id).await?;
+                super::delegation::validate(
+                    &run,
+                    &self.inner.runner,
+                    &self.inner.config,
+                    &self.inner.home,
+                    stop,
+                )
+                .await?;
                 ensure!(
                     run.status == EngineeringStatus::Verified,
                     EngineeringConflict("integrate requires VERIFIED tasks".into())
@@ -723,7 +972,7 @@ fn mark_continued(r: &mut EngineeringRun) -> Result<()> {
         }
     }
     ensure!(
-        !eligible.is_empty(),
+        !eligible.is_empty() || (r.delegation.is_some() && !r.ready_tasks().is_empty()),
         EngineeringConflict("no eligible resolved human-paused tasks".into())
     );
     for task in &mut r.tasks {

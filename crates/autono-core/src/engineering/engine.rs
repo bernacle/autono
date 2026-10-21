@@ -25,6 +25,7 @@ pub(super) struct Engine {
     pub artifacts: Artifacts,
     pub trusted_context: Arc<tokio::sync::OnceCell<String>>,
     pub wakeup: Arc<tokio::sync::Notify>,
+    pub config: crate::config::Config,
 }
 #[derive(Clone)]
 enum SessionTarget {
@@ -81,6 +82,117 @@ fn new_session(config: &AgentConfig, role: AgentRole, resume: Option<String>) ->
     }
 }
 impl Engine {
+    async fn admit(&self, operation: &str, cwd: Option<&std::path::Path>) -> Result<()> {
+        let run = self.journal.read().await;
+        if run.delegation.is_none() {
+            return Ok(());
+        }
+        let checked = async {
+            ensure!(
+                !self.stop.is_cancelled(),
+                super::delegation::denied("delegated workflow cancelled or deadline reached")
+            );
+            super::delegation::validate(&run, &self.runner, &self.config, &self.home, &self.stop)
+                .await?;
+            if operation.starts_with("integration") || operation.starts_with("local integration") {
+                ensure!(
+                    run.delegation
+                        .as_ref()
+                        .is_some_and(|a| a.contract.request.local_integration),
+                    super::delegation::denied("local integration was not delegated")
+                );
+            }
+            if let Some(cwd) = cwd {
+                super::delegation::owns_cwd(
+                    &run.delegation
+                        .as_ref()
+                        .context("authorization missing")?
+                        .contract,
+                    cwd,
+                )?;
+            }
+            Ok(())
+        }
+        .await;
+        let detail = match &checked {
+            Ok(()) => format!(
+                "Allowed {operation}: exact per-run delegation; context and deadline revalidated"
+            ),
+            Err(e) => format!("Denied {operation}: {e:#}"),
+        };
+        self.journal.change(if checked.is_ok() {"delegation_allowed"} else {"delegation_denied"}, &detail, |r| {
+            if checked.is_err() {
+                let req = HumanRequirement { kind: HumanActionType::Runtime, reason: detail.clone(), affected_tasks: vec![], requested_action: "Inspect the denied operation. Textual resolutions do not expand delegation; changed authority requires a new proposal and consent.".into(), blocking: true, evidence: "Daemon execution-time delegation check".into(), confidence: 100, permission: None };
+                let action = super::preflight::action(req, &detail, false, None);
+                if !r.human_actions.iter().any(|a| a.id == action.id) { r.human_actions.push(action); }
+            }
+            Ok(())
+        }).await?;
+        checked
+    }
+    /// Internal stage transitions reuse original consent; all existing readiness,
+    /// verification, revision and independent review gates remain authoritative.
+    pub async fn advance_delegated(&self) -> Result<()> {
+        if self.journal.read().await.delegation.is_none() {
+            return Ok(());
+        }
+        let run = self.journal.read().await;
+        if run.status == EngineeringStatus::AwaitingApproval {
+            self.admit("execution admission", None).await?;
+            if !run.preflight.as_ref().is_some_and(|p| p.ready) && !run.autonomous_preflight_ready()
+            {
+                self.journal
+                    .change(
+                        "delegation_waiting",
+                        "Automatic preflight is not ready; inspect durable human actions",
+                        |_| Ok(()),
+                    )
+                    .await?;
+                return Ok(());
+            }
+            self.journal
+                .change(
+                    "delegation_execution",
+                    "Original delegation admits the immutable plan and configured checks",
+                    |r| {
+                        r.status = EngineeringStatus::Running;
+                        r.approved_at = Some(
+                            r.delegation
+                                .as_ref()
+                                .context("authorization missing")?
+                                .authorized_at,
+                        );
+                        r.summary = "Executing within original bounded delegation".into();
+                        Ok(())
+                    },
+                )
+                .await?;
+            self.execute().await?;
+        }
+        let run = self.journal.read().await;
+        if run.status == EngineeringStatus::Verified
+            && run
+                .delegation
+                .as_ref()
+                .is_some_and(|a| a.contract.request.local_integration)
+        {
+            self.admit("local integration admission", None).await?;
+            let w = workspace::reference(&self.home, run.id, "integration", &run.base_commit);
+            self.journal
+                .change(
+                    "delegation_integration",
+                    "Original delegation admits isolated local integration and combined checks",
+                    |r| {
+                        r.status = EngineeringStatus::Integrating;
+                        r.integration_workspace = Some(w);
+                        Ok(())
+                    },
+                )
+                .await?;
+            self.integrate().await?;
+        }
+        Ok(())
+    }
     async fn project_context(&self) -> Result<String> {
         // Context is immutable for this operation; independent sessions still get
         // their own copy, without repeating supervised Git reads for every task.
@@ -100,6 +212,8 @@ impl Engine {
             .clone())
     }
     pub async fn plan(&self) -> Result<()> {
+        self.admit("planning and owned worktree creation", None)
+            .await?;
         let mut run = self.journal.read().await;
         let _lease = WorkspaceLease::acquire(&run.planning_workspace).map_err(workspace_blocker)?;
         workspace::create(
@@ -166,6 +280,11 @@ impl Engine {
         resume: Option<String>,
     ) -> Result<AgentResponse> {
         ensure!(!self.stop.is_cancelled(), "workflow stopped");
+        self.admit(&format!("{role:?} invocation"), Some(&cwd))
+            .await?;
+        let bounded_run = self.journal.read().await;
+        let bounded = bounded_run.delegation.is_some();
+        let resume = if bounded { None } else { resume };
         self.artifacts.verify()?;
         let mut session = if let SessionTarget::Reviewer(id, n, index) = &target {
             self.journal
@@ -208,6 +327,8 @@ impl Engine {
                     .context("missing task")?
                     .plan,
             )
+        } else if bounded && role == AgentRole::Coder {
+            super::delegation::coder_schema()
         } else {
             agent::schema(role)
         };
@@ -226,12 +347,25 @@ impl Engine {
             "Use the CLI's existing login only. Never inspect, print, copy, or modify CLI credential files or authentication tokens. Never request interactive input. If a human dependency or permission is needed, return a blocker and stop that operation; do not wait or retry it. Never expose secrets in output. All session artifacts are read-only; do not modify them or other sessions' files.\n\n{}",
             prompt.text.replace("{ARTIFACT_DIR}", escaped_artifacts)
         );
+        let prompt = if bounded {
+            let mut context = super::delegation::source_context(&bounded_run, &cwd)?;
+            if role == AgentRole::Reviewer {
+                context.push_str(&format!("\nOriginal delegated feature specification: {}\nImmutable execution plan (a working breakdown, never authority to weaken the specification or harness): {}\nReview the current task against the relevant original intent as well as its criteria. Other independent tasks need not be completed yet. Material omissions or unresolved choices require a blocker, never invented authority.\n", serde_json::to_string(&bounded_run.specification)?, serde_json::to_string(&bounded_run.plan)?));
+            }
+            format!("{prompt}{context}")
+        } else {
+            prompt
+        };
         let prompt_path = self
             .artifacts
             .write(&artifacts, "prompt.md", prompt.as_bytes())?;
         self.artifacts.seal(&artifacts)?;
         // Keep individual argv values below Linux/macOS limits for large specifications.
-        let prompt = if prompt.len() > 64 * 1024 {
+        ensure!(
+            !bounded || prompt.len() <= 64 * 1024,
+            super::delegation::denied("tool-free prompt exceeds 64 KiB")
+        );
+        let prompt = if !bounded && prompt.len() > 64 * 1024 {
             format!(
                 "You are Autono's {role:?} provider. Read the complete task instructions from {} before working. Return the structured result required by the supplied JSON schema. Follow the workspace and role restrictions in that file.",
                 serde_json::to_string(&prompt_path)?
@@ -240,6 +374,7 @@ impl Engine {
             prompt
         };
         let request = AgentRequest {
+            bounded,
             config: config.clone(),
             role,
             cwd: cwd.clone(),
@@ -251,6 +386,8 @@ impl Engine {
             let command = self
                 .agents
                 .prepare(&request, &self.runner, &self.stop)
+                .await?;
+            self.admit(&format!("{role:?} process launch"), Some(&cwd))
                 .await?;
             let process = self
                 .runner
@@ -432,7 +569,7 @@ impl Engine {
                 let mut finished = false;
                 self.journal.change("execution_finished", "All currently runnable tasks finished", |r| {
                     if !r.ready_tasks().is_empty() { return Ok(()); }
-                    r.status = if r.tasks.iter().all(|t|t.status==TaskStatus::Completed) {EngineeringStatus::Verified} else if r.tasks.iter().any(|t|matches!(t.status,TaskStatus::Blocked | TaskStatus::BlockedHuman)) {EngineeringStatus::Blocked} else {EngineeringStatus::Failed};
+                    r.status = if r.tasks.iter().all(|t|t.status==TaskStatus::Completed) {EngineeringStatus::Verified} else if r.tasks.iter().any(|t|matches!(t.status,TaskStatus::Blocked | TaskStatus::BlockedHuman)) || (r.delegation.is_some() && r.human_actions.iter().any(|a|r.action_blocks(a))) {EngineeringStatus::Blocked} else {EngineeringStatus::Failed};
                     r.summary = format!("{} of {} tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate.", r.tasks.iter().filter(|t| t.status == TaskStatus::Completed).count(), r.tasks.len());
                     finished = true;
                     Ok(())
@@ -518,6 +655,8 @@ impl Engine {
     }
 
     async fn run_task(&self, id: &str) -> Result<()> {
+        self.admit("task worktree and dependency admission", None)
+            .await?;
         let run = self.journal.read().await;
         let t = run
             .tasks
@@ -533,6 +672,7 @@ impl Engine {
                 .await
                 .map_err(workspace_blocker)?;
             for dependency in &task.dependencies {
+                self.admit("dependency merge", Some(&w.path)).await?;
                 let dep = run
                     .tasks
                     .iter()
@@ -670,7 +810,7 @@ impl Engine {
             let git_state = workspace::coder_state(&self.runner, &w.path, &self.stop)
                 .await
                 .map_err(workspace_blocker)?;
-            let coder = self
+            let mut coder = self
                 .call_agent(
                     SessionTarget::Coder(id.into(), number),
                     run.settings.agents.coder.clone(),
@@ -681,6 +821,13 @@ impl Engine {
                 )
                 .await;
             ensure!(git_state == workspace::git_state(&self.runner,&w.path)?, AgentFailure {kind:"git_control_mutation".into(), detail:"Coder changed Git HEAD/index control state (including index flags); no commands or review accepted".into(), blocked:true});
+            if run.delegation.is_some()
+                && let Ok(response) = &mut coder
+            {
+                self.admit("exact file replacements", Some(&w.path)).await?;
+                response.result =
+                    super::delegation::apply_edits(&run, &w.path, response.result.clone())?;
+            }
             workspace::assert_owned(&self.runner, &w, &w.base_commit, &self.stop).await?;
             workspace::stage(&self.runner, &w.path, &self.stop).await?;
             let inventory = review::inventory(
@@ -730,7 +877,11 @@ impl Engine {
                         }
                         .into());
                     }
-                    resume = response.session_id;
+                    resume = if run.delegation.is_some() {
+                        None
+                    } else {
+                        response.session_id
+                    };
                 }
                 Err(error) => {
                     if error
@@ -797,6 +948,8 @@ impl Engine {
             }
             self.artifacts.verify()?;
             workspace::assert_owned(&self.runner, &w, &w.base_commit, &self.stop).await?;
+            self.admit("reviewed immutable-tree preservation", Some(&w.path))
+                .await?;
             let commit = workspace::commit(
                 &self.runner,
                 &w,
@@ -936,7 +1089,11 @@ impl Engine {
                 &self.stop,
             )
             .await?;
-        let excerpt: String = diff.chars().take(48_000).collect();
+        let excerpt: String = if run.delegation.is_some() {
+            diff.clone()
+        } else {
+            diff.chars().take(48_000).collect()
+        };
         let data = serde_json::json!({
             "verified_tree":tree,
             "changed_files":inventory, "diff_statistics":stats,
@@ -995,6 +1152,8 @@ impl Engine {
                         Ok(())
                     },
                 )
+                .await?;
+            self.admit("independent review worktree creation", None)
                 .await?;
             let _lease = WorkspaceLease::acquire(&rw).map_err(workspace_blocker)?;
             workspace::create(&self.runner, &run.repository, &mut rw, &self.stop)
@@ -1118,6 +1277,8 @@ impl Engine {
         let run = self.journal.read().await;
         let mut checks = Vec::new();
         for command in &run.settings.verification.commands {
+            self.admit("exact configured verification command", Some(cwd))
+                .await?;
             let key = Uuid::new_v4();
             self.journal
                 .change(
@@ -1129,10 +1290,27 @@ impl Engine {
                     |_| Ok(()),
                 )
                 .await?;
+            let effective_command = if run.delegation.is_some() {
+                let temp = self
+                    .home
+                    .join("engineering")
+                    .join(run.id.to_string())
+                    .join("check-tmp")
+                    .join(key.to_string());
+                std::fs::create_dir_all(&temp)?;
+                ensure!(
+                    std::fs::canonicalize(&temp)? == temp,
+                    super::delegation::denied("check temporary directory changed ownership")
+                );
+                super::delegation::sandbox_command(command, cwd, &temp)?
+            } else {
+                command.clone()
+            };
+            self.admit("verification process launch", Some(cwd)).await?;
             let process = self
                 .runner
                 .start(
-                    command.clone(),
+                    effective_command,
                     cwd,
                     run.settings.verification.timeout_seconds,
                     key,
@@ -1205,6 +1383,7 @@ impl Engine {
         Ok(checks)
     }
     pub async fn integrate(&self) -> Result<()> {
+        self.admit("integration worktree creation", None).await?;
         let run = self.journal.read().await;
         self.runner.bind_git(
             run.repository_git
@@ -1226,6 +1405,8 @@ impl Engine {
             })
             .await?;
         for id in run.plan.as_ref().context("missing plan")?.validate()? {
+            self.admit("integration of accepted task artifact", Some(&w.path))
+                .await?;
             let task = run
                 .tasks
                 .iter()

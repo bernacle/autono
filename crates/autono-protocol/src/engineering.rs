@@ -617,6 +617,9 @@ pub struct EngineeringRun {
     pub base_commit: String,
     pub specification: String,
     pub settings: WorkflowSettings,
+    /// Absent on all legacy and supervised runs. Never inferred from preferences.
+    #[serde(default)]
+    pub delegation: Option<DelegationAuthorization>,
     pub plan: Option<ExecutionPlan>,
     pub approved_at: Option<DateTime<Utc>>,
     pub planner: Option<AgentSession>,
@@ -632,11 +635,45 @@ pub struct EngineeringRun {
     pub summary: String,
 }
 impl EngineeringRun {
+    /// A proposal/resolution cannot grant an unsupported permission. Delegation
+    /// covers only the two baseline scopes; actual execution revalidates context.
+    pub fn action_blocks(&self, action: &HumanAction) -> bool {
+        if let Some(p) = &action.requirement.permission {
+            return matches!(
+                action.status,
+                HumanActionStatus::Rejected | HumanActionStatus::Deferred
+            ) || self.settings.permissions.classify(p.operation) == PermissionRule::Deny
+                || !p.supported(self.id)
+                || (self.settings.permissions.classify(p.operation) != PermissionRule::Allow
+                    && self.delegation.is_none()
+                    && action.status != HumanActionStatus::Resolved);
+        }
+        action.blocks()
+    }
+    /// All deterministic host gates and run-wide human gates must pass. A scoped
+    /// human action blocks its tasks/descendants while independent work may run.
+    pub fn autonomous_preflight_ready(&self) -> bool {
+        self.delegation.is_some()
+            && self
+                .preflight
+                .as_ref()
+                .is_some_and(|p| !p.checks.iter().any(|c| c.blocking && c.ready != Some(true)))
+            && !self
+                .human_actions
+                .iter()
+                .any(|a| a.requirement.affected_tasks.is_empty() && self.action_blocks(a))
+    }
     pub fn ready_tasks(&self) -> Vec<String> {
         self.tasks
             .iter()
             .filter(|t| {
                 matches!(t.status, TaskStatus::Ready | TaskStatus::Waiting)
+                    && (self.delegation.is_none()
+                        || !self.human_actions.iter().any(|a| {
+                            self.action_blocks(a)
+                                && (a.requirement.affected_tasks.is_empty()
+                                    || a.requirement.affected_tasks.contains(&t.plan.id))
+                        }))
                     && t.plan.dependencies.iter().all(|d| {
                         self.tasks
                             .iter()
@@ -647,7 +684,7 @@ impl EngineeringRun {
             .collect()
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct PlanSubmission {
     pub id: Uuid,
@@ -884,4 +921,37 @@ pub struct PreflightReport {
     pub action_ids: Vec<String>,
     pub ready: bool,
     pub limitation: String,
+}
+
+/// A proposal is inspectable consent material, not permission to start planning.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DelegationProposalRequest {
+    pub submission: PlanSubmission,
+    /// Exact relative UTF-8 regular files; no globs, deletes, links or mode changes.
+    pub writable_files: Vec<String>,
+    pub max_runtime_seconds: u64,
+    pub local_integration: bool,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DelegationContract {
+    pub version: u32,
+    pub request: DelegationProposalRequest,
+    pub repository_git: GitOwnership,
+    /// Filesystem device/inode/owner identities, in addition to Git metadata hashes.
+    pub repository_identity: BTreeMap<PathBuf, String>,
+    pub base_commit: String,
+    pub worktree_root: PathBuf,
+    pub settings: WorkflowSettings,
+    pub verification_sandbox: String,
+    pub user_config_digest: Option<String>,
+    pub limitations: Vec<String>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DelegationAuthorization {
+    pub contract: DelegationContract,
+    pub authorized_at: DateTime<Utc>,
+    pub expires_at: DateTime<Utc>,
 }
