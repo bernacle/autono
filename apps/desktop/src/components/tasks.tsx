@@ -3,10 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, X } from "lucide-react";
 import type { Run, Task } from "../lib/types";
 import { blockedAncestors, pending } from "../lib/utils";
+import { criterionEvidence, reviewAccepts } from "../lib/evidence-model";
 import { latestReview, orderedTasks } from "../lib/presentation";
 import { Badge, Empty, StatusGlyph } from "./common";
 import { DependencyGraph } from "./dependency-graph";
-import { TaskEvidence, SessionRow, WorkspaceRow } from "./evidence";
+import {
+  CheckSummary,
+  TaskEvidence,
+  SessionRow,
+  WorkspaceRow,
+} from "./evidence";
 import { Segmented } from "./ui/segmented";
 import { Button } from "./ui/button";
 export function TasksView({
@@ -216,19 +222,20 @@ export function TasksView({
                         {run.settings.execution.max_attempts}
                       </span>
                       <span className="task-check" title="Checks">
-                        {latest?.verification.length ? (
-                          latest.verification.every((v) => v.passed) ? (
-                            <Check className="success-text" size={13} />
-                          ) : (
-                            <X className="danger-text" size={13} />
-                          )
+                        {latest ? (
+                          <CheckSummary
+                            run={run}
+                            task={t}
+                            attempt={latest}
+                            compact
+                          />
                         ) : (
                           "—"
                         )}
                       </span>
                       <span className="task-check" title="Review">
                         {review ? (
-                          review.accepted ? (
+                          reviewAccepts(review) ? (
                             <Check className="success-text" size={13} />
                           ) : (
                             <X className="danger-text" size={13} />
@@ -408,7 +415,7 @@ export function TaskInspector({
           <h3>Acceptance criteria</h3>
           <ul className="criteria-list">
             {task.plan.acceptance_criteria.map((c, i) => {
-              const result = review?.criteria.find((r) => r.criterion === c);
+              const result = criterionEvidence(review, task.plan, i);
               return (
                 <li key={i}>
                   {result?.satisfied && (

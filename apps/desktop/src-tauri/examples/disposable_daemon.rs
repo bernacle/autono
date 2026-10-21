@@ -42,14 +42,16 @@ impl AgentRuntime for Fixture {
                 .and_then(|value| value.parse::<u64>().ok())
                 .filter(|value| (1..=60).contains(value))
                 .unwrap_or(2);
-            let permanent_failure =
-                std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("verification-failure");
+            let single_task = matches!(
+                std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref(),
+                Ok("verification-failure" | "verification-timeout")
+            );
             let observable =
                 std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("observability");
             let mut before = format!("sleep {delay}; ");
             let value = match r.role {
                 AgentRole::Planner => {
-                    let tasks = if permanent_failure {
+                    let tasks = if single_task {
                         vec![("A", vec![])]
                     } else {
                         vec![
@@ -60,12 +62,12 @@ impl AgentRuntime for Fixture {
                             ("E", vec!["C"]),
                         ]
                     };
-                    let requirements = if permanent_failure {
+                    let requirements = if single_task {
                         json!([])
                     } else {
                         json!([{"kind":"product_decision","reason":"The fixture specification leaves the export format open","requested_action":"Choose the report export format","affected_tasks":["B"],"blocking":true,"evidence":"CSV or JSON is not specified","confidence":100,"permission":null}])
                     };
-                    let milestones = if permanent_failure {
+                    let milestones = if single_task {
                         json!([{"id":"m1","goal":"Verification failure fixture","task_ids":["A"]}])
                     } else {
                         json!([{"id":"m1","goal":"Foundation and parallel checks","task_ids":["A","C","E"]},{"id":"m2","goal":"Report and final assembly","task_ids":["B","D"]}])
@@ -182,6 +184,14 @@ async fn main() -> Result<()> {
     if std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("verification-failure") {
         config.verification.commands[0][2] =
             "printf 'fixture verification: intentional failure\\n'; exit 1".into();
+    }
+    if std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("verification-timeout") {
+        config.verification.commands.push(vec![
+            "sh".into(),
+            "-c".into(),
+            "printf 'fixture verification: waiting\\n'; sleep 60".into(),
+        ]);
+        config.verification.timeout_seconds = 30;
     }
     // Keep the bridge's read-only settings view identical to the injected daemon config.
     tokio::fs::write(paths.config(), toml::to_string(&config)?).await?;

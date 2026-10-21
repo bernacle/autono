@@ -1,3 +1,8 @@
+import {
+  checkEventOutcome,
+  reviewAccepts,
+  type CheckOutcome,
+} from "./evidence-model";
 import type { EngineeringEvent, Run, Session, TaskStatus } from "./types";
 
 /** Journal conventions, pinned to engineering/{store,engine,service}.rs. No mutations. */
@@ -56,7 +61,7 @@ export interface Segment {
   start: number;
   end: number | null;
   live: boolean;
-  outcome: "recorded" | "passed" | "failed" | "interrupted";
+  outcome: "recorded" | "failed" | "interrupted" | CheckOutcome;
   sources: Source[];
   session?: string;
   process?: string;
@@ -442,7 +447,7 @@ export function deriveExecution(run: Run, history: History): ExecutionModel {
         agents.delete(key);
       }
       for (const [key, s] of checks) {
-        add({ ...s, outcome: "interrupted" }, f);
+        add({ ...s, outcome: checkEventOutcome(run, s) }, f);
         checks.delete(key);
       }
       if (f.kind !== "completed")
@@ -554,7 +559,12 @@ export function deriveExecution(run: Run, history: History): ExecutionModel {
           unparsed++;
           continue;
         }
-        s.outcome = f.outcome === "succeeded" ? "passed" : "failed";
+        s.outcome =
+          f.outcome === "succeeded"
+            ? s.phase === "review"
+              ? "recorded"
+              : "passed"
+            : "failed";
         const closed = add(s, f);
         if (s.task && s.phase === "review" && closed)
           reviewByTask.set(s.task, closed);
@@ -597,7 +607,7 @@ export function deriveExecution(run: Run, history: History): ExecutionModel {
       checkProcesses.set(f.process!, s);
       if (f.kind === "verification_process") s.sources.push(ref(f));
       else {
-        s.outcome = f.accepted ? "passed" : "failed";
+        s.outcome = checkEventOutcome(run, { ...f, key: s.key });
         add(s, f);
         checks.delete(s.key!);
         checkProcesses.delete(f.process!);
@@ -609,7 +619,14 @@ export function deriveExecution(run: Run, history: History): ExecutionModel {
         unparsed++;
         continue;
       }
-      s.outcome = f.accepted ? "passed" : "failed";
+      const recordedReview = tasks
+        .get(f.task!)
+        ?.attempts.find((a) => a.number === s.attempt)
+        ?.reviews.find((r) => r.session.id === s.session)?.review;
+      s.outcome =
+        f.accepted && (!recordedReview || reviewAccepts(recordedReview))
+          ? "passed"
+          : "failed";
       s.sources.push(ref(f));
       if (f.findings) {
         const review = tasks

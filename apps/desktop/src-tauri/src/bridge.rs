@@ -519,26 +519,58 @@ impl Redactor {
     }
     fn text(&self, text: &str) -> String {
         static PATTERN: OnceLock<Regex> = OnceLock::new();
+        let marker = self.placeholder();
         let mut text = text.to_owned();
         for secret in &self.literals {
-            text = text.replace(secret, "[redacted]");
+            text = text.replace(secret, &marker);
         }
-        let regex = PATTERN.get_or_init(|| Regex::new(r#"(?i)((?:bearer|basic)\s+[^\s"'<>]+|(?:[\w-]*(?:token|password|secret|api[_-]?key|credential)[\w-]*)["']?\s*[:=]\s*["']?[^\s,"'<>}]+|sk-[a-zA-Z0-9_-]{12,}|(?:https?://)[^\s/@:]+:[^\s/@]+@[^\s]+)"#).expect("valid redaction pattern"));
-        regex
-            .replace_all(&text, "[redacted]")
+        text = text
             .chars()
             .filter(|c| !c.is_control() || *c == '\n' || *c == '\t')
-            .collect()
+            .collect();
+        // Control normalization can join fragments into a known credential.
+        for secret in &self.literals {
+            text = text.replace(secret, &marker);
+        }
+        let regex = PATTERN.get_or_init(|| Regex::new(r#"(?i)((?:bearer|basic)\s+[^\s"'<>]+|(?:[\w-]*(?:token|password|secret|api[_-]?key|credential)[\w-]*)["']?\s*[:=]\s*["']?[^\s,"'<>}]+|sk-[a-zA-Z0-9_-]{12,}|(?:https?://)[^\s/@:]+:[^\s/@]+@[^\s]+)"#).expect("valid redaction pattern"));
+        let text = regex.replace_all(&text, marker.as_str()).into_owned();
+        // Fail closed if replacements themselves reconstruct a known literal.
+        if self.contains_literal(&text) {
+            marker
+        } else {
+            text
+        }
+    }
+    fn contains_literal(&self, text: &str) -> bool {
+        self.literals
+            .iter()
+            .any(|secret| !secret.is_empty() && text.contains(secret))
+    }
+    fn placeholder(&self) -> String {
+        for candidate in ["[redacted]", "[withheld]", "***", "…"] {
+            if !self.contains_literal(candidate) {
+                return candidate.into();
+            }
+        }
+        // Even short process credentials must not occur in the replacement itself.
+        // Prefer a nonempty marker so redacting a blocker cannot make it empty.
+        (0xe000..=0x10ffff)
+            .filter_map(char::from_u32)
+            .filter(|c| !c.is_control())
+            .map(|c| c.to_string())
+            .find(|s| !self.contains_literal(s))
+            .unwrap_or_default()
     }
     fn output_line(&self, text: &str) -> String {
-        if let Ok(mut value @ Value::Object(_)) = serde_json::from_str::<Value>(text) {
-            if value["type"] == "item.completed"
-                && let Some(item) = value.get_mut("item").and_then(Value::as_object_mut)
-            {
-                item.remove("text");
-            }
+        if let Ok(mut value) = serde_json::from_str::<Value>(text) {
             self.value(&mut value);
-            return value.to_string();
+            let serialized = value.to_string();
+            // JSON escaping must not reconstruct a known literal on the wire.
+            return if self.contains_literal(&serialized) {
+                self.placeholder()
+            } else {
+                serialized
+            };
         }
         self.text(text)
     }
@@ -552,7 +584,7 @@ impl Redactor {
                         .as_str()
                         .is_some_and(|s| s.starts_with('-') && sensitive(s) && !s.contains('='));
                     if redact_next {
-                        *v = Value::String("[redacted]".into());
+                        *v = Value::String(self.placeholder());
                     } else {
                         self.value(v);
                     }
@@ -560,19 +592,37 @@ impl Redactor {
                 }
             }
             Value::Object(map) => {
-                for (key, v) in map {
-                    if sensitive(key)
-                        || key == "env"
-                        || key == "result"
-                        || key == "structured_output"
+                if map.get("type").and_then(Value::as_str) == Some("item.completed")
+                    && let Some(item) = map.get_mut("item").and_then(Value::as_object_mut)
+                {
+                    item.remove("text");
+                }
+                let original = std::mem::take(map);
+                for (key, mut v) in original {
+                    if sensitive(&key)
+                        || ["env", "result", "structured_output"].contains(&key.as_str())
                     {
-                        *v = Value::String("[redacted]".into());
+                        v = Value::String(self.placeholder());
                     } else {
-                        self.value(v);
+                        self.value(&mut v);
+                    }
+                    let key = self.text(&key);
+                    match map.entry(key) {
+                        serde_json::map::Entry::Vacant(entry) => {
+                            entry.insert(v);
+                        }
+                        // Redacted/normalized keys can collide. Never keep either payload.
+                        serde_json::map::Entry::Occupied(mut entry) => {
+                            entry.insert(Value::String(self.placeholder()));
+                        }
                     }
                 }
             }
-            _ => {}
+            _ => {
+                if self.contains_literal(&value.to_string()) {
+                    *value = Value::String(self.placeholder());
+                }
+            }
         }
     }
 }
@@ -596,6 +646,84 @@ fn sensitive(key: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn review_known_secret_is_redacted_even_in_json_object_keys() {
+        let secret = "pr4-known-credential-canary-1234567890";
+        let r = Redactor::new(secret);
+        let line = json!({(secret): "ordinary value"}).to_string();
+        assert!(!r.output_line(&line).contains(secret));
+    }
+    fn assert_no_literal(value: &Value, literals: &[&str]) {
+        match value {
+            Value::String(text) => assert!(literals.iter().all(|s| !text.contains(s))),
+            Value::Array(values) => values.iter().for_each(|v| assert_no_literal(v, literals)),
+            Value::Object(map) => {
+                for (key, value) in map {
+                    assert!(literals.iter().all(|s| !key.contains(s)));
+                    assert_no_literal(value, literals);
+                }
+            }
+            _ => assert!(literals.iter().all(|s| !value.to_string().contains(s))),
+        }
+    }
+    #[test]
+    fn redacts_decoded_keys_nested_arrays_normalization_and_collisions() {
+        let secret = "canary-1234567890";
+        let r = Redactor {
+            literals: vec![secret.into(), "123456".into()],
+        };
+        let interrupted = "canary-\u{1b}1234567890".to_owned();
+        let payload = json!({
+            (secret): [{"nested":{(secret):secret}}, 123456],
+            (interrupted): "normalized key payload",
+            "[redacted]": "collision payload",
+            "safe": "retained",
+            "events":[{"type":"item.completed","item":{"text":"raw provider transcript"}}]
+        });
+        let mut direct = payload.clone();
+        r.value(&mut direct);
+        assert_no_literal(&direct, &[secret, "123456"]);
+        assert_eq!(direct["[redacted]"], "[redacted]");
+        assert_eq!(direct["safe"], "retained");
+        assert!(!direct.to_string().contains("collision payload"));
+        assert!(!direct.to_string().contains("raw provider transcript"));
+        for value in [payload.clone(), json!([payload]), json!(secret)] {
+            let escaped = value.to_string().replace("canary", "\\u0063anary");
+            let output = r.output_line(&escaped);
+            let decoded: Value = serde_json::from_str(&output).expect("sanitized valid JSON");
+            assert_no_literal(&decoded, &[secret, "123456"]);
+            assert!(!output.contains(secret));
+        }
+    }
+    #[test]
+    fn replacement_and_json_serialization_cannot_reintroduce_literals() {
+        let r = Redactor {
+            literals: vec!["redacted".into()],
+        };
+        let mut value =
+            json!({"password":"private", "array":["--token","private"], "redacted": "value"});
+        r.value(&mut value);
+        assert_no_literal(&value, &["redacted"]);
+        let mut blocker = json!({"blocker":"redacted"});
+        r.value(&mut blocker);
+        assert!(
+            !blocker["blocker"]
+                .as_str()
+                .expect("retained blocker")
+                .is_empty()
+        );
+        let short = Redactor {
+            literals: vec!["redacted".into(), "withheld".into(), "*".into(), "…".into()],
+        };
+        let marker = short.placeholder();
+        assert!(!marker.is_empty());
+        assert!(!short.contains_literal(&marker));
+        // The decoded value does not contain a backslash-n, but serialization does.
+        let r = Redactor {
+            literals: vec!["canary\\n".into()],
+        };
+        assert_eq!(r.output_line(&json!("canary\n").to_string()), "[redacted]");
+    }
     #[test]
     fn redacts_secrets_and_controls() {
         let r = Redactor::new("exact-daemon-bearer-abcdefghijklmnopqrstuvwxyz");

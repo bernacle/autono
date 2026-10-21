@@ -3770,3 +3770,22 @@ textarea::placeholder {
   color: var(--text-2);
   margin: 12px 0 20px;
 }
+
+/* Recorded check outcomes: infrastructure and interruption are not failed tests. */
+.phase-test_failure {
+  background: var(--seg-failed);
+  border: 1px solid var(--danger);
+}
+.phase-timeout,
+.phase-infrastructure_failure {
+  background: var(--surface-1);
+  border: 1px solid var(--attention);
+}
+.phase-cancelled,
+.phase-unknown {
+  background: var(--seg-coding);
+  border: 1px dashed var(--text-3);
+}
+.execution-stats .check-outcomes {
+  white-space: normal;
+}

@@ -1,3 +1,4 @@
+import { checkEventOutcome, checkLabels } from "./evidence-model";
 import type { EngineeringEvent, Run } from "./types";
 import { parseFact, sessionBindings } from "./execution-model";
 import { humanize } from "./presentation";
@@ -8,6 +9,8 @@ export function describeEvent(e: EngineeringEvent, run: Run) {
     b = f?.session ? sessionBindings(run).get(f.session) : undefined;
   const task = f?.task ?? b?.task;
   const attempt = f?.attempt ?? b?.attempt;
+  const checkOutcome =
+    f?.kind === "verification_finished" ? checkEventOutcome(run, f) : undefined;
   const names: Record<string, string> = {
     created: "Planning requested",
     planning_workspace_ready: "Planning worktree prepared",
@@ -51,11 +54,9 @@ export function describeEvent(e: EngineeringEvent, run: Run) {
     verification_started: "Configured checks started",
     verification_process: "Check process recorded",
     verification_finished:
-      f?.accepted === true
-        ? "Configured check passed"
-        : f?.accepted === false
-          ? "Configured check failed"
-          : "Configured check result recorded",
+      checkOutcome && checkOutcome !== "unknown"
+        ? `Configured check · ${checkLabels[checkOutcome].toLowerCase()}`
+        : "Configured check result recorded · outcome unavailable",
     task_state: f?.state
       ? f.state === "BLOCKED_HUMAN"
         ? "Task paused for a human decision"
@@ -78,7 +79,7 @@ export function describeEvent(e: EngineeringEvent, run: Run) {
       !!f?.outcome &&
       f.outcome !== "succeeded") ||
     (e.kind === "review_finished" && f?.accepted === false) ||
-    (e.kind === "verification_finished" && f?.accepted === false) ||
+    (checkOutcome !== undefined && checkOutcome !== "passed") ||
     ["FAILED", "INTERRUPTED", "BLOCKED", "BLOCKED_HUMAN"].includes(
       f?.state ?? "",
     );

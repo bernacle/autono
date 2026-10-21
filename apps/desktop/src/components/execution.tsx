@@ -1,3 +1,4 @@
+import { checkLabels, verificationCounts } from "../lib/evidence-model";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { ArrowRight, Expand, Minimize, TerminalSquare } from "lucide-react";
 import type { Run } from "../lib/types";
@@ -15,7 +16,7 @@ import { Segmented } from "./ui/segmented";
 import { Journal } from "./journal";
 import { TaskInspector } from "./tasks";
 import { PhaseSource } from "./phase-source";
-import { SessionRow } from "./evidence";
+import { CheckSummary, SessionRow } from "./evidence";
 const labels: Record<Segment["phase"], string> = {
   planning: "Planning",
   awaiting: "Awaiting approval",
@@ -32,7 +33,7 @@ const labels: Record<Segment["phase"], string> = {
   review: "Independent review",
 };
 export const phaseLabel = (s: Segment) =>
-  `${labels[s.phase]}${s.outcome === "failed" ? " · failed" : s.outcome === "interrupted" ? " · stopped" : ""}`;
+  `${labels[s.phase]}${s.phase === "checks" && s.outcome !== "recorded" && s.outcome !== "passed" && s.outcome !== "failed" && s.outcome !== "interrupted" ? ` · ${checkLabels[s.outcome].toLowerCase()}` : s.outcome === "failed" ? " · failed" : s.outcome === "interrupted" ? " · stopped" : ""}`;
 export function PhaseBar({
   segment: s,
   from,
@@ -572,7 +573,8 @@ export function ExecutionView({
       ...run.tasks.flatMap((t) => t.attempts.flatMap((a) => a.verification)),
       ...run.integration_verification,
     ],
-    reviews = run.tasks.flatMap((t) => t.attempts.flatMap((a) => a.reviews));
+    reviews = run.tasks.flatMap((t) => t.attempts.flatMap((a) => a.reviews)),
+    checkCounts = verificationCounts(checks);
   return (
     <div
       className={`execution-layout ${task ? "has-inspector" : ""} ${expanded ? "execution-expanded" : ""}`}
@@ -596,12 +598,20 @@ export function ExecutionView({
             </strong>
           </div>
           <div>
-            <span>Checks</span>
+            <span>Check results</span>
             <strong>
-              {checks.filter((v) => v.passed).length}
-              <small>
+              {checkCounts.passed}
+              <small className="check-outcomes">
                 {" "}
-                passed · {checks.filter((v) => !v.passed).length} failed
+                passed · {checkCounts.test_failure} test failed
+                {checkCounts.timeout > 0 &&
+                  ` · ${checkCounts.timeout} timed out`}
+                {checkCounts.cancelled > 0 &&
+                  ` · ${checkCounts.cancelled} cancelled`}
+                {checkCounts.infrastructure_failure > 0 &&
+                  ` · ${checkCounts.infrastructure_failure} infrastructure`}
+                {checkCounts.unknown > 0 &&
+                  ` · ${checkCounts.unknown} unavailable`}
               </small>
             </strong>
           </div>
@@ -913,13 +923,7 @@ export function VerificationLedger({
               <button className="task-chip" onClick={() => onTask(t.plan.id)}>
                 {t.plan.id} · {a.number}
               </button>
-              <span>
-                {a.verification.length
-                  ? a.verification.every((v) => v.passed)
-                    ? "✓ Checks passed"
-                    : "× Check failed"
-                  : "No check result"}
-              </span>
+              <CheckSummary run={run} task={t} attempt={a} />
               <span>{a.reviews.length} independent reviews</span>
               <span>
                 {a.verified_tree && a.verified_tree === a.preserved_tree

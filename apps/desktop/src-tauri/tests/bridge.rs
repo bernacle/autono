@@ -63,7 +63,31 @@ async fn authenticated_bridge_projects_state_and_replays_bounded_sanitized_logs(
         .await?;
     assert_eq!(raw.status(), 401);
     let id = Uuid::new_v4();
-    let process=supervisor.submit_keyed(Submission{submission_key:id,spec:RunSpec{command:vec!["sh".into(),"-c".into(),"printf 'API_KEY='; sleep 0.1; printf 'fixture-secret-value\\nverification passed\\nnot permitted\\n'".into()],cwd:dir.path().to_owned(),env:BTreeMap::from([("PRIVATE_PASSWORD".into(),"never-to-javascript".into()),("NO_COLOR".into(),"no".into())]),timeout_seconds:Some(5),keep_awake:false}}).await?;
+    let credential = "never-to-javascript";
+    let escaped_credential = "canary-quoted-\"-slash-\\-unicode-é";
+    let object = json!({
+        (credential): {"nested":[{(escaped_credential):credential}]},
+        "safe":"preserved object evidence"
+    })
+    .to_string()
+    .replace("never", "\\u006eever");
+    let array = json!([{(escaped_credential):[credential]}, {"safe":"preserved array evidence"}])
+        .to_string();
+    let process = supervisor.submit_keyed(Submission {
+        submission_key: id,
+        spec: RunSpec {
+            command: vec!["sh".into(), "-c".into(), "printf 'API_KEY='; sleep 0.1; printf 'fixture-secret-value\\nverification passed\\nnot permitted\\n'; printf '%s\\n' \"$FIXTURE_OBJECT\" \"$FIXTURE_ARRAY\"".into()],
+            cwd: dir.path().to_owned(),
+            env: BTreeMap::from([
+                ("PRIVATE_PASSWORD".into(), credential.into()),
+                ("PRIVATE_TOKEN".into(), escaped_credential.into()),
+                ("FIXTURE_OBJECT".into(), object),
+                ("FIXTURE_ARRAY".into(), array),
+                ("NO_COLOR".into(), "no".into())
+            ]),
+            timeout_seconds: Some(5), keep_awake: false,
+        }
+    }).await?;
     let mut cursor = 0;
     let mut lines = vec![];
     for _ in 0..50 {
@@ -102,8 +126,18 @@ async fn authenticated_bridge_projects_state_and_replays_bounded_sanitized_logs(
             .expect("recorded event timestamp");
         chrono::DateTime::parse_from_rfc3339(timestamp)?;
     }
+    for line in &lines {
+        if let Ok(decoded) =
+            serde_json::from_str::<serde_json::Value>(line["text"].as_str().unwrap_or(""))
+        {
+            assert_no_canary(&decoded, &[credential, escaped_credential]);
+        }
+    }
     let text = json!(lines).to_string();
+    assert!(!text.contains("never-to-javascript"));
     assert!(text.contains("verification passed"));
+    assert!(text.contains("preserved object evidence"));
+    assert!(text.contains("preserved array evidence"));
     assert!(text.contains("not permitted"));
     assert!(!text.contains("fixture-secret-value"));
     assert!(cursor > 0);
@@ -138,4 +172,20 @@ async fn authenticated_bridge_projects_state_and_replays_bounded_sanitized_logs(
     service.signal_shutdown();
     service.shutdown().await?;
     Ok(())
+}
+
+fn assert_no_canary(value: &serde_json::Value, canaries: &[&str]) {
+    match value {
+        serde_json::Value::String(text) => assert!(canaries.iter().all(|s| !text.contains(s))),
+        serde_json::Value::Array(values) => {
+            values.iter().for_each(|v| assert_no_canary(v, canaries))
+        }
+        serde_json::Value::Object(map) => {
+            for (key, value) in map {
+                assert!(canaries.iter().all(|s| !key.contains(s)));
+                assert_no_canary(value, canaries);
+            }
+        }
+        _ => {}
+    }
 }

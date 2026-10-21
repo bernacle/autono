@@ -114,7 +114,9 @@ describe("daemon journal projection", () => {
     ).toHaveLength(2);
     expect(m.segments.filter((s) => s.phase === "checks")).toHaveLength(8);
     expect(
-      m.segments.filter((s) => s.phase === "checks" && s.outcome === "failed"),
+      m.segments.filter(
+        (s) => s.phase === "checks" && s.outcome === "test_failure",
+      ),
     ).toHaveLength(1);
     expect(m.segments.filter((s) => s.phase === "executing")).toHaveLength(2);
     expect(m.segments.some((s) => s.live)).toBe(false);
@@ -136,7 +138,9 @@ describe("daemon journal projection", () => {
     expect(m.incomplete).toBe(0);
     expect(m.segments.some((s) => s.live)).toBe(false);
     expect(
-      m.segments.filter((s) => s.phase === "checks" && s.outcome === "failed"),
+      m.segments.filter(
+        (s) => s.phase === "checks" && s.outcome === "test_failure",
+      ),
     ).toHaveLength(3);
     expect(m.markers.filter((m) => m.kind === "completed")).toHaveLength(0);
     expect(
@@ -227,7 +231,7 @@ describe("daemon journal projection", () => {
       ).unparsed,
     ).toBe(1);
   });
-  it("preserves check failures and joins a live check before a result exists", () => {
+  it("joins a live check and keeps an unclassified false finish unknown without snapshot evidence", () => {
     const r = running(),
       start = event(
         1,
@@ -256,7 +260,7 @@ describe("daemon journal projection", () => {
       ]),
     );
     expect(m.segments[0]).toMatchObject({
-      outcome: "failed",
+      outcome: "unknown",
       process: uuid(7),
       live: false,
     });

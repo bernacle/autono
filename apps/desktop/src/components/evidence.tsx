@@ -1,6 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
 import { Folder, TerminalSquare } from "lucide-react";
-import type { Run, Session, Verification, Workspace } from "../lib/types";
+import type { Run, Session, Task, Verification, Workspace } from "../lib/types";
+import {
+  attemptChecks,
+  checkLabels,
+  reviewAccepts,
+  reviewRecords,
+  verificationOutcome,
+  type Attempt,
+} from "../lib/evidence-model";
 import { useTransport } from "../lib/transport";
 import { short } from "../lib/utils";
 import { Badge, Empty, ErrorNotice, Panel } from "./common";
@@ -32,61 +40,70 @@ export function TaskEvidence({
               {attempt.detail && (
                 <p className="warning-text">{attempt.detail}</p>
               )}
+              <p>
+                <CheckSummary run={run} task={task} attempt={attempt} />
+              </p>
               <VerificationList
                 results={attempt.verification}
                 onProcess={setProcess}
               />
-              {(attempt.reviews.length
-                ? attempt.reviews.map((r) => r.review)
-                : [attempt.review]
-              )
-                .filter((r) => r !== null)
-                .map((review, index) => (
-                  <div className="review" key={index}>
+              {reviewRecords(attempt).map(
+                ({ ordinal, session, review, diagnostic }) => (
+                  <div
+                    className="review"
+                    key={session?.id ?? `legacy-${ordinal}`}
+                    data-review-ordinal={ordinal}
+                    data-review-session={session?.id}
+                  >
                     <div className="row-between">
-                      <h4>Independent review {index + 1}</h4>
+                      <h4>Independent review {ordinal}</h4>
                       <Badge
                         status={
-                          review.accepted ? "review accepted" : "REJECTED"
+                          review
+                            ? reviewAccepts(review)
+                              ? "review accepted"
+                              : "REJECTED"
+                            : "review unavailable"
                         }
                       />
                     </div>
-                    {review.blocker && (
-                      <p className="warning-text">{review.blocker}</p>
-                    )}
-                    {review.criteria.map((c, i) => (
-                      <details key={i}>
-                        <summary>
-                          {c.satisfied ? "✓" : "✕"} {c.criterion_id}{" "}
-                          {c.criterion}
-                        </summary>
-                        <p>{c.evidence}</p>
-                      </details>
-                    ))}
-                    {review.findings.map((finding, i) => (
-                      <div className="finding" key={i}>
-                        <strong>
-                          {finding.severity} · {finding.file}:{finding.line}
-                        </strong>
-                        <p>{finding.explanation}</p>
-                        <p>Recommended fix: {finding.recommended_fix}</p>
-                        <small>
-                          Confidence {Math.round(finding.confidence * 100)}%
-                        </small>
-                      </div>
-                    ))}
-                    {!review.findings.length && (
-                      <p className="muted">No reviewer findings.</p>
+                    <SessionRow session={session} onProcess={setProcess} />
+                    {diagnostic && <p className="warning-text">{diagnostic}</p>}
+                    {review ? (
+                      <>
+                        {review.blocker && (
+                          <p className="warning-text">{review.blocker}</p>
+                        )}
+                        {review.criteria.map((c, i) => (
+                          <details key={i}>
+                            <summary>
+                              {c.satisfied ? "✓" : "✕"} {c.criterion_id}{" "}
+                              {c.criterion}
+                            </summary>
+                            <p>{c.evidence}</p>
+                          </details>
+                        ))}
+                        {review.findings.map((finding, i) => (
+                          <div className="finding" key={i}>
+                            <strong>
+                              {finding.severity} · {finding.file}:{finding.line}
+                            </strong>
+                            <p>{finding.explanation}</p>
+                            <p>Recommended fix: {finding.recommended_fix}</p>
+                            <small>
+                              Confidence {Math.round(finding.confidence * 100)}%
+                            </small>
+                          </div>
+                        ))}
+                        {!review.findings.length && (
+                          <p className="muted">No reviewer findings.</p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="muted">No validated review result.</p>
                     )}
                   </div>
-                ))}
-              {attempt.reviews.map(
-                (r, i) =>
-                  r.diagnostic && (
-                    <p className="warning-text" key={i}>
-                      {r.diagnostic}
-                    </p>
-                  ),
+                ),
               )}
               <dl className="tree-evidence">
                 <dt>Verified tree</dt>
@@ -206,6 +223,43 @@ export function SessionRow({
     </div>
   );
 }
+export function CheckSummary({
+  run,
+  task,
+  attempt,
+  compact = false,
+}: {
+  run: Run;
+  task: Task;
+  attempt: Attempt;
+  compact?: boolean;
+}) {
+  const summary = attemptChecks(run, task, attempt),
+    symbol =
+      summary.state === "passed"
+        ? "✓"
+        : summary.state === "test_failure"
+          ? "✕"
+          : ["partial", "pending"].includes(summary.state)
+            ? "…"
+            : "—",
+    tone =
+      summary.state === "passed"
+        ? "success-text"
+        : summary.state === "test_failure"
+          ? "danger-text"
+          : ["timeout", "infrastructure_failure", "partial"].includes(
+                summary.state,
+              )
+            ? "warning-text"
+            : "muted";
+  return (
+    <span className={tone} title={summary.label} aria-label={summary.label}>
+      {symbol}
+      {!compact && ` ${summary.label}`}
+    </span>
+  );
+}
 export function VerificationList({
   results,
   onProcess,
@@ -221,7 +275,8 @@ export function VerificationList({
             <code>{JSON.stringify(result.command)}</code>
             <div className="row">
               <Badge
-                status={result.outcome ?? (result.passed ? "passed" : "FAILED")}
+                status={verificationOutcome(result)}
+                label={checkLabels[verificationOutcome(result)]}
               />
               <Button
                 variant="ghost"

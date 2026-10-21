@@ -1,0 +1,613 @@
+{
+  "run": {
+    "id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+    "revision": 27,
+    "status": "BLOCKED",
+    "created_at": "2026-10-21T17:26:37.857023Z",
+    "updated_at": "2026-10-21T17:28:18.585734Z",
+    "repository": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository",
+    "repository_git": {
+      "worktree": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository",
+      "git_dir": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git",
+      "common_dir": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git",
+      "metadata": {
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/commondir": null,
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/config.worktree": null,
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/gitdir": null,
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/attributes": null,
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/grafts": null,
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/objects/info/alternates": null,
+        "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/objects/info/http-alternates": null
+      }
+    },
+    "requested_base": "main",
+    "base_commit": "6a410d209bb54d0fd9fe5adeafd1c783d544ae73",
+    "specification": "# Observable recovery fixture\nExercise deterministic shell-only failures, retries, independent findings, human continuation and local integration.",
+    "settings": {
+      "agents": {
+        "planner": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "coder": {
+          "provider": "codex",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "reviewer": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        }
+      },
+      "execution": {
+        "max_parallel": 2,
+        "max_attempts": 3,
+        "max_review_cycles": 2
+      },
+      "verification": {
+        "commands": [
+          [
+            "sh",
+            "-c",
+            "printf 'fixture verification: passed\\n'; test -f README.md"
+          ],
+          ["sh", "-c", "printf 'fixture verification: waiting\\n'; sleep 60"]
+        ],
+        "timeout_seconds": 30
+      },
+      "preflight": {
+        "required_env": [],
+        "required_tools": [],
+        "required_directories": [],
+        "external_services": []
+      },
+      "permissions": {
+        "rules": {
+          "run_checks": "REQUIRE_APPROVAL"
+        }
+      }
+    },
+    "plan": {
+      "human_requirements": [],
+      "requirements": [
+        {
+          "id": "r",
+          "text": "Deliver an independently verified local report"
+        }
+      ],
+      "milestones": [
+        {
+          "id": "m1",
+          "goal": "Verification failure fixture",
+          "task_ids": ["A"]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": ["Task A artifact exists"],
+          "dependencies": [],
+          "requirement_ids": ["r"],
+          "verification_expectations": ["Configured shell check passes"],
+          "role": "coder"
+        }
+      ]
+    },
+    "approved_at": "2026-10-21T17:27:46.484001Z",
+    "planner": {
+      "id": "488f16df-b856-47b4-9d97-2efed34514c7",
+      "role": "planner",
+      "provider": "claude",
+      "provider_session_id": "62ea7556-ca82-428a-89ac-50c4aa7786a5",
+      "resumed_from": null,
+      "process_key": "f93706dc-e0a0-447c-a2e7-55635be276d8",
+      "process_run_id": "8e080694-50dc-411a-8427-c48314f5cc49",
+      "outcome": "succeeded",
+      "result": null
+    },
+    "planning_workspace": {
+      "id": "a0f4e9a1-890b-49d8-b681-5cbf0bc472d2",
+      "path": "/tmp/autono-native-bru342-pr4-fixes-01/engineering/76896ca5-11b9-42e2-ad7d-43b2ac744b58/planner",
+      "branch": "autono/76896ca5-11b9-42e2-ad7d-43b2ac744b58/planner",
+      "base_commit": "6a410d209bb54d0fd9fe5adeafd1c783d544ae73",
+      "head_commit": null,
+      "git": {
+        "worktree": "/private/tmp/autono-native-bru342-pr4-fixes-01/engineering/76896ca5-11b9-42e2-ad7d-43b2ac744b58/planner",
+        "git_dir": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/planner",
+        "common_dir": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git",
+        "metadata": {
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/engineering/76896ca5-11b9-42e2-ad7d-43b2ac744b58/planner/.git": "b8246887f32f9212c14d16cc8368fde64f5b3930e6cfde11d47fab4b5aea039d",
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/attributes": null,
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/grafts": null,
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/objects/info/alternates": null,
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/objects/info/http-alternates": null,
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/planner/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/planner/config.worktree": null,
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/planner/gitdir": "8eceb19c4c9f0d1f5b7142efd1aaaadb09308f18603b15c2e69ef634bc305053",
+          "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/planner/info/exclude": null
+        }
+      }
+    },
+    "tasks": [
+      {
+        "plan": {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": ["Task A artifact exists"],
+          "dependencies": [],
+          "requirement_ids": ["r"],
+          "verification_expectations": ["Configured shell check passes"],
+          "role": "coder"
+        },
+        "status": "BLOCKED",
+        "workspace": {
+          "id": "3c046036-c4cc-4be4-bd82-a91dceb4bdb6",
+          "path": "/tmp/autono-native-bru342-pr4-fixes-01/engineering/76896ca5-11b9-42e2-ad7d-43b2ac744b58/task-A",
+          "branch": "autono/76896ca5-11b9-42e2-ad7d-43b2ac744b58/task-A",
+          "base_commit": "6a410d209bb54d0fd9fe5adeafd1c783d544ae73",
+          "head_commit": null,
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-pr4-fixes-01/engineering/76896ca5-11b9-42e2-ad7d-43b2ac744b58/task-A",
+            "git_dir": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/task-A",
+            "common_dir": "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/engineering/76896ca5-11b9-42e2-ad7d-43b2ac744b58/task-A/.git": "1fbd8512cc2a4a9f4c9d5f8098927aecbd75a7598b7d968a1b77cebcd2117d5f",
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/task-A/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/task-A/config.worktree": null,
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/task-A/gitdir": "f249bc854a107fc664778882e8afe4536f7709775cf0a4908fe0ae4f603fce74",
+              "/private/tmp/autono-native-bru342-pr4-fixes-01/fixture-repository/.git/worktrees/task-A/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "5b9ea517-be7b-4e83-907d-7bcd88b43fbe",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "f8bd4027-d07b-4092-a76b-4a6fab6c6eba",
+              "resumed_from": null,
+              "process_key": "df6198b5-01ee-49b2-9bbe-5acb8b997cb7",
+              "process_run_id": "a23baa30-95e4-44cc-9f88-50994a25830b",
+              "outcome": "succeeded",
+              "result": null
+            },
+            "verification": [
+              {
+                "process_key": "b47842f1-8dd6-460c-875f-f31f2aeb4673",
+                "process_run_id": "27777981-032e-44df-9031-c741fe672583",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: passed\\n'; test -f README.md"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=27777981-032e-44df-9031-c741fe672583 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+              },
+              {
+                "process_key": "da679ca0-8d3a-43b5-8fa7-d138f691dd54",
+                "process_run_id": "9b2c9ef5-3044-41df-93c1-beececd35189",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: waiting\\n'; sleep 60"
+                ],
+                "exit_code": null,
+                "passed": false,
+                "outcome": "timeout",
+                "output_complete": true,
+                "summary": "process=9b2c9ef5-3044-41df-93c1-beececd35189 status=Failed exit=None output_complete=Some(true) warnings=[]; timeout exceededfixture verification: waiting\n"
+              }
+            ],
+            "reviewer": null,
+            "reviews": [],
+            "review": null,
+            "snapshot": null,
+            "verified_tree": null,
+            "preserved_tree": null,
+            "detail": "verification_infrastructure: Verification did not produce a test verdict (Some(Timeout)): process=9b2c9ef5-3044-41df-93c1-beececd35189 status=Failed exit=None output_complete=Some(true) warnings=[]; timeout exceededfixture verification: waiting\n"
+          }
+        ],
+        "artifact_commit": null
+      }
+    ],
+    "blockers": [
+      {
+        "task_id": "A",
+        "kind": "verification_infrastructure",
+        "detail": "verification_infrastructure: Verification did not produce a test verdict (Some(Timeout)): process=9b2c9ef5-3044-41df-93c1-beececd35189 status=Failed exit=None output_complete=Some(true) warnings=[]; timeout exceededfixture verification: waiting\n",
+        "action": "Inspect human actions; resolve externally and explicitly continue eligible live pauses",
+        "created_at": "2026-10-21T17:28:18.579764Z"
+      }
+    ],
+    "human_actions": [
+      {
+        "id": "H-c47171dec65c46043457a6557e485cb9",
+        "requirement": {
+          "kind": "permission",
+          "reason": "Execution requires a configured permission",
+          "requested_action": "Approve or reject this exact run operation",
+          "affected_tasks": [],
+          "blocking": true,
+          "evidence": "Daemon host check; values were not read",
+          "confidence": 100,
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run 76896ca5-11b9-42e2-ad7d-43b2ac744b58 immutable configured verification commands"
+          }
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "043b246b-6c0a-4427-9aa6-fd9d2cc4d095",
+          "disposition": "approve",
+          "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+          "effect": "unknown",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run 76896ca5-11b9-42e2-ad7d-43b2ac744b58 immutable configured verification commands"
+          }
+        },
+        "created_at": "2026-10-21T17:26:39.879978Z",
+        "updated_at": "2026-10-21T17:26:45.548888Z",
+        "audit": [
+          {
+            "at": "2026-10-21T17:26:39.879978Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T17:26:45.548888Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "043b246b-6c0a-4427-9aa6-fd9d2cc4d095",
+              "disposition": "approve",
+              "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+              "effect": "unknown",
+              "permission": {
+                "operation": "run_checks",
+                "scope": "run 76896ca5-11b9-42e2-ad7d-43b2ac744b58 immutable configured verification commands"
+              }
+            }
+          }
+        ],
+        "continuable": false,
+        "workspace_snapshot": null
+      },
+      {
+        "id": "H-2fe36bc9fced2442a540ce91c9f8bfe8",
+        "requirement": {
+          "kind": "runtime",
+          "reason": "verification_infrastructure: verification_infrastructure: Verification did not produce a test verdict (Some(Timeout)): process=9b2c9ef5-3044-41df-93c1-beececd35189 status=Failed exit=None output_complete=Some(true) warnings=[]; timeout exceededfixture verification: waiting\n",
+          "requested_action": "Integrity/ownership failure: inspect retained artifacts and establish a new trusted base; this task cannot be continued",
+          "affected_tasks": ["A"],
+          "blocking": true,
+          "evidence": "Task A; attempt 1; retained process evidence",
+          "confidence": 100,
+          "permission": null
+        },
+        "status": "PENDING",
+        "resolution": null,
+        "created_at": "2026-10-21T17:28:18.579768Z",
+        "updated_at": "2026-10-21T17:28:18.579768Z",
+        "audit": [
+          {
+            "at": "2026-10-21T17:28:18.579768Z",
+            "status": "PENDING",
+            "request": null
+          }
+        ],
+        "continuable": false,
+        "workspace_snapshot": null
+      }
+    ],
+    "preflight": {
+      "checked_at": "2026-10-21T17:27:46.480587Z",
+      "checks": [
+        {
+          "id": "repository",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Repository accessibility and pinned Git ownership"
+        },
+        {
+          "id": "planning-workspace",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Planning checkout accessibility and pinned Git ownership"
+        },
+        {
+          "id": "git-working-state",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees"
+        },
+        {
+          "id": "installed-codex",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "installed-claude",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "verification-0",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Configured verification executable availability; command behavior is validated during execution"
+        },
+        {
+          "id": "verification-1",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Configured verification executable availability; command behavior is validated during execution"
+        },
+        {
+          "id": "permission-WorkspaceWrite",
+          "ready": true,
+          "blocking": false,
+          "evidence": "WorkspaceWrite: Allow; scope run 76896ca5-11b9-42e2-ad7d-43b2ac744b58 assigned task worktrees"
+        },
+        {
+          "id": "permission-RunChecks",
+          "ready": false,
+          "blocking": false,
+          "evidence": "RunChecks: RequireApproval; scope run 76896ca5-11b9-42e2-ad7d-43b2ac744b58 immutable configured verification commands"
+        },
+        {
+          "id": "injected-provider",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Injected runtime availability contract"
+        }
+      ],
+      "action_ids": ["H-c47171dec65c46043457a6557e485cb9"],
+      "ready": true,
+      "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation."
+    },
+    "integration_workspace": null,
+    "integration_verification": [],
+    "summary": "0 of 1 tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate."
+  },
+  "events": [
+    {
+      "sequence": 1,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:37.858049+00:00",
+      "kind": "created",
+      "detail": "Feature specification and configuration preserved; planning requested"
+    },
+    {
+      "sequence": 2,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:38.138803+00:00",
+      "kind": "planning_workspace_ready",
+      "detail": "Pinned Git ownership"
+    },
+    {
+      "sequence": 3,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:38.611760+00:00",
+      "kind": "agent_started",
+      "detail": "Planner Claude; session=488f16df-b856-47b4-9d97-2efed34514c7 process_key=f93706dc-e0a0-447c-a2e7-55635be276d8"
+    },
+    {
+      "sequence": 4,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:38.634837+00:00",
+      "kind": "agent_process",
+      "detail": "Planner process=8e080694-50dc-411a-8427-c48314f5cc49"
+    },
+    {
+      "sequence": 5,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:39.670346+00:00",
+      "kind": "agent_finished",
+      "detail": "Planner session=488f16df-b856-47b4-9d97-2efed34514c7 outcome=succeeded"
+    },
+    {
+      "sequence": 6,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:39.850494+00:00",
+      "kind": "plan_ready",
+      "detail": "Validated plan awaits developer approval"
+    },
+    {
+      "sequence": 7,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:39.850582+00:00",
+      "kind": "task_state",
+      "detail": "A: None -> Ready"
+    },
+    {
+      "sequence": 8,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:39.881751+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 9,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:45.552307+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 10,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:26:45.606533+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 11,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.483588+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 12,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.486127+00:00",
+      "kind": "approved",
+      "detail": "Developer approved the persisted plan and configured checks"
+    },
+    {
+      "sequence": 13,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.490740+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 14,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.493862+00:00",
+      "kind": "task_started",
+      "detail": "A"
+    },
+    {
+      "sequence": 15,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.496458+00:00",
+      "kind": "workspace_reserved",
+      "detail": "A: /tmp/autono-native-bru342-pr4-fixes-01/engineering/76896ca5-11b9-42e2-ad7d-43b2ac744b58/task-A (autono/76896ca5-11b9-42e2-ad7d-43b2ac744b58/task-A)"
+    },
+    {
+      "sequence": 16,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.496966+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 17,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.699256+00:00",
+      "kind": "workspace_ready",
+      "detail": "A"
+    },
+    {
+      "sequence": 18,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.865611+00:00",
+      "kind": "attempt_started",
+      "detail": "A: attempt 1"
+    },
+    {
+      "sequence": 19,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.919638+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=5b9ea517-be7b-4e83-907d-7bcd88b43fbe process_key=df6198b5-01ee-49b2-9bbe-5acb8b997cb7"
+    },
+    {
+      "sequence": 20,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:46.948567+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=a23baa30-95e4-44cc-9f88-50994a25830b"
+    },
+    {
+      "sequence": 21,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:47.968173+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=5b9ea517-be7b-4e83-907d-7bcd88b43fbe outcome=succeeded"
+    },
+    {
+      "sequence": 22,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:48.540471+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 1)) process_key=b47842f1-8dd6-460c-875f-f31f2aeb4673 command=[\"sh\",\"-c\",\"printf 'fixture verification: passed\\\\n'; test -f README.md\"]"
+    },
+    {
+      "sequence": 23,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:48.544066+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 1)) process=27777981-032e-44df-9031-c741fe672583"
+    },
+    {
+      "sequence": 24,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:48.556743+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 1)) process=27777981-032e-44df-9031-c741fe672583 passed=true"
+    },
+    {
+      "sequence": 25,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:48.559871+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 1)) process_key=da679ca0-8d3a-43b5-8fa7-d138f691dd54 command=[\"sh\",\"-c\",\"printf 'fixture verification: waiting\\\\n'; sleep 60\"]"
+    },
+    {
+      "sequence": 26,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:27:48.563436+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 1)) process=9b2c9ef5-3044-41df-93c1-beececd35189"
+    },
+    {
+      "sequence": 27,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:28:18.578181+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 1)) process=9b2c9ef5-3044-41df-93c1-beececd35189 passed=false"
+    },
+    {
+      "sequence": 28,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:28:18.582281+00:00",
+      "kind": "task_stopped",
+      "detail": "A: verification_infrastructure: Verification did not produce a test verdict (Some(Timeout)): process=9b2c9ef5-3044-41df-93c1-beececd35189 status=Failed exit=None output_complete=Some(true) warnings=[]; timeout exceededfixture verification: waiting\n"
+    },
+    {
+      "sequence": 29,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:28:18.582361+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Running) -> Blocked"
+    },
+    {
+      "sequence": 30,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:28:18.585355+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 31,
+      "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+      "timestamp": "2026-10-21T17:28:18.588113+00:00",
+      "kind": "execution_finished",
+      "detail": "All currently runnable tasks finished"
+    }
+  ]
+}
