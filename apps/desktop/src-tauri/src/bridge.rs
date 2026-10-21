@@ -599,12 +599,18 @@ impl Redactor {
                 }
                 let original = std::mem::take(map);
                 for (key, mut v) in original {
+                    // ReviewResult::accepts uses is_empty(), not trim(): retain
+                    // rejection when a nonempty blocker consists only of controls.
+                    let had_blocker = key == "blocker" && v.as_str().is_some_and(|s| !s.is_empty());
                     if sensitive(&key)
                         || ["env", "result", "structured_output"].contains(&key.as_str())
                     {
                         v = Value::String(self.placeholder());
                     } else {
                         self.value(&mut v);
+                    }
+                    if had_blocker && v.as_str() == Some("") {
+                        v = Value::String(self.placeholder());
                     }
                     let key = self.text(&key);
                     match map.entry(key) {
@@ -723,6 +729,36 @@ mod tests {
             literals: vec!["canary\\n".into()],
         };
         assert_eq!(r.output_line(&json!("canary\n").to_string()), "[redacted]");
+    }
+    #[test]
+    fn blocker_projection_preserves_daemon_verdict_without_changing_general_text() {
+        use autono_protocol::engineering::ReviewResult;
+        let r = Redactor {
+            literals: vec!["desktop-only-authentication-token-1234567890".into()],
+        };
+        let cases: Vec<Value> = serde_json::from_str(include_str!(
+            "../../src/test/fixtures/review-blocker-cases.json"
+        ))
+        .expect("shared blocker cases");
+        for case in cases {
+            let original: ReviewResult = serde_json::from_value(json!({
+                "accepted":true,"criteria":[{"criterion_id":"A-C1","criterion":"Safe criterion","satisfied":true,"evidence":"Readable evidence"}],
+                "findings":[],"blocker":case["original"]
+            })).expect("valid review");
+            let mut value = json!({"review":original, "reviews":[{"review":original}], "ordinary_text":"\u{1b}"});
+            r.value(&mut value);
+            assert_eq!(value["ordinary_text"], "");
+            for projected in [&value["review"], &value["reviews"][0]["review"]] {
+                let projected: ReviewResult =
+                    serde_json::from_value(projected.clone()).expect("projected review");
+                assert_eq!(projected.accepts(), original.accepts(), "{}", case["name"]);
+                assert_eq!(
+                    projected.blocker,
+                    case["projected"].as_str().expect("projected blocker")
+                );
+                assert_eq!(projected.criteria[0].evidence, "Readable evidence");
+            }
+        }
     }
     #[test]
     fn redacts_secrets_and_controls() {

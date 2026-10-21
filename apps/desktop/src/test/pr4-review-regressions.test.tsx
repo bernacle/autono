@@ -3,6 +3,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import captured from "./fixtures/completed-journal.json";
+import blockerCases from "./fixtures/review-blocker-cases.json";
+import { reviewAccepts } from "../lib/evidence-model";
 import type { Run, EngineeringEvent } from "../lib/types";
 import { appendHistory, deriveExecution } from "../lib/execution-model";
 import { TaskEvidence } from "../components/evidence";
@@ -35,6 +37,71 @@ function html(node: ReactNode) {
   );
 }
 describe("PR 4 adversarial regressions", () => {
+  it.each(blockerCases)(
+    "preserves the bridge verdict in every review presentation: $name",
+    (testCase) => {
+      const { run } = fixture(),
+        task = run.tasks[0],
+        attempt = task.attempts[0];
+      const review = {
+        ...attempt.reviews[0].review!,
+        accepted: true,
+        findings: [],
+        blocker: testCase.projected,
+      };
+      expect(review.criteria.every((c) => c.satisfied)).toBe(true);
+      expect(reviewAccepts({ ...review, blocker: testCase.original })).toBe(
+        testCase.accepts,
+      );
+      expect(reviewAccepts(review)).toBe(testCase.accepts);
+      attempt.review = review;
+      attempt.reviews[0].review = review;
+      run.tasks = [task];
+      for (const view of [
+        <TaskEvidence run={run} onProcess={vi.fn()} />,
+        <TaskInspector
+          task={task}
+          run={run}
+          onClose={vi.fn()}
+          onProcess={vi.fn()}
+          onHuman={vi.fn()}
+        />,
+      ]) {
+        const container = document.createElement("div");
+        container.innerHTML = html(view);
+        const badge = container.querySelector(".review .badge")!;
+        expect(badge.textContent).toBe(
+          testCase.accepts ? "Review accepted" : "Rejected",
+        );
+        expect(badge.querySelector(".glyph-success") !== null).toBe(
+          testCase.accepts,
+        );
+        expect(container.textContent).toContain(
+          "Fixture artifact and deterministic check inspected",
+        );
+        expect(container.textContent).not.toContain("\u001b");
+      }
+      const container = document.createElement("div");
+      container.innerHTML = html(
+        <TasksView
+          run={run}
+          onProcess={vi.fn()}
+          onHuman={vi.fn()}
+          onExecution={vi.fn()}
+        />,
+      );
+      expect(
+        container.querySelector(
+          '[data-task="A"] [title="Review"] .success-text',
+        ) !== null,
+      ).toBe(testCase.accepts);
+      expect(
+        container.querySelector(
+          '[data-task="A"] [title="Review"] .danger-text',
+        ) !== null,
+      ).toBe(!testCase.accepts);
+    },
+  );
   it("does not label a provider accepted review with a blocking finding as accepted", () => {
     const { run } = fixture();
     const task = run.tasks[0],
