@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 1420 --strictPort",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run test:production",
     "typecheck": "tsc -b",
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "test:production": "node --experimental-vm-modules scripts/production-smoke.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

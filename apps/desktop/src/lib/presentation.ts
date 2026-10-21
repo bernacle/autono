@@ -105,7 +105,7 @@ export function orderedTasks(run: Run) {
     (a, b) =>
       milestone(a.plan.id) - milestone(b.plan.id) ||
       (depths.get(a.plan.id) ?? 0) - (depths.get(b.plan.id) ?? 0) ||
-      a.plan.id.localeCompare(b.plan.id),
+      run.tasks.indexOf(a) - run.tasks.indexOf(b),
   );
 }
 export function latestReview(task: Task) {

@@ -162,14 +162,6 @@ export function NewRun({
             }
           />
         </Field>
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={ack}
-            onChange={(e) => setAck(e.target.checked)}
-          />
-          Start the configured planner. This may use paid inference.
-        </label>
         {activeRun && (
           <p className="notice notice-warning">
             The daemon accepts one active engineering run. Its admission
@@ -177,25 +169,35 @@ export function NewRun({
           </p>
         )}
         {mutation.isError && <ErrorNotice error={mutation.error} />}
-        <div className="form-submit">
-          <Button
-            variant="secondary"
-            onClick={onClose}
-            disabled={mutation.isPending}
-          >
-            Back
-          </Button>
-          <span id="planning-reason" className="meta">
-            {missing || "Ready to submit · ⌘↵"}
-          </span>
-          <Button
-            aria-describedby="planning-reason"
-            disabled={!!missing || mutation.isPending}
-            onClick={() => mutation.mutate()}
-          >
-            {mutation.isPending ? "Submitting to daemon…" : "Start planning"}
-            <ArrowRight size={14} />
-          </Button>
+        <div className="planning-footer">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={ack}
+              onChange={(e) => setAck(e.target.checked)}
+            />
+            Start the configured planner. This may use paid inference.
+          </label>
+          <div className="form-submit">
+            <Button
+              variant="secondary"
+              onClick={onClose}
+              disabled={mutation.isPending}
+            >
+              Back
+            </Button>
+            <span id="planning-reason" className="meta">
+              {missing || "Ready to submit · ⌘↵"}
+            </span>
+            <Button
+              aria-describedby="planning-reason"
+              disabled={!!missing || mutation.isPending}
+              onClick={() => mutation.mutate()}
+            >
+              {mutation.isPending ? "Submitting to daemon…" : "Start planning"}
+              <ArrowRight size={14} />
+            </Button>
+          </div>
         </div>
       </div>
       <aside className="planner-rail">

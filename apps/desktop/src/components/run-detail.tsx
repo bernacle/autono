@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Tabs from "@radix-ui/react-tabs";
 import {
@@ -21,14 +21,15 @@ import {
 } from "../lib/presentation";
 import { Badge, Empty, ErrorNotice, Panel } from "./common";
 import { Button } from "./ui/button";
-import { Dialog } from "./ui/dialog";
+import { useExecution } from "../lib/execution";
+import { ExecutionView, VerificationLedger } from "./execution";
+import { LogDock } from "./log-dock";
 import { Menu } from "./ui/menu";
 import { TasksView } from "./tasks";
 import { Lifecycle } from "./lifecycle";
 import { PreflightChecklist } from "./preflight";
 import { HumanActionCard } from "./human-action";
 import { ConfirmAction } from "./confirm-action";
-import { Activity, ProcessLogs } from "./activity";
 import { SessionRow, TaskEvidence, IntegrationEvidence } from "./evidence";
 import { RunGuide } from "./new-run";
 export function RunDetail({
@@ -52,6 +53,30 @@ export function RunDetail({
     refetchInterval: 2500,
     retry: false,
   });
+  const execution = useExecution(query.data);
+  const [selectedTask, setSelectedTask] = useState<string | null>(() =>
+    new URLSearchParams(window.location.hash.slice(1)).get("run") === id
+      ? new URLSearchParams(window.location.hash.slice(1)).get("task")
+      : null,
+  );
+  const [selectedPhase, setSelectedPhase] = useState<string | null>(null);
+  const [taskView, setTaskView] = useState<"list" | "graph">("list");
+  const selectTask = useCallback(
+    (task: string | null) => {
+      setSelectedTask(task);
+      setSelectedPhase(null);
+      const hash = new URLSearchParams();
+      if (task) {
+        hash.set("run", id);
+        hash.set("task", task);
+      }
+      const url = new URL(window.location.href);
+      url.hash = hash.toString();
+      // Preserve the exact custom-scheme path (WKWebView may have an empty path).
+      window.history.replaceState(null, "", url.href);
+    },
+    [id],
+  );
   const [confirmation, setConfirmation] = useState<{
       run: Run;
       action: RunAction;
@@ -97,6 +122,7 @@ export function RunDetail({
     next = primaryAction(run),
     reason = next ? actionReason(run, next, enabled) : "";
   const ask = (action: RunAction) => {
+    setProcess(null);
     setNotice("");
     setConfirmation({ run, action });
   };
@@ -253,7 +279,12 @@ export function RunDetail({
         </Tabs.List>
         <Tabs.Content value="tasks" className="tasks-tab">
           <TasksView
+            key={taskView}
             run={run}
+            selected={selectedTask}
+            onSelect={selectTask}
+            initialView={taskView}
+            logDockOpen={!!process}
             onProcess={setProcess}
             onHuman={openHuman}
             onExecution={() => setTab("execution")}
@@ -265,38 +296,39 @@ export function RunDetail({
           )}
         </Tabs.Content>
         <Tabs.Content value="execution" className="tab-content">
-          <Panel title="Agent sessions">
-            <SessionRow session={run.planner} onProcess={setProcess} />
-            {run.tasks.flatMap((task) =>
-              task.attempts.map((attempt) => (
-                <div key={`${task.plan.id}-${attempt.number}`}>
-                  <div className="session-label">
-                    {task.plan.id} · attempt {attempt.number}
-                  </div>
-                  <SessionRow session={attempt.coder} onProcess={setProcess} />
-                  {attempt.reviews.length ? (
-                    attempt.reviews.map((r) => (
-                      <SessionRow
-                        key={r.session.id}
-                        session={r.session}
-                        onProcess={setProcess}
-                      />
-                    ))
-                  ) : (
-                    <SessionRow
-                      session={attempt.reviewer}
-                      onProcess={setProcess}
-                    />
-                  )}
-                </div>
-              )),
-            )}
-          </Panel>
-          <Panel title="Engineering event journal">
-            <Activity id={id} showErrors={connected} />
-          </Panel>
+          {execution.query.isError && (
+            <ErrorNotice
+              error={execution.query.error}
+              retry={() => void execution.query.refetch()}
+            />
+          )}
+          <ExecutionView
+            run={run}
+            model={execution.model}
+            history={execution.query.data}
+            selected={selectedTask}
+            phaseId={selectedPhase}
+            onSelect={selectTask}
+            onPhase={setSelectedPhase}
+            onProcess={setProcess}
+            onGraph={() => {
+              setTaskView("graph");
+              setTab("tasks");
+            }}
+            onHuman={openHuman}
+            connected={enabled && !execution.query.isError}
+            logDockOpen={!!process}
+          />
         </Tabs.Content>
         <Tabs.Content value="verification" className="tab-content">
+          <VerificationLedger
+            run={run}
+            onTask={(task) => {
+              selectTask(task);
+              setTab("tasks");
+            }}
+            onProcess={setProcess}
+          />
           <TaskEvidence run={run} onProcess={setProcess} />
         </Tabs.Content>
         <Tabs.Content value="plan" className="tab-content">
@@ -458,16 +490,7 @@ export function RunDetail({
           onAccepted={setNotice}
         />
       )}
-      {process && (
-        <Dialog
-          wide
-          title="Process output"
-          description="Durable daemon process events"
-          onClose={() => setProcess(null)}
-        >
-          <ProcessLogs id={process} />
-        </Dialog>
-      )}
+      {process && <LogDock id={process} onClose={() => setProcess(null)} />}
     </div>
   );
 }

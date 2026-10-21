@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { useTransport } from "./lib/transport";
 import { useAppearance } from "./lib/appearance";
-import type { Connection, Process, Run, Session } from "./lib/types";
+import type { Connection, Process, Run } from "./lib/types";
 import {
   can,
   canResolve,
@@ -32,7 +32,6 @@ import {
 } from "./lib/utils";
 import { basename, clock, duration } from "./lib/presentation";
 import { Button } from "./components/ui/button";
-import { Dialog } from "./components/ui/dialog";
 import {
   Badge,
   Empty,
@@ -44,8 +43,12 @@ import { NewRun } from "./components/new-run";
 import { RunDetail } from "./components/run-detail";
 import { SettingsView } from "./components/settings";
 import { HumanActionsView } from "./components/human-action";
-import { Activity, ProcessLogs } from "./components/activity";
-import { SessionRow } from "./components/evidence";
+import { AgentProgress } from "./components/agent-progress";
+import { Journal } from "./components/journal";
+import { Timeline } from "./components/execution";
+import { LogDock } from "./components/log-dock";
+import { useExecution, useNow, elapsed, timeLabel } from "./lib/execution";
+
 type Page = "overview" | "runs" | "human" | "settings" | "processes";
 const pages = [
   { id: "overview", label: "Overview", icon: LayoutGrid },
@@ -53,6 +56,7 @@ const pages = [
   { id: "runs", label: "Runs", icon: GitBranch },
 ] as const;
 export default function App() {
+  const body = useRef<HTMLElement>(null);
   const transport = useTransport(),
     client = useQueryClient(),
     appearance = useAppearance();
@@ -64,6 +68,9 @@ export default function App() {
     [humanFocus, setHumanFocus] = useState<string | null>(null),
     [rail, setRail] = useState<boolean | null>(null),
     [commands, setCommands] = useState(false);
+  useEffect(() => {
+    if (body.current) body.current.scrollTop = 0;
+  }, [page, selected, newRun]);
   const connection = useQuery({
     queryKey: ["connection"],
     queryFn: () => transport.request<Connection>({ type: "status" }),
@@ -118,12 +125,14 @@ export default function App() {
     !connection.data!.engineering.persistence_error &&
     connection.data!.host.database === "available";
   const navigate = useCallback((next: Page) => {
+    setProcess(null);
     setPage(next);
     setSelected(null);
     setNewRun(false);
     setCommands(false);
   }, []);
   const select = useCallback((id: string, tab?: string) => {
+    setProcess(null);
     setPage("runs");
     setSelected(id);
     setRunTab(tab);
@@ -131,6 +140,7 @@ export default function App() {
     setCommands(false);
   }, []);
   const human = useCallback((runId: string, actionId: string) => {
+    setProcess(null);
     setPage("human");
     setSelected(null);
     setNewRun(false);
@@ -443,6 +453,7 @@ export default function App() {
           </div>
         )}
         <main
+          ref={body}
           className={`sheet-body ${page === "human" && !selected && !newRun ? "human-sheet" : ""}`}
           data-stale={!healthy && !!connection.data}
         >
@@ -580,16 +591,7 @@ export default function App() {
           reconnect={reconnect}
         />
       )}
-      {process && (
-        <Dialog
-          wide
-          title="Process output"
-          description="Durable process events from the daemon"
-          onClose={() => setProcess(null)}
-        >
-          <ProcessLogs id={process} />
-        </Dialog>
-      )}
+      {process && <LogDock id={process} onClose={() => setProcess(null)} />}
     </div>
   );
 }
@@ -616,11 +618,14 @@ function Overview({
   onNew: () => void;
   onProcess: (id: string) => void;
 }) {
-  const [now, setNow] = useState(Date.now);
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
-  }, []);
+  const working =
+    active ??
+    runs.find((r) =>
+      ["BLOCKED", "VERIFIED", "AWAITING_APPROVAL"].includes(r.status),
+    );
+  const now = useNow();
+  const observed = working ?? runs[0],
+    execution = useExecution(observed);
   const actions = runs.flatMap((run) =>
     run.human_actions
       .filter((a) => canResolve(run) && pending(a))
@@ -629,30 +634,25 @@ function Overview({
   const approvals = runs.filter((r) => can(r, "execute")),
     integrable = runs.filter((r) => can(r, "integrate")),
     continuable = runs.filter((r) => can(r, "continue"));
-  const sessions: Session[] = active
-    ? [
-        active.planner,
-        ...active.tasks.flatMap((t) =>
-          t.attempts.flatMap((a) => [
-            a.coder,
-            ...(a.reviews.length
-              ? a.reviews.map((r) => r.session)
-              : [a.reviewer]),
-          ]),
-        ),
-      ].filter((s): s is Session => !!s && !s.outcome)
-    : [];
+  const sessions =
+    execution.model?.segments.filter((s) => s.live && s.session) ?? [];
   return (
     <div className="overview-layout">
       <div className="overview-main">
         <Panel
-          title="Working now"
+          title={
+            working?.status === "BLOCKED"
+              ? "Awaiting attention"
+              : working?.status === "VERIFIED"
+                ? "Ready to integrate"
+                : "Working now"
+          }
           meta={
-            active && (
+            working && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => select(active.id)}
+                onClick={() => select(working.id)}
               >
                 Open run
                 <ArrowRight size={13} />
@@ -660,45 +660,79 @@ function Overview({
             )
           }
         >
-          {active ? (
+          {working ? (
             <div className="working-now">
               <div className="working-header">
                 <div>
                   <div className="run-title-row">
-                    <h2>{title(active)}</h2>
-                    <Badge status={active.status} />
+                    <h2>{title(working)}</h2>
+                    <Badge status={working.status} />
                   </div>
                   <p className="meta">
-                    {basename(active.repository)} · {active.requested_base} @{" "}
-                    {short(active.base_commit)}
+                    {basename(working.repository)} · {working.requested_base} @{" "}
+                    {short(working.base_commit)}
                   </p>
                 </div>
                 <div className="working-duration">
                   <span className="meta">Since approval</span>
                   <strong>
-                    {active.approved_at
-                      ? duration((now - Date.parse(active.approved_at)) / 1000)
+                    {working.approved_at
+                      ? duration((now - Date.parse(working.approved_at)) / 1000)
                       : "Not approved"}
                   </strong>
                 </div>
               </div>
-              {sessions.length ? (
-                sessions.map((s) => (
-                  <SessionRow key={s.id} session={s} onProcess={onProcess} />
-                ))
-              ) : (
-                <p className="quiet-row">
-                  No active agent sessions. Inspect the run for its next
-                  required action.
-                </p>
+              {execution.model && (
+                <Timeline
+                  mini
+                  run={working}
+                  model={execution.model}
+                  selected={null}
+                  onTask={() => select(working.id, "execution")}
+                  onPhase={() => select(working.id, "execution")}
+                  onGraph={() => select(working.id, "tasks")}
+                  connected={healthy && !execution.query.isError}
+                />
               )}
+              <div className="overview-agents">
+                {sessions.length ? (
+                  sessions.map((s) => (
+                    <AgentProgress
+                      key={s.id}
+                      segment={s}
+                      onProcess={onProcess}
+                      connected={healthy}
+                    />
+                  ))
+                ) : (
+                  <p className="quiet-row">
+                    No agent start is currently open in the journal.
+                  </p>
+                )}
+              </div>
+              <div className="overview-progress">
+                <span>
+                  {
+                    working.tasks.filter((t) =>
+                      ["BLOCKED", "BLOCKED_HUMAN"].includes(t.status),
+                    ).length
+                  }{" "}
+                  blocked tasks
+                </span>
+                <span>
+                  Last recorded progress:{" "}
+                  {execution.model?.lastProgress
+                    ? `${timeLabel(execution.model.lastProgress)} · ${elapsed(now - execution.model.lastProgress)} ago`
+                    : "None recorded"}
+                </span>
+              </div>
               <div className="working-footer">
                 <span>
-                  {sessions.length} agents running ·{" "}
-                  {active.tasks.filter((t) => t.status === "COMPLETED").length}/
-                  {active.tasks.length} tasks completed
+                  {sessions.length} recorded live agents ·{" "}
+                  {working.tasks.filter((t) => t.status === "COMPLETED").length}
+                  /{working.tasks.length} tasks completed
                 </span>
-                <span>Updated {clock(active.updated_at)}</span>
+                <span>Updated {clock(working.updated_at)}</span>
               </div>
             </div>
           ) : (
@@ -712,25 +746,34 @@ function Overview({
             </Empty>
           )}
         </Panel>
-        {(active ?? runs[0]) && (
+        {observed && (
           <Panel
             title="Meaningful activity"
             meta={
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => select((active ?? runs[0]).id, "execution")}
+                onClick={() => select(observed.id, "execution")}
               >
                 Full journal
                 <ArrowRight size={13} />
               </Button>
             }
           >
-            <Activity
-              id={(active ?? runs[0]).id}
-              compact
-              showErrors={healthy}
-            />
+            {execution.query.isError && healthy && (
+              <ErrorNotice
+                error={execution.query.error}
+                retry={() => void execution.query.refetch()}
+              />
+            )}
+            {observed && (
+              <Journal
+                run={observed}
+                events={execution.query.data?.recent ?? []}
+                cursor={execution.query.data?.cursor ?? 0}
+                compact
+              />
+            )}
           </Panel>
         )}
         <Panel

@@ -1,0 +1,227 @@
+[
+  {
+    "file": "screenshots/dag-selected-light-1440.jpg",
+    "description": "Same selected B task, upstream A and downstream D, directed crossing edges",
+    "width": 1440,
+    "height": 900,
+    "bytes": 148602,
+    "sha256": "3c694898cb8ea86cabd83146056e705938bc6a38a84c9c5ec030577b9869a540",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/disconnected-light-960.jpg",
+    "description": "Real metadata loss, retained state, disabled mutations",
+    "width": 960,
+    "height": 680,
+    "bytes": 77564,
+    "sha256": "d7de99fa7f8b8743ee888c770d423ac74465e01b751d888f6a5f26a95d2621b7",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/execution-blocked-dark-1440.jpg",
+    "description": "Live open human pause and dependency wait, continuation gated",
+    "width": 1440,
+    "height": 900,
+    "bytes": 195535,
+    "sha256": "e14c266eb55599aaf834972992f7fb496894687949f09c8eeadea7c256605293",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/execution-completed-dark-1440.jpg",
+    "description": "Completed run: seven passed checks, one failed check, seven reviews",
+    "width": 1440,
+    "height": 900,
+    "bytes": 189159,
+    "sha256": "45daee6c264fdde0c09bf591d3589375b27bc063abe07da08a67e482d1329899",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/execution-completed-light-1440.jpg",
+    "description": "Completed Execution in the light theme",
+    "width": 1440,
+    "height": 900,
+    "bytes": 183500,
+    "sha256": "c66a11ddf1bc99c66985832359edcafc604c5811fd912f79b00b5d15164ec6f5",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/execution-expanded-dark-1440.jpg",
+    "description": "Expanded whole-run timeline, two executions and human pause",
+    "width": 1440,
+    "height": 900,
+    "bytes": 151469,
+    "sha256": "5766c9cbffcb859450f7c1db599642c7e06dbde6d2089c122d9b8f79f5db7f2a",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/execution-failed-dark-1440.jpg",
+    "description": "Terminal FAILED run: three failed checks and two retries",
+    "width": 1440,
+    "height": 900,
+    "bytes": 180283,
+    "sha256": "62de9be8c2abb204e77b9bdcd1111d8240690275a4eccec511fca0ebb09ff30e",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/execution-failed-dark-960.jpg",
+    "description": "Terminal failure at minimum window size",
+    "width": 960,
+    "height": 680,
+    "bytes": 96843,
+    "sha256": "fd4edb74c0a10455a7163555eac160305050665ce4653fbc319f16e82563315f",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/execution-live-dark-1440.jpg",
+    "description": "Compact Execution during real coding/check/review work",
+    "width": 1440,
+    "height": 900,
+    "bytes": 189559,
+    "sha256": "493e0c9c151c7252232a839af732e93faf593a242f14840d223d10aff8977d1a",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/new-run-dark-960.jpg",
+    "description": "Native New Run with planner acknowledgment and footer reachable",
+    "width": 960,
+    "height": 680,
+    "bytes": 85708,
+    "sha256": "74ea7af557b165ada428ef2829d39bd287fb08e26b1133217ca903ff72efdf04",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/new-run-light-960.jpg",
+    "description": "Light New Run with planner acknowledgment initially unchecked",
+    "width": 960,
+    "height": 680,
+    "bytes": 82515,
+    "sha256": "f15ba68369827dd78efeea77d4dafc747b5bfda920b5ce7cedab44db423a2a14",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/new-run-ready-dark-960.jpg",
+    "description": "Native folder selected and explicit planner acknowledgment",
+    "width": 960,
+    "height": 680,
+    "bytes": 106790,
+    "sha256": "c26334b9fd2ec06073e7933b2e0c2e0a1900ff09b8e589de6d84792e0a05f3d5",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/overview-blocked-dark-1440.jpg",
+    "description": "Three verified tasks, one human pause and a waiting descendant",
+    "width": 1440,
+    "height": 900,
+    "bytes": 165770,
+    "sha256": "7cc0f78448208b35eeb0082a406c6a6245d1057ec64f638802532636380543e8",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/overview-completed-dark-1440.jpg",
+    "description": "Completed run, meaningful local integration activity",
+    "width": 1440,
+    "height": 900,
+    "bytes": 126203,
+    "sha256": "a914785a4e92f646b7aaaac298364d0d0f176c14f3f5fa48b0e08b4441067d4d",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/overview-light-1440.jpg",
+    "description": "Completed run in the approved light theme",
+    "width": 1440,
+    "height": 900,
+    "bytes": 114085,
+    "sha256": "aa5021e6287c34a509aae5db3903952f4c2bd976d7ec3875f83c940304976cf4",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/overview-light-960.jpg",
+    "description": "Light Overview at minimum window size",
+    "width": 960,
+    "height": 680,
+    "bytes": 68412,
+    "sha256": "076b035f16ffaf423e84dcf39bc80f7fe189901ad23efc896f5409c98622445c",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/overview-live-dark-1440.jpg",
+    "description": "Live shell agents, actual task lanes and meaningful progress",
+    "width": 1440,
+    "height": 900,
+    "bytes": 154373,
+    "sha256": "e54f4e4aceba748594b178a2471829d2245c1c53a45ce41d22d9b6f78023b33f",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/permission-dark-960.jpg",
+    "description": "Exact authoritative permission; no decision or inspected effect preselected",
+    "width": 960,
+    "height": 680,
+    "bytes": 109636,
+    "sha256": "a165304921483853599ab273b8b713a6029b5e12ea9c3f4ad22b628bdb38421a",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/phase-log-dock-light-960.jpg",
+    "description": "Minimum-window nonmodal output dock with timestamps and cursor",
+    "width": 960,
+    "height": 680,
+    "bytes": 120299,
+    "sha256": "e493ab91f862d89a6172d6ae94753c49eecb286de3eb74e101ffdcf487a10e5e",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/phase-original-source-dark-1440.jpg",
+    "description": "Lazy retrieval of older exact agent_started #48 source",
+    "width": 1440,
+    "height": 900,
+    "bytes": 184554,
+    "sha256": "260e4d2ea056043f607af55e8f49774c2aaab802e64f96c19106a1bdd215ba09",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/review-inspector-log-dock-dark-1440.jpg",
+    "description": "Rejected review phase and its sanitized process output",
+    "width": 1440,
+    "height": 900,
+    "bytes": 203506,
+    "sha256": "f517e0212fa49522a94f1a826dd2947b6e440e4d39e81658ef3dd73cafbd4143",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/review-invalid-dark-1440.jpg",
+    "description": "Invalid reviewer result retained as a diagnostic",
+    "width": 1440,
+    "height": 900,
+    "bytes": 188728,
+    "sha256": "c49e3c0f7587a88dcead239574de1c614faa9bcd9a7b930c313155cd1248b8cd",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/reviewer-findings-dark-1440.jpg",
+    "description": "Rejected medium finding and retained advisory low finding",
+    "width": 1440,
+    "height": 900,
+    "bytes": 186604,
+    "sha256": "77967793e277970d8efccde61e7ef1c2bb8af5e8cb224b3444996bdb230d729e",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/timeline-inspector-light-960.jpg",
+    "description": "Minimum-window selected phase and original source references",
+    "width": 960,
+    "height": 680,
+    "bytes": 114011,
+    "sha256": "ed9bf3b5a625a1cce422df27603fc6bd2f9a6bd6412a302a1af25d0230353c67",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  },
+  {
+    "file": "screenshots/timeline-selected-light-1440.jpg",
+    "description": "Selected continued attempt synchronized with the inspector",
+    "width": 1440,
+    "height": 900,
+    "bytes": 204398,
+    "sha256": "e1cbcd8d6a7466d354b4b1f7f152f35e0632f30fa74476c8f32917ff3d476edc",
+    "capture": "Native macOS Tauri window, unmodified JPEG"
+  }
+]

@@ -95,6 +95,13 @@ async fn authenticated_bridge_projects_state_and_replays_bounded_sanitized_logs(
         }
         tokio::time::sleep(std::time::Duration::from_millis(30)).await;
     }
+    assert!(!lines.is_empty());
+    for line in &lines {
+        let timestamp = line["timestamp"]
+            .as_str()
+            .expect("recorded event timestamp");
+        chrono::DateTime::parse_from_rfc3339(timestamp)?;
+    }
     let text = json!(lines).to_string();
     assert!(text.contains("verification passed"));
     assert!(text.contains("not permitted"));

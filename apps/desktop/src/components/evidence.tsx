@@ -188,7 +188,7 @@ export function SessionRow({
           {session.provider_session_id ?? `Session ${short(session.id)}`}
         </small>
       </div>
-      <Badge status={session.outcome ?? "RUNNING"} />
+      <Badge status={session.outcome ?? "Outcome pending"} />
       {session.process_run_id ? (
         <Button
           variant="ghost"

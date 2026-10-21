@@ -1,0 +1,2819 @@
+{
+  "provenance": "Real Chunk 2 shell-only disposable daemon acceptance: check failure/retry, rejected review, invalid review retry, human continuation, local integration. Provider result fields omitted to match bridge projection.",
+  "run": {
+    "id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+    "revision": 162,
+    "status": "COMPLETED",
+    "created_at": "2026-10-21T14:02:11.470746Z",
+    "updated_at": "2026-10-21T14:22:30.629672Z",
+    "repository": "/private/tmp/autono-native-bru342-observability-02/fixture-repository",
+    "repository_git": {
+      "worktree": "/private/tmp/autono-native-bru342-observability-02/fixture-repository",
+      "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+      "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+      "metadata": {
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/commondir": null,
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config.worktree": null,
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/gitdir": null,
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+        "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null
+      }
+    },
+    "requested_base": "main",
+    "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+    "specification": "# Observable recovery fixture\nExercise deterministic shell-only failures, retries, independent findings, human continuation and local integration.",
+    "settings": {
+      "agents": {
+        "planner": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "coder": {
+          "provider": "codex",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "reviewer": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        }
+      },
+      "execution": {
+        "max_parallel": 2,
+        "max_attempts": 3,
+        "max_review_cycles": 2
+      },
+      "verification": {
+        "commands": [
+          [
+            "sh",
+            "-c",
+            "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+          ]
+        ],
+        "timeout_seconds": 30
+      },
+      "preflight": {
+        "required_env": [],
+        "required_tools": [],
+        "required_directories": [],
+        "external_services": []
+      },
+      "permissions": {
+        "rules": {
+          "run_checks": "REQUIRE_APPROVAL"
+        }
+      }
+    },
+    "plan": {
+      "human_requirements": [
+        {
+          "kind": "product_decision",
+          "reason": "The fixture specification leaves the export format open",
+          "requested_action": "Choose the report export format",
+          "affected_tasks": [
+            "B"
+          ],
+          "blocking": true,
+          "evidence": "CSV or JSON is not specified",
+          "confidence": 100,
+          "permission": null
+        }
+      ],
+      "requirements": [
+        {
+          "id": "r",
+          "text": "Deliver an independently verified local report"
+        }
+      ],
+      "milestones": [
+        {
+          "id": "m1",
+          "goal": "Foundation and parallel checks",
+          "task_ids": [
+            "A",
+            "C",
+            "E"
+          ]
+        },
+        {
+          "id": "m2",
+          "goal": "Report and final assembly",
+          "task_ids": [
+            "B",
+            "D"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": [
+            "Task A artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "B",
+          "goal": "Implement report export",
+          "description": "Implement fixture task B",
+          "acceptance_criteria": [
+            "Task B artifact exists"
+          ],
+          "dependencies": [
+            "A"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "C",
+          "goal": "Add validation helpers",
+          "description": "Implement fixture task C",
+          "acceptance_criteria": [
+            "Task C artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "D",
+          "goal": "Assemble report workflow",
+          "description": "Implement fixture task D",
+          "acceptance_criteria": [
+            "Task D artifact exists"
+          ],
+          "dependencies": [
+            "B"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "E",
+          "goal": "Verify validation coverage",
+          "description": "Implement fixture task E",
+          "acceptance_criteria": [
+            "Task E artifact exists"
+          ],
+          "dependencies": [
+            "C"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        }
+      ]
+    },
+    "approved_at": "2026-10-21T14:05:19.264093Z",
+    "planner": {
+      "id": "c5333c97-a324-49ea-8c15-a0686ce5e694",
+      "role": "planner",
+      "provider": "claude",
+      "provider_session_id": "ee8103d2-1ede-447d-a3cc-f364f9cff2da",
+      "resumed_from": null,
+      "process_key": "44fb5ff7-b1a4-402d-8254-300b7ba4ff7e",
+      "process_run_id": "fd109b7d-811c-4d12-bce9-6fec6d3fc75f",
+      "outcome": "succeeded"
+    },
+    "planning_workspace": {
+      "id": "c1acabdb-1b08-4b5f-8b18-cc89c8c612c9",
+      "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/planner",
+      "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/planner",
+      "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+      "head_commit": null,
+      "git": {
+        "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/planner",
+        "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/planner",
+        "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+        "metadata": {
+          "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/planner/.git": "9b09dcbaeb4d7230d8c22fa2e4be10186c9cdfaa5d95a370b03f034b5ea774f4",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/planner/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/planner/config.worktree": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/planner/gitdir": "7fbfaf5db60ded88f05f9520424df698f953a85ed83ca4c51408ef7a1b941cf1",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/planner/info/exclude": null
+        }
+      }
+    },
+    "tasks": [
+      {
+        "plan": {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": [
+            "Task A artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "e9458b21-9097-497a-8c79-fc7c1801864b",
+          "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-A",
+          "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-A",
+          "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+          "head_commit": "46d8b7420628c5c58039d8b0fe09a4156184699e",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-A",
+            "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-A",
+            "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-A/.git": "e0ebadc70a53fc8152aba26c00a68c9ca070350dd113122e2741bd9905bdb611",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-A/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-A/config.worktree": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-A/gitdir": "ee4bb8f82419bb526403485c013a2461a9feefbb1e76307a8531b21a9e53b22f",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-A/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "58ab9653-ff6c-4d19-a408-1cb7e1721e7f",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "34c81c52-3150-4dcd-bc13-934d7bae9a15",
+              "resumed_from": null,
+              "process_key": "b2b93d97-f01e-4a2b-9fd5-3ce5c7a084e7",
+              "process_run_id": "dc90ed55-828c-4245-95f4-9da98b7530c0",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "db8f1860-15cf-4875-b007-3fa7523f8ff8",
+                "process_run_id": "e9d57eb3-4133-436d-b5fb-ab23b571f503",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=e9d57eb3-4133-436d-b5fb-ab23b571f503 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: inspected\n"
+              }
+            ],
+            "reviewer": {
+              "id": "70082797-151b-4bb8-96cd-a62ccba4f4df",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "aecfbb90-7295-4615-9c43-a0941c38b5bc",
+              "resumed_from": null,
+              "process_key": "441f3908-8f7c-4843-b72e-c897fb047290",
+              "process_run_id": "bf5de859-22eb-4a9d-b1c3-9ba659a886d0",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "70082797-151b-4bb8-96cd-a62ccba4f4df",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "aecfbb90-7295-4615-9c43-a0941c38b5bc",
+                  "resumed_from": null,
+                  "process_key": "441f3908-8f7c-4843-b72e-c897fb047290",
+                  "process_run_id": "bf5de859-22eb-4a9d-b1c3-9ba659a886d0",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "76b208cd-bee2-422f-ba6c-0b74cf976f50",
+                  "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-1",
+                  "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-1",
+                  "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-1/.git": "877ad513dc0d45d49ab63eabe42360092a01513a95e63ff8c3ec3862651d4cb9",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-1/gitdir": "3a9df92d7e574c40c0c2731613f90b632d2edc7f8ba1a5621ea1d19b1229d955",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": false,
+                  "criteria": [
+                    {
+                      "criterion_id": "A-C1",
+                      "criterion": "Task A artifact exists",
+                      "satisfied": false,
+                      "evidence": "Fixture review requires the next coding attempt"
+                    }
+                  ],
+                  "findings": [
+                    {
+                      "severity": "medium",
+                      "file": "A.txt",
+                      "line": 1,
+                      "explanation": "Fixture report foundation needs an explicit header",
+                      "recommended_fix": "Add the header in the next attempt",
+                      "confidence": 0.98
+                    }
+                  ],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": false,
+              "criteria": [
+                {
+                  "criterion_id": "A-C1",
+                  "criterion": "Task A artifact exists",
+                  "satisfied": false,
+                  "evidence": "Fixture review requires the next coding attempt"
+                }
+              ],
+              "findings": [
+                {
+                  "severity": "medium",
+                  "file": "A.txt",
+                  "line": 1,
+                  "explanation": "Fixture report foundation needs an explicit header",
+                  "recommended_fix": "Add the header in the next attempt",
+                  "confidence": 0.98
+                }
+              ],
+              "blocker": ""
+            },
+            "snapshot": "4f57d54d5663d52ba7d132124209b374d4e28281c521e775917f74663c6eea8a",
+            "verified_tree": "fb2d36e9a07fc38c73a1b621a021a553b090167c",
+            "preserved_tree": null,
+            "detail": "{\n  \"accepted\": false,\n  \"criteria\": [\n    {\n      \"criterion_id\": \"A-C1\",\n      \"criterion\": \"Task A artifact exists\",\n      \"satisfied\": false,\n      \"evidence\": \"Fixture review requires the next coding attempt\"\n    }\n  ],\n  \"findings\": [\n    {\n      \"severity\": \"medium\",\n      \"file\": \"A.txt\",\n      \"line\": 1,\n      \"explanation\": \"Fixture report foundation needs an explicit header\",\n      \"recommended_fix\": \"Add the header in the next attempt\",\n      \"confidence\": 0.98\n    }\n  ],\n  \"blocker\": \"\"\n}"
+          },
+          {
+            "number": 2,
+            "coder": {
+              "id": "2dce2667-c795-4347-80b3-ed58f6aad2b2",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "d2654467-931a-473b-a16a-c7682b2ead06",
+              "resumed_from": "34c81c52-3150-4dcd-bc13-934d7bae9a15",
+              "process_key": "1b8b4297-e82f-4ccd-81f7-099d3789d7e2",
+              "process_run_id": "a14345e6-4957-40f4-bda1-a9846e29e625",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "11af809f-5641-4653-b894-4b8e79194ba4",
+                "process_run_id": "28ba5a77-1f7d-43e7-82ff-a97591e1bd15",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=28ba5a77-1f7d-43e7-82ff-a97591e1bd15 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: inspected\n"
+              }
+            ],
+            "reviewer": {
+              "id": "f31100c4-538c-4969-a24f-dde99bf46395",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "2046f5c2-1a01-4a5c-a0f0-889af1ac91cf",
+              "resumed_from": null,
+              "process_key": "ec3f2d98-1932-4a2a-9b28-6afbb564e0a2",
+              "process_run_id": "3821d527-c24e-4b77-9ae7-cf57e09f5d33",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "f31100c4-538c-4969-a24f-dde99bf46395",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "2046f5c2-1a01-4a5c-a0f0-889af1ac91cf",
+                  "resumed_from": null,
+                  "process_key": "ec3f2d98-1932-4a2a-9b28-6afbb564e0a2",
+                  "process_run_id": "3821d527-c24e-4b77-9ae7-cf57e09f5d33",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "0dc82b07-b5f9-4539-ac0f-f68e61f8e5d4",
+                  "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-2",
+                  "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-2",
+                  "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-2",
+                    "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-2",
+                    "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-A-2/.git": "d5bf475b4d4ec18fa75ea647177017b2247fc265839fec4a6b475d13aa48e927",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-2/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-2/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-2/gitdir": "a75402ab7f3d5fe8bae0aec64787fd845270cda2fd32accba04668ec1ee5c505",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-A-2/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "A-C1",
+                      "criterion": "Task A artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [
+                    {
+                      "severity": "low",
+                      "file": "A.txt",
+                      "line": 1,
+                      "explanation": "Consider a more descriptive fixture header",
+                      "recommended_fix": "Optional naming improvement",
+                      "confidence": 0.9
+                    }
+                  ],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "A-C1",
+                  "criterion": "Task A artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [
+                {
+                  "severity": "low",
+                  "file": "A.txt",
+                  "line": 1,
+                  "explanation": "Consider a more descriptive fixture header",
+                  "recommended_fix": "Optional naming improvement",
+                  "confidence": 0.9
+                }
+              ],
+              "blocker": ""
+            },
+            "snapshot": "29afbfdf35ee53e58af34a851c7fe860f4c4314197858fd9aa01dfd487ed4eb6",
+            "verified_tree": "fb2d36e9a07fc38c73a1b621a021a553b090167c",
+            "preserved_tree": "fb2d36e9a07fc38c73a1b621a021a553b090167c",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "46d8b7420628c5c58039d8b0fe09a4156184699e"
+      },
+      {
+        "plan": {
+          "id": "B",
+          "goal": "Implement report export",
+          "description": "Implement fixture task B",
+          "acceptance_criteria": [
+            "Task B artifact exists"
+          ],
+          "dependencies": [
+            "A"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "c28e04e2-65e5-4aad-ad67-cd1d3bb19ddd",
+          "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-B",
+          "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-B",
+          "base_commit": "d7297bc436f562159a5955eb3c1984e7df146230",
+          "head_commit": "b2c48dc2223208163877ae989689409bdcbb71cb",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-B",
+            "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-B",
+            "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-B/.git": "6765f8bf5de178b0a62c6774dc4cbec6c82619851001f3d1fcf4377695bd778d",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-B/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-B/config.worktree": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-B/gitdir": "71dc389899f69b8c81ae51dae9b07169b514b0f3f337cf692b11d8e1ed2fc998",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-B/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "560b8fba-e615-473a-b7ac-2d692cd2e9da",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "b8e6f531-e163-4524-be65-20ac13f2a14b",
+              "resumed_from": null,
+              "process_key": "98f228b0-ab24-483a-aeea-dc1a9b00fc68",
+              "process_run_id": "9655b1c5-7a4d-4d01-96d0-b378daafba2b",
+              "outcome": "succeeded"
+            },
+            "verification": [],
+            "reviewer": null,
+            "reviews": [],
+            "review": null,
+            "snapshot": null,
+            "verified_tree": null,
+            "preserved_tree": null,
+            "detail": "human_action: Inspect fixture export destination; confirm that no external report was sent before continuing"
+          },
+          {
+            "number": 2,
+            "coder": {
+              "id": "e4ae2011-d069-4af4-8335-bb9f09247f3e",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "b2becb9e-1ea9-4c20-9b2b-b81ee8f3cc9a",
+              "resumed_from": null,
+              "process_key": "c18f7efd-545a-43fe-ab49-436bb7d66d03",
+              "process_run_id": "58283052-5f60-4acf-a95b-ffd0beba3787",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "a212c5a4-1bd5-4420-9271-2d99e2d68ee3",
+                "process_run_id": "688c8ae6-380c-4d3b-a8ba-2c70b4807943",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=688c8ae6-380c-4d3b-a8ba-2c70b4807943 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: inspected\n"
+              }
+            ],
+            "reviewer": {
+              "id": "2e2a186d-d569-4879-9ab1-c63c4aa2224d",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "c985c5be-b72b-4003-9741-ccc1984627f7",
+              "resumed_from": null,
+              "process_key": "319a472e-7215-4e2c-aacf-de5d966f7e95",
+              "process_run_id": "7ba09d41-48c8-452d-8986-cdbae5b341ac",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "2e2a186d-d569-4879-9ab1-c63c4aa2224d",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "c985c5be-b72b-4003-9741-ccc1984627f7",
+                  "resumed_from": null,
+                  "process_key": "319a472e-7215-4e2c-aacf-de5d966f7e95",
+                  "process_run_id": "7ba09d41-48c8-452d-8986-cdbae5b341ac",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "51052d3c-7372-462c-8e57-96909178515e",
+                  "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-B-1",
+                  "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/review-B-1",
+                  "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-B-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-B-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-B-1/.git": "7d006a59d2d6ac5a79dfe1ae4b022f35cdbb31303f5e054cb2a7d0066c0c2770",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-B-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-B-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-B-1/gitdir": "a81b31e62e6a1372edbd3577587675e011cee68026b56925708c6e47c75e2b7b",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-B-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "B-C1",
+                      "criterion": "Task B artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "B-C1",
+                  "criterion": "Task B artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "6124f2a7ae87bcd22ff5092fae42e759412ed5723c787e8dbfa928271a358509",
+            "verified_tree": "74bff7768d9bf3821a67fb313e7b1e23aff460bc",
+            "preserved_tree": "74bff7768d9bf3821a67fb313e7b1e23aff460bc",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "b2c48dc2223208163877ae989689409bdcbb71cb"
+      },
+      {
+        "plan": {
+          "id": "C",
+          "goal": "Add validation helpers",
+          "description": "Implement fixture task C",
+          "acceptance_criteria": [
+            "Task C artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "a1d84da6-758c-471c-bf61-1142c669f0f0",
+          "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-C",
+          "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-C",
+          "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+          "head_commit": "ce2cec13eef922815ecdebd3ead352c857116529",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-C",
+            "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-C",
+            "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-C/.git": "b6794f55924cad9de3edca52cfb6ed85e39f886d67c118ee5451f2e4c753bfad",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-C/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-C/config.worktree": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-C/gitdir": "4cbe303bbac0e1f36c5f1c19de4f360b9b4844b4edcc7b69d4698f606a6bfe22",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-C/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "3563c75e-763f-4401-8fb0-7b3ebc0bf2f6",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "679f1506-9e90-43b7-bc61-bcbeb5760094",
+              "resumed_from": null,
+              "process_key": "00126436-c451-484f-aff6-8263bff29e0b",
+              "process_run_id": "1933dc3d-e5d8-410f-86c6-e92f80053ad4",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "118f33bd-1afc-43ec-a642-27d60fd316a1",
+                "process_run_id": "ef15783f-39c2-460e-b40e-58e433ec6c41",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+                ],
+                "exit_code": 1,
+                "passed": false,
+                "outcome": "test_failure",
+                "output_complete": true,
+                "summary": "process=ef15783f-39c2-460e-b40e-58e433ec6c41 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1fixture verification: inspected\n"
+              }
+            ],
+            "reviewer": null,
+            "reviews": [],
+            "review": null,
+            "snapshot": null,
+            "verified_tree": null,
+            "preserved_tree": null,
+            "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"118f33bd-1afc-43ec-a642-27d60fd316a1\",\"process_run_id\":\"ef15783f-39c2-460e-b40e-58e433ec6c41\",\"command\":[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=ef15783f-39c2-460e-b40e-58e433ec6c41 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1fixture verification: inspected\\n\"}]"
+          },
+          {
+            "number": 2,
+            "coder": {
+              "id": "e216d954-6240-4b7a-8892-b6d4494a7f90",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "e8a7522b-9567-4848-9316-9b7896890398",
+              "resumed_from": "679f1506-9e90-43b7-bc61-bcbeb5760094",
+              "process_key": "272305b6-3ef5-43de-b8d0-57455018dae9",
+              "process_run_id": "f8a3caea-2e20-4284-8393-71e54161eb11",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "3ee82be5-ce0c-4975-ac53-7e24830d98d1",
+                "process_run_id": "1263cd67-3017-41b4-871e-f8ec2240ed2e",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=1263cd67-3017-41b4-871e-f8ec2240ed2e status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: inspected\n"
+              }
+            ],
+            "reviewer": {
+              "id": "795f4790-d0d3-4c22-8bbf-c93603438b8d",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "785a1a22-dad7-4939-9bc0-8c6808c64140",
+              "resumed_from": null,
+              "process_key": "d92cb397-c659-4734-abe9-945a0625a491",
+              "process_run_id": "e3f61f62-9304-46cb-96b5-86d858c509b3",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "795f4790-d0d3-4c22-8bbf-c93603438b8d",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "785a1a22-dad7-4939-9bc0-8c6808c64140",
+                  "resumed_from": null,
+                  "process_key": "d92cb397-c659-4734-abe9-945a0625a491",
+                  "process_run_id": "e3f61f62-9304-46cb-96b5-86d858c509b3",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "3dc48a52-8970-4048-add3-d37a1051abd6",
+                  "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-C-1",
+                  "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/review-C-1",
+                  "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-C-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-C-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-C-1/.git": "f96c20cae850a84658e321b2985e59545f87f57ea0d93bf20e5b9a0a44eaa183",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-C-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-C-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-C-1/gitdir": "13b5c1d7fc592823a678eefce823f0da865d47e335968c44d69b54330132c1d1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-C-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "C-C1",
+                      "criterion": "Task C artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "C-C1",
+                  "criterion": "Task C artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "f65b24c0f49d887134161575905de13528d8fae885fe06a705b5794096b7304d",
+            "verified_tree": "ce191086c0532b95c09409d31a2e167f35584f65",
+            "preserved_tree": "ce191086c0532b95c09409d31a2e167f35584f65",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "ce2cec13eef922815ecdebd3ead352c857116529"
+      },
+      {
+        "plan": {
+          "id": "D",
+          "goal": "Assemble report workflow",
+          "description": "Implement fixture task D",
+          "acceptance_criteria": [
+            "Task D artifact exists"
+          ],
+          "dependencies": [
+            "B"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "38e96a54-e6fd-486e-8dd6-e78197994085",
+          "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-D",
+          "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-D",
+          "base_commit": "5f5c275cb872b5f520c8e283a2d0900fe9b9fd04",
+          "head_commit": "7bedd6b34035040633c13819fee1cf3217097b8d",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-D",
+            "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-D",
+            "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-D/.git": "d8e42320ab9409e85a92be2767daee398c45cceb051e3a6e29760cf4151b1df9",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-D/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-D/config.worktree": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-D/gitdir": "c14fe30f86699b4b7b3dbd038d5268094fafc1a61c96b0bb50033e33d1e5efb8",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-D/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "db9660f2-1bba-4120-a85c-91025b498a13",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "87e50ddf-1e03-44ee-9571-81add3166ae8",
+              "resumed_from": null,
+              "process_key": "8c2a3c3b-e221-4c33-9957-63f16b130bb7",
+              "process_run_id": "bdf4eedf-e8bb-4d0a-a6c8-307f7fd2a5cb",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "9e03dbad-1151-4ad3-a5be-55ff21646906",
+                "process_run_id": "6710bbfe-0c55-47eb-b8fe-925c85d3c925",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=6710bbfe-0c55-47eb-b8fe-925c85d3c925 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: inspected\n"
+              }
+            ],
+            "reviewer": {
+              "id": "17a8ea7b-2dfd-4811-afc5-eb9fef04cd41",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "6d5e6fbf-d29a-4059-8415-f7fe2e31f361",
+              "resumed_from": null,
+              "process_key": "8f88b571-a6e1-4acf-9cb0-1fccc6575267",
+              "process_run_id": "08668d86-def5-47f1-b783-a26a69eba5c0",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "17a8ea7b-2dfd-4811-afc5-eb9fef04cd41",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "6d5e6fbf-d29a-4059-8415-f7fe2e31f361",
+                  "resumed_from": null,
+                  "process_key": "8f88b571-a6e1-4acf-9cb0-1fccc6575267",
+                  "process_run_id": "08668d86-def5-47f1-b783-a26a69eba5c0",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "82d5e80d-c310-45a4-b5d1-7ec4a3d27641",
+                  "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-D-1",
+                  "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/review-D-1",
+                  "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-D-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-D-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-D-1/.git": "dfb74097ba9bafc112d6d4b312547318669ab95849cd1e46daa5b24eac2846c6",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-D-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-D-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-D-1/gitdir": "c17e53a9c9b115bbd9657d54a4326c7d1fbc49ea686bae0e530f6a3a6807c980",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-D-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "D-C1",
+                      "criterion": "Task D artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "D-C1",
+                  "criterion": "Task D artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "21ee42cb2156bfde8f71889591a409658ab170f761c0a8bb7d77ea7119c58bd8",
+            "verified_tree": "69f8203430b0d467c2ed206c9424240dcd095f92",
+            "preserved_tree": "69f8203430b0d467c2ed206c9424240dcd095f92",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "7bedd6b34035040633c13819fee1cf3217097b8d"
+      },
+      {
+        "plan": {
+          "id": "E",
+          "goal": "Verify validation coverage",
+          "description": "Implement fixture task E",
+          "acceptance_criteria": [
+            "Task E artifact exists"
+          ],
+          "dependencies": [
+            "C"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "26359622-c4fe-4821-b722-8b875c9452c5",
+          "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-E",
+          "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-E",
+          "base_commit": "ce5b2bda3a146565986562e3ec194c975da9e79d",
+          "head_commit": "d5da3dc88cca3320a1ed876fceb0b7830c55944b",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-E",
+            "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-E",
+            "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-E/.git": "83e46c8c222ebb477fd6aabf079003fc103667d52b32797369ecf916080ce238",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-E/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-E/config.worktree": null,
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-E/gitdir": "971fc7dca572c2200909a854ce162d8e73065fcbd398a408f48a3e5b16a5e5f5",
+              "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/task-E/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "a1fad676-6561-4b77-b0ab-1688b4b7dfe4",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "20d882f1-fcb2-4022-886f-8a8c6f54e184",
+              "resumed_from": null,
+              "process_key": "d168ded4-554a-492d-a8b4-c895455f2d39",
+              "process_run_id": "91c81b31-9328-49a0-b684-805432c982d7",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "28b7c4c7-759f-40f2-acd7-eb1d2daac8be",
+                "process_run_id": "1e33693c-72d8-42b8-9e28-c0ee46266d91",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=1e33693c-72d8-42b8-9e28-c0ee46266d91 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: inspected\n"
+              }
+            ],
+            "reviewer": {
+              "id": "61ef20f1-0588-4724-bf94-0b969f31c206",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "3ea9deb3-6b73-4359-8271-82d823000c2e",
+              "resumed_from": null,
+              "process_key": "bd424385-a07c-4e6c-a79d-49348ee0ddfc",
+              "process_run_id": "45ce1972-c2aa-417a-9063-917163e11006",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "69bbc638-5e0f-4345-89d2-238142768e4b",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "eb969641-06c4-4fd9-a309-141ac86d0bd8",
+                  "resumed_from": null,
+                  "process_key": "f4a498ee-a422-4b5b-86ab-4640108f0adf",
+                  "process_run_id": "c28a21fc-6060-4a6b-81c8-857e482f0713",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "9abb40cf-d48e-475e-95ed-a8a70427fd5e",
+                  "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-1",
+                  "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-1",
+                  "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-1/.git": "d77fb087315299115341edd4f310367721d70b01ef16b6d88f87fb8d22ebab2d",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-1/gitdir": "1352376b9293c13c2e4599dcc723703c483f78400e1bbc5943d8ea129a4aa333",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": null,
+                "diagnostic": "invalid structured review: unknown field `invalid_fixture_review`, expected one of `accepted`, `criteria`, `findings`, `blocker`"
+              },
+              {
+                "session": {
+                  "id": "61ef20f1-0588-4724-bf94-0b969f31c206",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "3ea9deb3-6b73-4359-8271-82d823000c2e",
+                  "resumed_from": null,
+                  "process_key": "bd424385-a07c-4e6c-a79d-49348ee0ddfc",
+                  "process_run_id": "45ce1972-c2aa-417a-9063-917163e11006",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "6eb4feb5-659b-47ee-8679-4b596d369c5f",
+                  "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-2",
+                  "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-2",
+                  "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-2",
+                    "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-2",
+                    "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/review-E-2/.git": "f5d1eb48bacd67eb6c81a252ae63c6d7b1f1c81519b9186f3242450c309f80a1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-2/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-2/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-2/gitdir": "edb821b12b455c3119576f9ff982a7b9bc8fa69cf879d2ae2d5875672b8106e6",
+                      "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/review-E-2/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "E-C1",
+                      "criterion": "Task E artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "E-C1",
+                  "criterion": "Task E artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "887384dc821dcee851e54470daebda0b1b6366552b01676341962814690dffb0",
+            "verified_tree": "a43941b3acd371629eb43a2b847d841fb6452600",
+            "preserved_tree": "a43941b3acd371629eb43a2b847d841fb6452600",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "d5da3dc88cca3320a1ed876fceb0b7830c55944b"
+      }
+    ],
+    "blockers": [
+      {
+        "task_id": "B",
+        "kind": "human_action",
+        "detail": "human_action: Inspect fixture export destination; confirm that no external report was sent before continuing",
+        "action": "Inspect human actions; resolve externally and explicitly continue eligible live pauses",
+        "created_at": "2026-10-21T14:06:05.860347Z"
+      }
+    ],
+    "human_actions": [
+      {
+        "id": "H-559f2a4cf9e185da907630d02d1ce37f",
+        "requirement": {
+          "kind": "product_decision",
+          "reason": "The fixture specification leaves the export format open",
+          "requested_action": "Choose the report export format",
+          "affected_tasks": [
+            "B"
+          ],
+          "blocking": true,
+          "evidence": "CSV or JSON is not specified",
+          "confidence": 100,
+          "permission": null
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "cf53ac99-6660-41f7-86f0-0d952b113abc",
+          "disposition": "resolve",
+          "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+          "effect": "unknown",
+          "permission": null
+        },
+        "created_at": "2026-10-21T14:02:20.101288Z",
+        "updated_at": "2026-10-21T14:03:30.347307Z",
+        "audit": [
+          {
+            "at": "2026-10-21T14:02:20.101288Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T14:03:30.347307Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "cf53ac99-6660-41f7-86f0-0d952b113abc",
+              "disposition": "resolve",
+              "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+              "effect": "unknown",
+              "permission": null
+            }
+          }
+        ],
+        "continuable": false,
+        "workspace_snapshot": null
+      },
+      {
+        "id": "H-2f8e38059958e456b1c2c2ebeee91d70",
+        "requirement": {
+          "kind": "permission",
+          "reason": "Execution requires a configured permission",
+          "requested_action": "Approve or reject this exact run operation",
+          "affected_tasks": [],
+          "blocking": true,
+          "evidence": "Daemon host check; values were not read",
+          "confidence": 100,
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run 60c19237-51ff-4096-97e1-5fa5d1609003 immutable configured verification commands"
+          }
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "f16421b2-d148-460a-8648-ee480895a854",
+          "disposition": "approve",
+          "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+          "effect": "unknown",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run 60c19237-51ff-4096-97e1-5fa5d1609003 immutable configured verification commands"
+          }
+        },
+        "created_at": "2026-10-21T14:02:20.101338Z",
+        "updated_at": "2026-10-21T14:03:30.354481Z",
+        "audit": [
+          {
+            "at": "2026-10-21T14:02:20.101338Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T14:03:30.354481Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "f16421b2-d148-460a-8648-ee480895a854",
+              "disposition": "approve",
+              "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+              "effect": "unknown",
+              "permission": {
+                "operation": "run_checks",
+                "scope": "run 60c19237-51ff-4096-97e1-5fa5d1609003 immutable configured verification commands"
+              }
+            }
+          }
+        ],
+        "continuable": false,
+        "workspace_snapshot": null
+      },
+      {
+        "id": "H-00233add00c77b49336bfb0680ab102b",
+        "requirement": {
+          "kind": "runtime",
+          "reason": "human_action: human_action: Inspect fixture export destination; confirm that no external report was sent before continuing",
+          "requested_action": "human_action: Inspect fixture export destination; confirm that no external report was sent before continuing",
+          "affected_tasks": [
+            "B"
+          ],
+          "blocking": true,
+          "evidence": "Task B; attempt 1; retained process evidence",
+          "confidence": 100,
+          "permission": null
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "879c2980-bcf7-463b-8e46-bb966ba34717",
+          "disposition": "resolve",
+          "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+          "effect": "not_performed",
+          "permission": null
+        },
+        "created_at": "2026-10-21T14:06:05.860354Z",
+        "updated_at": "2026-10-21T14:15:18.357175Z",
+        "audit": [
+          {
+            "at": "2026-10-21T14:06:05.860354Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T14:15:18.357175Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "879c2980-bcf7-463b-8e46-bb966ba34717",
+              "disposition": "resolve",
+              "note": "Exact shell-only fixture operation inspected; use JSON locally. No external report was sent.",
+              "effect": "not_performed",
+              "permission": null
+            }
+          }
+        ],
+        "continuable": true,
+        "workspace_snapshot": "6c5a50b1feb4790adbc186c750246ce186bebe77262148b3f3ad4ef42fc26f8c"
+      }
+    ],
+    "preflight": {
+      "checked_at": "2026-10-21T14:20:09.310986Z",
+      "checks": [
+        {
+          "id": "repository",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Repository accessibility and pinned Git ownership"
+        },
+        {
+          "id": "planning-workspace",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Planning checkout accessibility and pinned Git ownership"
+        },
+        {
+          "id": "git-working-state",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees"
+        },
+        {
+          "id": "installed-codex",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "installed-claude",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "verification-0",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Configured verification executable availability; command behavior is validated during execution"
+        },
+        {
+          "id": "permission-WorkspaceWrite",
+          "ready": true,
+          "blocking": false,
+          "evidence": "WorkspaceWrite: Allow; scope run 60c19237-51ff-4096-97e1-5fa5d1609003 assigned task worktrees"
+        },
+        {
+          "id": "permission-RunChecks",
+          "ready": false,
+          "blocking": false,
+          "evidence": "RunChecks: RequireApproval; scope run 60c19237-51ff-4096-97e1-5fa5d1609003 immutable configured verification commands"
+        },
+        {
+          "id": "injected-provider",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Injected runtime availability contract"
+        }
+      ],
+      "action_ids": [
+        "H-559f2a4cf9e185da907630d02d1ce37f",
+        "H-2f8e38059958e456b1c2c2ebeee91d70"
+      ],
+      "ready": true,
+      "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation."
+    },
+    "integration_workspace": {
+      "id": "3f05d87a-afa1-431c-a0b9-a1bee036eae3",
+      "path": "/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/integration",
+      "branch": "autono/60c19237-51ff-4096-97e1-5fa5d1609003/integration",
+      "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+      "head_commit": "d99bd2e4b5ffc2dfe763db2996c65154c6c9c250",
+      "git": {
+        "worktree": "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/integration",
+        "git_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/integration",
+        "common_dir": "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git",
+        "metadata": {
+          "/private/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/integration/.git": "f9834bd93461a1b781255e93c687d37b199f3ea59d38e4deac6c9c3ec406016a",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/attributes": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/info/grafts": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/alternates": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/objects/info/http-alternates": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/integration/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/integration/config.worktree": null,
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/integration/gitdir": "a20f8c7ce0546221b0b53e77eae1c42c9c360495abbd723e90fe9f0408f6fcbe",
+          "/private/tmp/autono-native-bru342-observability-02/fixture-repository/.git/worktrees/integration/info/exclude": null
+        }
+      }
+    },
+    "integration_verification": [
+      {
+        "process_key": "7aaa05be-8e2f-4e25-9986-2865fc3cba54",
+        "process_run_id": "e0cc7ef3-daea-4d98-8382-bfbf7aaadbc0",
+        "command": [
+          "sh",
+          "-c",
+          "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }"
+        ],
+        "exit_code": 0,
+        "passed": true,
+        "outcome": "passed",
+        "output_complete": true,
+        "summary": "process=e0cc7ef3-daea-4d98-8382-bfbf7aaadbc0 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: inspected\n"
+      }
+    ],
+    "summary": "All 5 tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch autono/60c19237-51ff-4096-97e1-5fa5d1609003/integration at d99bd2e4b5ffc2dfe763db2996c65154c6c9c250 (/tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/integration). No merge to main was performed."
+  },
+  "events": [
+    {
+      "sequence": 1,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:11.472726+00:00",
+      "kind": "created",
+      "detail": "Feature specification and configuration preserved; planning requested"
+    },
+    {
+      "sequence": 2,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:11.571382+00:00",
+      "kind": "planning_workspace_ready",
+      "detail": "Pinned Git ownership"
+    },
+    {
+      "sequence": 3,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:11.884537+00:00",
+      "kind": "agent_started",
+      "detail": "Planner Claude; session=c5333c97-a324-49ea-8c15-a0686ce5e694 process_key=44fb5ff7-b1a4-402d-8254-300b7ba4ff7e"
+    },
+    {
+      "sequence": 4,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:11.900566+00:00",
+      "kind": "agent_process",
+      "detail": "Planner process=fd109b7d-811c-4d12-bce9-6fec6d3fc75f"
+    },
+    {
+      "sequence": 5,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:19.926216+00:00",
+      "kind": "agent_finished",
+      "detail": "Planner session=c5333c97-a324-49ea-8c15-a0686ce5e694 outcome=succeeded"
+    },
+    {
+      "sequence": 6,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:20.077292+00:00",
+      "kind": "plan_ready",
+      "detail": "Validated plan awaits developer approval"
+    },
+    {
+      "sequence": 7,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:20.077343+00:00",
+      "kind": "task_state",
+      "detail": "A: None -> Ready"
+    },
+    {
+      "sequence": 8,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:20.077374+00:00",
+      "kind": "task_state",
+      "detail": "B: None -> Waiting"
+    },
+    {
+      "sequence": 9,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:20.077416+00:00",
+      "kind": "task_state",
+      "detail": "C: None -> Ready"
+    },
+    {
+      "sequence": 10,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:20.077461+00:00",
+      "kind": "task_state",
+      "detail": "D: None -> Waiting"
+    },
+    {
+      "sequence": 11,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:20.077507+00:00",
+      "kind": "task_state",
+      "detail": "E: None -> Waiting"
+    },
+    {
+      "sequence": 12,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:02:20.103126+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 13,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:03:30.351065+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 14,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:03:30.357411+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 15,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:03:30.410318+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 16,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.263756+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 17,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.266774+00:00",
+      "kind": "approved",
+      "detail": "Developer approved the persisted plan and configured checks"
+    },
+    {
+      "sequence": 18,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.271201+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 19,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.274307+00:00",
+      "kind": "task_started",
+      "detail": "A"
+    },
+    {
+      "sequence": 20,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.277473+00:00",
+      "kind": "workspace_reserved",
+      "detail": "A: /tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-A (autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-A)"
+    },
+    {
+      "sequence": 21,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.277507+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 22,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.280744+00:00",
+      "kind": "task_started",
+      "detail": "C"
+    },
+    {
+      "sequence": 23,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.284155+00:00",
+      "kind": "workspace_reserved",
+      "detail": "C: /tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-C (autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-C)"
+    },
+    {
+      "sequence": 24,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.284215+00:00",
+      "kind": "task_state",
+      "detail": "C: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 25,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.469466+00:00",
+      "kind": "workspace_ready",
+      "detail": "C"
+    },
+    {
+      "sequence": 26,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.473678+00:00",
+      "kind": "workspace_ready",
+      "detail": "A"
+    },
+    {
+      "sequence": 27,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.632374+00:00",
+      "kind": "attempt_started",
+      "detail": "C: attempt 1"
+    },
+    {
+      "sequence": 28,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.636825+00:00",
+      "kind": "attempt_started",
+      "detail": "A: attempt 1"
+    },
+    {
+      "sequence": 29,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.687425+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=58ab9653-ff6c-4d19-a408-1cb7e1721e7f process_key=b2b93d97-f01e-4a2b-9fd5-3ce5c7a084e7"
+    },
+    {
+      "sequence": 30,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.691080+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=3563c75e-763f-4401-8fb0-7b3ebc0bf2f6 process_key=00126436-c451-484f-aff6-8263bff29e0b"
+    },
+    {
+      "sequence": 31,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.712021+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=dc90ed55-828c-4245-95f4-9da98b7530c0"
+    },
+    {
+      "sequence": 32,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:19.723860+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=1933dc3d-e5d8-410f-86c6-e92f80053ad4"
+    },
+    {
+      "sequence": 33,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:27.736251+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=58ab9653-ff6c-4d19-a408-1cb7e1721e7f outcome=succeeded"
+    },
+    {
+      "sequence": 34,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:27.747150+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=3563c75e-763f-4401-8fb0-7b3ebc0bf2f6 outcome=succeeded"
+    },
+    {
+      "sequence": 35,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:28.597151+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"C\", 1)) process_key=118f33bd-1afc-43ec-a642-27d60fd316a1 command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 36,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:28.601042+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 1)) process_key=db8f1860-15cf-4875-b007-3fa7523f8ff8 command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 37,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:28.605158+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"C\", 1)) process=ef15783f-39c2-460e-b40e-58e433ec6c41"
+    },
+    {
+      "sequence": 38,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:28.610694+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 1)) process=e9d57eb3-4133-436d-b5fb-ab23b571f503"
+    },
+    {
+      "sequence": 39,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:28.617279+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 1)) process=e9d57eb3-4133-436d-b5fb-ab23b571f503 passed=true"
+    },
+    {
+      "sequence": 40,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:28.622060+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"C\", 1)) process=ef15783f-39c2-460e-b40e-58e433ec6c41 passed=false"
+    },
+    {
+      "sequence": 41,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.042657+00:00",
+      "kind": "attempt_feedback",
+      "detail": "C: attempt 1"
+    },
+    {
+      "sequence": 42,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.046432+00:00",
+      "kind": "verification_passed",
+      "detail": "A"
+    },
+    {
+      "sequence": 43,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.051198+00:00",
+      "kind": "attempt_started",
+      "detail": "C: attempt 2"
+    },
+    {
+      "sequence": 44,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.103278+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=e216d954-6240-4b7a-8892-b6d4494a7f90 process_key=272305b6-3ef5-43de-b8d0-57455018dae9"
+    },
+    {
+      "sequence": 45,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.122098+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=f8a3caea-2e20-4284-8393-71e54161eb11"
+    },
+    {
+      "sequence": 46,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.309421+00:00",
+      "kind": "review_reserved",
+      "detail": "A: review 1"
+    },
+    {
+      "sequence": 47,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.404502+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "A"
+    },
+    {
+      "sequence": 48,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.560638+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=70082797-151b-4bb8-96cd-a62ccba4f4df process_key=441f3908-8f7c-4843-b72e-c897fb047290"
+    },
+    {
+      "sequence": 49,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:29.585487+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=bf5de859-22eb-4a9d-b1c3-9ba659a886d0"
+    },
+    {
+      "sequence": 50,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.145102+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=e216d954-6240-4b7a-8892-b6d4494a7f90 outcome=succeeded"
+    },
+    {
+      "sequence": 51,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.600074+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=70082797-151b-4bb8-96cd-a62ccba4f4df outcome=succeeded"
+    },
+    {
+      "sequence": 52,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.659562+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"C\", 2)) process_key=3ee82be5-ce0c-4975-ac53-7e24830d98d1 command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 53,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.664665+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"C\", 2)) process=1263cd67-3017-41b4-871e-f8ec2240ed2e"
+    },
+    {
+      "sequence": 54,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.674281+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"C\", 2)) process=1263cd67-3017-41b4-871e-f8ec2240ed2e passed=true"
+    },
+    {
+      "sequence": 55,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.864154+00:00",
+      "kind": "review_finished",
+      "detail": "A: accepted=false findings=1"
+    },
+    {
+      "sequence": 56,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.869255+00:00",
+      "kind": "attempt_feedback",
+      "detail": "A: attempt 1"
+    },
+    {
+      "sequence": 57,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.875664+00:00",
+      "kind": "attempt_started",
+      "detail": "A: attempt 2"
+    },
+    {
+      "sequence": 58,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.927711+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=2dce2667-c795-4347-80b3-ed58f6aad2b2 process_key=1b8b4297-e82f-4ccd-81f7-099d3789d7e2"
+    },
+    {
+      "sequence": 59,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:37.945233+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=a14345e6-4957-40f4-bda1-a9846e29e625"
+    },
+    {
+      "sequence": 60,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:38.008868+00:00",
+      "kind": "verification_passed",
+      "detail": "C"
+    },
+    {
+      "sequence": 61,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:38.233605+00:00",
+      "kind": "review_reserved",
+      "detail": "C: review 1"
+    },
+    {
+      "sequence": 62,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:38.320732+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "C"
+    },
+    {
+      "sequence": 63,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:38.458657+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=795f4790-d0d3-4c22-8bbf-c93603438b8d process_key=d92cb397-c659-4734-abe9-945a0625a491"
+    },
+    {
+      "sequence": 64,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:38.485845+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=e3f61f62-9304-46cb-96b5-86d858c509b3"
+    },
+    {
+      "sequence": 65,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:45.968909+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=2dce2667-c795-4347-80b3-ed58f6aad2b2 outcome=succeeded"
+    },
+    {
+      "sequence": 66,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:46.503673+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=795f4790-d0d3-4c22-8bbf-c93603438b8d outcome=succeeded"
+    },
+    {
+      "sequence": 67,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:46.522793+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 2)) process_key=11af809f-5641-4653-b894-4b8e79194ba4 command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 68,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:46.530529+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 2)) process=28ba5a77-1f7d-43e7-82ff-a97591e1bd15"
+    },
+    {
+      "sequence": 69,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:46.538582+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 2)) process=28ba5a77-1f7d-43e7-82ff-a97591e1bd15 passed=true"
+    },
+    {
+      "sequence": 70,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:46.817062+00:00",
+      "kind": "review_finished",
+      "detail": "C: accepted=true findings=0"
+    },
+    {
+      "sequence": 71,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:46.916134+00:00",
+      "kind": "verification_passed",
+      "detail": "A"
+    },
+    {
+      "sequence": 72,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.131835+00:00",
+      "kind": "review_reserved",
+      "detail": "A: review 2"
+    },
+    {
+      "sequence": 73,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.245030+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "A"
+    },
+    {
+      "sequence": 74,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.405912+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=f31100c4-538c-4969-a24f-dde99bf46395 process_key=ec3f2d98-1932-4a2a-9b28-6afbb564e0a2"
+    },
+    {
+      "sequence": 75,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.429842+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=3821d527-c24e-4b77-9ae7-cf57e09f5d33"
+    },
+    {
+      "sequence": 76,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.796741+00:00",
+      "kind": "task_completed",
+      "detail": "C: ce2cec13eef922815ecdebd3ead352c857116529"
+    },
+    {
+      "sequence": 77,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.796787+00:00",
+      "kind": "task_state",
+      "detail": "C: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 78,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.803792+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 79,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.810017+00:00",
+      "kind": "task_started",
+      "detail": "E"
+    },
+    {
+      "sequence": 80,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.810053+00:00",
+      "kind": "task_state",
+      "detail": "E: Some(Waiting) -> Ready"
+    },
+    {
+      "sequence": 81,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.816078+00:00",
+      "kind": "workspace_reserved",
+      "detail": "E: /tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-E (autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-E)"
+    },
+    {
+      "sequence": 82,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:47.816123+00:00",
+      "kind": "task_state",
+      "detail": "E: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 83,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:48.015180+00:00",
+      "kind": "workspace_ready",
+      "detail": "E"
+    },
+    {
+      "sequence": 84,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:48.021734+00:00",
+      "kind": "attempt_started",
+      "detail": "E: attempt 1"
+    },
+    {
+      "sequence": 85,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:48.070734+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=a1fad676-6561-4b77-b0ab-1688b4b7dfe4 process_key=d168ded4-554a-492d-a8b4-c895455f2d39"
+    },
+    {
+      "sequence": 86,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:48.086654+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=91c81b31-9328-49a0-b684-805432c982d7"
+    },
+    {
+      "sequence": 87,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:55.458062+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=f31100c4-538c-4969-a24f-dde99bf46395 outcome=succeeded"
+    },
+    {
+      "sequence": 88,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:55.767936+00:00",
+      "kind": "review_finished",
+      "detail": "A: accepted=true findings=1"
+    },
+    {
+      "sequence": 89,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:56.103377+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=a1fad676-6561-4b77-b0ab-1688b4b7dfe4 outcome=succeeded"
+    },
+    {
+      "sequence": 90,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:56.812305+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"E\", 1)) process_key=28b7c4c7-759f-40f2-acd7-eb1d2daac8be command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 91,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:56.820757+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"E\", 1)) process=1e33693c-72d8-42b8-9e28-c0ee46266d91"
+    },
+    {
+      "sequence": 92,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:56.830814+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"E\", 1)) process=1e33693c-72d8-42b8-9e28-c0ee46266d91 passed=true"
+    },
+    {
+      "sequence": 93,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.060371+00:00",
+      "kind": "task_completed",
+      "detail": "A: 46d8b7420628c5c58039d8b0fe09a4156184699e"
+    },
+    {
+      "sequence": 94,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.060445+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 95,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.068786+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 96,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.076721+00:00",
+      "kind": "task_started",
+      "detail": "B"
+    },
+    {
+      "sequence": 97,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.076757+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Waiting) -> Ready"
+    },
+    {
+      "sequence": 98,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.085178+00:00",
+      "kind": "workspace_reserved",
+      "detail": "B: /tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-B (autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-B)"
+    },
+    {
+      "sequence": 99,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.085229+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 100,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.276274+00:00",
+      "kind": "verification_passed",
+      "detail": "E"
+    },
+    {
+      "sequence": 101,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.294891+00:00",
+      "kind": "workspace_ready",
+      "detail": "B"
+    },
+    {
+      "sequence": 102,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.303049+00:00",
+      "kind": "attempt_started",
+      "detail": "B: attempt 1"
+    },
+    {
+      "sequence": 103,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.365994+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=560b8fba-e615-473a-b7ac-2d692cd2e9da process_key=98f228b0-ab24-483a-aeea-dc1a9b00fc68"
+    },
+    {
+      "sequence": 104,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.399112+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=9655b1c5-7a4d-4d01-96d0-b378daafba2b"
+    },
+    {
+      "sequence": 105,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.529957+00:00",
+      "kind": "review_reserved",
+      "detail": "E: review 1"
+    },
+    {
+      "sequence": 106,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.629143+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "E"
+    },
+    {
+      "sequence": 107,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.804961+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=69bbc638-5e0f-4345-89d2-238142768e4b process_key=f4a498ee-a422-4b5b-86ab-4640108f0adf"
+    },
+    {
+      "sequence": 108,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:05:57.835134+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=c28a21fc-6060-4a6b-81c8-857e482f0713"
+    },
+    {
+      "sequence": 109,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:05.428289+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=560b8fba-e615-473a-b7ac-2d692cd2e9da outcome=succeeded"
+    },
+    {
+      "sequence": 110,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:05.920442+00:00",
+      "kind": "task_stopped",
+      "detail": "B: human_action: Inspect fixture export destination; confirm that no external report was sent before continuing"
+    },
+    {
+      "sequence": 111,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:05.920530+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Running) -> BlockedHuman"
+    },
+    {
+      "sequence": 112,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:05.938521+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=69bbc638-5e0f-4345-89d2-238142768e4b outcome=succeeded"
+    },
+    {
+      "sequence": 113,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:05.953977+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 114,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:06.604435+00:00",
+      "kind": "review_invalid_or_failed",
+      "detail": "E: invalid structured review: unknown field `invalid_fixture_review`, expected one of `accepted`, `criteria`, `findings`, `blocker`"
+    },
+    {
+      "sequence": 115,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:06.615422+00:00",
+      "kind": "review_reserved",
+      "detail": "E: review 2"
+    },
+    {
+      "sequence": 116,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:06.766106+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "E"
+    },
+    {
+      "sequence": 117,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:06.946293+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=61ef20f1-0588-4724-bf94-0b969f31c206 process_key=bd424385-a07c-4e6c-a79d-49348ee0ddfc"
+    },
+    {
+      "sequence": 118,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:06.988793+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=45ce1972-c2aa-417a-9063-917163e11006"
+    },
+    {
+      "sequence": 119,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:15.015980+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=61ef20f1-0588-4724-bf94-0b969f31c206 outcome=succeeded"
+    },
+    {
+      "sequence": 120,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:15.296440+00:00",
+      "kind": "review_finished",
+      "detail": "E: accepted=true findings=0"
+    },
+    {
+      "sequence": 121,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:16.214390+00:00",
+      "kind": "task_completed",
+      "detail": "E: d5da3dc88cca3320a1ed876fceb0b7830c55944b"
+    },
+    {
+      "sequence": 122,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:16.214430+00:00",
+      "kind": "task_state",
+      "detail": "E: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 123,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:16.224426+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 124,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:06:16.235286+00:00",
+      "kind": "execution_finished",
+      "detail": "All currently runnable tasks finished"
+    },
+    {
+      "sequence": 125,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:15:18.377158+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 126,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:09.391245+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 127,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:09.417515+00:00",
+      "kind": "continued",
+      "detail": "Developer explicitly continued eligible live pauses; completed artifacts retained"
+    },
+    {
+      "sequence": 128,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:09.417729+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(BlockedHuman) -> Ready"
+    },
+    {
+      "sequence": 129,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:09.461151+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 130,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:09.478223+00:00",
+      "kind": "task_started",
+      "detail": "B"
+    },
+    {
+      "sequence": 131,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:09.499645+00:00",
+      "kind": "workspace_reserved",
+      "detail": "B: /tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-B (autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-B)"
+    },
+    {
+      "sequence": 132,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:09.499746+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 133,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:10.877599+00:00",
+      "kind": "workspace_ready",
+      "detail": "B"
+    },
+    {
+      "sequence": 134,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:11.269586+00:00",
+      "kind": "attempt_started",
+      "detail": "B: attempt 2"
+    },
+    {
+      "sequence": 135,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:11.455003+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=e4ae2011-d069-4af4-8335-bb9f09247f3e process_key=c18f7efd-545a-43fe-ab49-436bb7d66d03"
+    },
+    {
+      "sequence": 136,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:11.523229+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=58283052-5f60-4acf-a95b-ffd0beba3787"
+    },
+    {
+      "sequence": 137,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:19.623690+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=e4ae2011-d069-4af4-8335-bb9f09247f3e outcome=succeeded"
+    },
+    {
+      "sequence": 138,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:20.809479+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"B\", 2)) process_key=a212c5a4-1bd5-4420-9271-2d99e2d68ee3 command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 139,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:20.827113+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"B\", 2)) process=688c8ae6-380c-4d3b-a8ba-2c70b4807943"
+    },
+    {
+      "sequence": 140,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:20.888199+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"B\", 2)) process=688c8ae6-380c-4d3b-a8ba-2c70b4807943 passed=true"
+    },
+    {
+      "sequence": 141,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:21.511131+00:00",
+      "kind": "verification_passed",
+      "detail": "B"
+    },
+    {
+      "sequence": 142,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:21.866416+00:00",
+      "kind": "review_reserved",
+      "detail": "B: review 1"
+    },
+    {
+      "sequence": 143,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:22.068081+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "B"
+    },
+    {
+      "sequence": 144,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:22.356863+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=2e2a186d-d569-4879-9ab1-c63c4aa2224d process_key=319a472e-7215-4e2c-aacf-de5d966f7e95"
+    },
+    {
+      "sequence": 145,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:22.436509+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=7ba09d41-48c8-452d-8986-cdbae5b341ac"
+    },
+    {
+      "sequence": 146,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:30.445347+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=2e2a186d-d569-4879-9ab1-c63c4aa2224d outcome=succeeded"
+    },
+    {
+      "sequence": 147,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:30.801177+00:00",
+      "kind": "review_finished",
+      "detail": "B: accepted=true findings=0"
+    },
+    {
+      "sequence": 148,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.269196+00:00",
+      "kind": "task_completed",
+      "detail": "B: b2c48dc2223208163877ae989689409bdcbb71cb"
+    },
+    {
+      "sequence": 149,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.269244+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 150,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.286797+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 151,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.301877+00:00",
+      "kind": "task_started",
+      "detail": "D"
+    },
+    {
+      "sequence": 152,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.301958+00:00",
+      "kind": "task_state",
+      "detail": "D: Some(Waiting) -> Ready"
+    },
+    {
+      "sequence": 153,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.317005+00:00",
+      "kind": "workspace_reserved",
+      "detail": "D: /tmp/autono-native-bru342-observability-02/engineering/60c19237-51ff-4096-97e1-5fa5d1609003/task-D (autono/60c19237-51ff-4096-97e1-5fa5d1609003/task-D)"
+    },
+    {
+      "sequence": 154,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.317059+00:00",
+      "kind": "task_state",
+      "detail": "D: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 155,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.595018+00:00",
+      "kind": "workspace_ready",
+      "detail": "D"
+    },
+    {
+      "sequence": 156,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.609328+00:00",
+      "kind": "attempt_started",
+      "detail": "D: attempt 1"
+    },
+    {
+      "sequence": 157,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.676853+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=db9660f2-1bba-4120-a85c-91025b498a13 process_key=8c2a3c3b-e221-4c33-9957-63f16b130bb7"
+    },
+    {
+      "sequence": 158,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:32.787399+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=bdf4eedf-e8bb-4d0a-a6c8-307f7fd2a5cb"
+    },
+    {
+      "sequence": 159,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:40.828545+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=db9660f2-1bba-4120-a85c-91025b498a13 outcome=succeeded"
+    },
+    {
+      "sequence": 160,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:41.766292+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"D\", 1)) process_key=9e03dbad-1151-4ad3-a5be-55ff21646906 command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 161,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:41.790298+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"D\", 1)) process=6710bbfe-0c55-47eb-b8fe-925c85d3c925"
+    },
+    {
+      "sequence": 162,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:41.815355+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"D\", 1)) process=6710bbfe-0c55-47eb-b8fe-925c85d3c925 passed=true"
+    },
+    {
+      "sequence": 163,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:42.646968+00:00",
+      "kind": "verification_passed",
+      "detail": "D"
+    },
+    {
+      "sequence": 164,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:43.016460+00:00",
+      "kind": "review_reserved",
+      "detail": "D: review 1"
+    },
+    {
+      "sequence": 165,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:43.161570+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "D"
+    },
+    {
+      "sequence": 166,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:43.347228+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=17a8ea7b-2dfd-4811-afc5-eb9fef04cd41 process_key=8f88b571-a6e1-4acf-9cb0-1fccc6575267"
+    },
+    {
+      "sequence": 167,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:43.396604+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=08668d86-def5-47f1-b783-a26a69eba5c0"
+    },
+    {
+      "sequence": 168,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:51.716246+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=17a8ea7b-2dfd-4811-afc5-eb9fef04cd41 outcome=succeeded"
+    },
+    {
+      "sequence": 169,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:53.286912+00:00",
+      "kind": "review_finished",
+      "detail": "D: accepted=true findings=0"
+    },
+    {
+      "sequence": 170,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:54.992873+00:00",
+      "kind": "task_completed",
+      "detail": "D: 7bedd6b34035040633c13819fee1cf3217097b8d"
+    },
+    {
+      "sequence": 171,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:54.992950+00:00",
+      "kind": "task_state",
+      "detail": "D: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 172,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:55.008639+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 173,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:20:55.059030+00:00",
+      "kind": "execution_finished",
+      "detail": "All currently runnable tasks finished"
+    },
+    {
+      "sequence": 174,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:26.743960+00:00",
+      "kind": "integration_requested",
+      "detail": "Developer requested local integration and combined checks"
+    },
+    {
+      "sequence": 175,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:26.888770+00:00",
+      "kind": "integration_workspace_ready",
+      "detail": "Pinned Git ownership"
+    },
+    {
+      "sequence": 176,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:27.611202+00:00",
+      "kind": "integration_merge",
+      "detail": "A: 46d8b7420628c5c58039d8b0fe09a4156184699e"
+    },
+    {
+      "sequence": 177,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:28.418947+00:00",
+      "kind": "integration_merge",
+      "detail": "B: b2c48dc2223208163877ae989689409bdcbb71cb"
+    },
+    {
+      "sequence": 178,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:28.896129+00:00",
+      "kind": "integration_merge",
+      "detail": "C: ce2cec13eef922815ecdebd3ead352c857116529"
+    },
+    {
+      "sequence": 179,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:29.265172+00:00",
+      "kind": "integration_merge",
+      "detail": "D: 7bedd6b34035040633c13819fee1cf3217097b8d"
+    },
+    {
+      "sequence": 180,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:29.750565+00:00",
+      "kind": "integration_merge",
+      "detail": "E: d5da3dc88cca3320a1ed876fceb0b7830c55944b"
+    },
+    {
+      "sequence": 181,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:30.179058+00:00",
+      "kind": "verification_started",
+      "detail": "target=None process_key=7aaa05be-8e2f-4e25-9986-2865fc3cba54 command=[\"sh\",\"-c\",\"printf 'fixture verification: inspected\\\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }\"]"
+    },
+    {
+      "sequence": 182,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:30.193985+00:00",
+      "kind": "verification_process",
+      "detail": "target=None process=e0cc7ef3-daea-4d98-8382-bfbf7aaadbc0"
+    },
+    {
+      "sequence": 183,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:30.209646+00:00",
+      "kind": "verification_finished",
+      "detail": "target=None process=e0cc7ef3-daea-4d98-8382-bfbf7aaadbc0 passed=true"
+    },
+    {
+      "sequence": 184,
+      "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "timestamp": "2026-10-21T14:22:30.644050+00:00",
+      "kind": "completed",
+      "detail": "Verified integration commit d99bd2e4b5ffc2dfe763db2996c65154c6c9c250"
+    }
+  ]
+}

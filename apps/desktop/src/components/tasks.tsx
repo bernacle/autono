@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, Check, X } from "lucide-react";
 import type { Run, Task } from "../lib/types";
@@ -13,18 +14,34 @@ export function TasksView({
   onProcess,
   onHuman,
   onExecution,
+  selected: controlled,
+  onSelect,
+  initialView,
+  logDockOpen = false,
 }: {
   run: Run;
   onProcess: (id: string) => void;
   onHuman: (id: string) => void;
   onExecution: () => void;
+  selected?: string | null;
+  onSelect?: (id: string | null) => void;
+  initialView?: "list" | "graph";
+  logDockOpen?: boolean;
 }) {
-  const [view, setView] = useState<"list" | "graph">("list"),
-    [selected, setSelected] = useState<string | null>(null);
+  const [view, setView] = useState<"list" | "graph">(initialView ?? "list"),
+    [local, setLocal] = useState<string | null>(null);
+  const selected = controlled === undefined ? local : controlled;
+  const setSelected = useCallback(
+    (id: string | null) => {
+      setLocal(id);
+      onSelect?.(id);
+    },
+    [onSelect],
+  );
   const list = useRef<HTMLDivElement>(null),
     task = run.tasks.find((t) => t.plan.id === selected);
   const ordered = orderedTasks(run);
-  const closeInspector = useCallback(() => setSelected(null), []);
+  const closeInspector = useCallback(() => setSelected(null), [setSelected]);
   useEffect(() => {
     let prefix = false;
     const onKey = (e: KeyboardEvent) => {
@@ -45,7 +62,7 @@ export function TasksView({
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, []);
+  }, [setSelected]);
   const groups = (run.plan?.milestones ?? []).map((m) => ({
     ...m,
     tasks: ordered.filter((t) => m.task_ids.includes(t.plan.id)),
@@ -107,7 +124,7 @@ export function TasksView({
                   tasks currently held by {task.plan.id}
                 </span>
                 <Button variant="ghost" size="sm" onClick={onExecution}>
-                  Open execution journal
+                  Show in timeline
                   <ArrowRight size={13} />
                 </Button>
               </div>
@@ -236,6 +253,7 @@ export function TasksView({
           key={task.plan.id}
           task={task}
           run={run}
+          logDockOpen={logDockOpen}
           onClose={closeInspector}
           onProcess={onProcess}
           onHuman={onHuman}
@@ -244,15 +262,19 @@ export function TasksView({
     </div>
   );
 }
-function TaskInspector({
+export function TaskInspector({
   task,
   run,
   onClose,
   onProcess,
   onHuman,
+  phaseContext,
+  logDockOpen = false,
 }: {
   task: Task;
   run: Run;
+  phaseContext?: ReactNode;
+  logDockOpen?: boolean;
   onClose: () => void;
   onProcess: (id: string) => void;
   onHuman: (id: string) => void;
@@ -270,18 +292,41 @@ function TaskInspector({
   }, []);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    heading.current?.focus();
+    heading.current?.focus({ preventScroll: true });
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
       }
       if (e.key === "Tab" && matchMedia("(max-width: 1099px)").matches) {
+        const selector =
+          'button:not(:disabled),a[href],input,summary,[tabindex="0"]';
         const nodes = [
-          ...(pane.current?.querySelectorAll<HTMLElement>(
-            'button:not(:disabled),a[href],input,summary,[tabindex="0"]',
-          ) ?? []),
-        ];
+          ...(pane.current?.querySelectorAll<HTMLElement>(selector) ?? []),
+          ...(document
+            .getElementById("process-log-dock")
+            ?.querySelectorAll<HTMLElement>(selector) ?? []),
+        ].filter((node) => {
+          for (
+            let parent = node.parentElement;
+            parent;
+            parent = parent.parentElement
+          )
+            if (
+              parent.tagName === "DETAILS" &&
+              !parent.hasAttribute("open") &&
+              node !== parent.querySelector(":scope > summary")
+            )
+              return false;
+          return true;
+        });
+        nodes.sort((a, b) =>
+          a === b
+            ? 0
+            : a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING
+              ? -1
+              : 1,
+        );
         const first = nodes[0],
           last = nodes.at(-1);
         if (
@@ -321,6 +366,7 @@ function TaskInspector({
         ref={pane}
         role={overlay ? "dialog" : undefined}
         aria-modal={overlay ? true : undefined}
+        aria-owns={overlay && logDockOpen ? "process-log-dock" : undefined}
         aria-labelledby="task-inspector-title"
       >
         <header>
@@ -338,6 +384,7 @@ function TaskInspector({
           <h2 id="task-inspector-title" tabIndex={-1} ref={heading}>
             {task.plan.id} · {task.plan.goal}
           </h2>
+          {phaseContext}
           {actions.map((a) => (
             <div className="human-card" key={a.id}>
               <h3>Human inspection needed</h3>

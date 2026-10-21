@@ -230,6 +230,7 @@ export interface EngineeringEvent {
 }
 export interface LogLine {
   sequence: number;
+  timestamp?: string;
   stream: string;
   text: string;
 }

@@ -1,0 +1,154 @@
+{
+  "chunk": 2,
+  "no_paid_inference": true,
+  "daemon_protocol_orchestration_changes": false,
+  "native": {
+    "platform": "macOS arm64",
+    "machine": "Apple M1 Pro",
+    "themes": [
+      "dark",
+      "light"
+    ],
+    "sizes": [
+      [
+        1440,
+        900
+      ],
+      [
+        960,
+        680
+      ]
+    ],
+    "capture": "Actual Tauri window via native accessibility and screenshots"
+  },
+  "window_close": {
+    "home": "/tmp/autono-native-bru342-observability-02",
+    "daemon_pid": 42940,
+    "status": "RUNNING",
+    "revision": 56,
+    "active_processes": 2,
+    "desktop_exited": true,
+    "daemon_reachable": true
+  },
+  "resolution_before_continuation": {
+    "status": "BLOCKED",
+    "revision": 109,
+    "B": "BLOCKED_HUMAN",
+    "D": "WAITING",
+    "active_processes": 0
+  },
+  "native_continuation_confirmed": {
+    "status": "RUNNING",
+    "revision": 118,
+    "B_attempt": 2
+  },
+  "connection_recovery": {
+    "method": "Temporarily rename only disposable owner-only daemon.json; restore same file",
+    "retained_state": true,
+    "mutations_disabled": true,
+    "reconnected": true
+  },
+  "runs": [
+    {
+      "home": "/tmp/autono-native-bru342-observability-02",
+      "id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+      "status": "COMPLETED",
+      "revision": 162,
+      "journal_count": 184,
+      "journal_gaps": [],
+      "check_passed": 6,
+      "check_failed": 1,
+      "integration_checks": [
+        true
+      ],
+      "reviews": 7,
+      "review_invalid": 1,
+      "review_rejected": 1,
+      "findings": 2,
+      "base_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+      "original_main_commit": "0aace653b0bd56560306dbd119f5ef2788b560b9",
+      "integration_commit": "d99bd2e4b5ffc2dfe763db2996c65154c6c9c250",
+      "tasks": [
+        {
+          "id": "A",
+          "status": "COMPLETED",
+          "attempts": 2,
+          "verified_tree_matches": true
+        },
+        {
+          "id": "B",
+          "status": "COMPLETED",
+          "attempts": 2,
+          "verified_tree_matches": true
+        },
+        {
+          "id": "C",
+          "status": "COMPLETED",
+          "attempts": 2,
+          "verified_tree_matches": true
+        },
+        {
+          "id": "D",
+          "status": "COMPLETED",
+          "attempts": 1,
+          "verified_tree_matches": true
+        },
+        {
+          "id": "E",
+          "status": "COMPLETED",
+          "attempts": 1,
+          "verified_tree_matches": true
+        }
+      ]
+    },
+    {
+      "home": "/tmp/autono-native-bru342-observability-03",
+      "id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "status": "FAILED",
+      "revision": 41,
+      "journal_count": 45,
+      "journal_gaps": [
+        {
+          "after": 8,
+          "next": 19
+        }
+      ],
+      "check_passed": 0,
+      "check_failed": 3,
+      "integration_checks": [],
+      "reviews": 0,
+      "review_invalid": 0,
+      "review_rejected": 0,
+      "findings": 0,
+      "base_commit": "0d79b5b414ed30a01da21c4f74cb842de6e29451",
+      "original_main_commit": "0d79b5b414ed30a01da21c4f74cb842de6e29451",
+      "integration_commit": null,
+      "tasks": [
+        {
+          "id": "A",
+          "status": "FAILED",
+          "attempts": 3,
+          "verified_tree_matches": false
+        }
+      ]
+    }
+  ],
+  "blocked_capture": {
+    "home": "/tmp/autono-native-bru342-observability-04",
+    "id": "7c31da12-6cc9-49ae-be51-fe27303599b7",
+    "status": "BLOCKED",
+    "revision": 108,
+    "verified_tasks": 3,
+    "B": "BLOCKED_HUMAN",
+    "D": "WAITING"
+  },
+  "final_build": {
+    "frontend_tests": 62,
+    "rust_tests_passed": 92,
+    "rust_tests_ignored": 2,
+    "production_smoke_fetch_disabled": true,
+    "native_clean_launches": 3,
+    "native_app_mib": 14.82,
+    "projection_5000_median_ms": 12.84
+  }
+}

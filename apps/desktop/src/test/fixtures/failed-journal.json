@@ -1,0 +1,743 @@
+{
+  "provenance": "Real shell-only permanent verification failure. An auxiliary planning run was cancelled between this run\u2019s planning and approval, producing real global sequence gaps. Provider result fields omitted.",
+  "run": {
+    "id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+    "revision": 41,
+    "status": "FAILED",
+    "created_at": "2026-10-21T14:32:29.149936Z",
+    "updated_at": "2026-10-21T14:34:06.496031Z",
+    "repository": "/private/tmp/autono-native-bru342-observability-03/fixture-repository",
+    "repository_git": {
+      "worktree": "/private/tmp/autono-native-bru342-observability-03/fixture-repository",
+      "git_dir": "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git",
+      "common_dir": "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git",
+      "metadata": {
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/commondir": null,
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/config.worktree": null,
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/gitdir": null,
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/attributes": null,
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/grafts": null,
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/objects/info/alternates": null,
+        "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/objects/info/http-alternates": null
+      }
+    },
+    "requested_base": "main",
+    "base_commit": "0d79b5b414ed30a01da21c4f74cb842de6e29451",
+    "specification": "# Observable recovery fixture\nExercise deterministic shell-only failures, retries, independent findings, human continuation and local integration.",
+    "settings": {
+      "agents": {
+        "planner": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "coder": {
+          "provider": "codex",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "reviewer": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        }
+      },
+      "execution": {
+        "max_parallel": 2,
+        "max_attempts": 3,
+        "max_review_cycles": 2
+      },
+      "verification": {
+        "commands": [
+          [
+            "sh",
+            "-c",
+            "printf 'fixture verification: intentional failure\\n'; exit 1"
+          ]
+        ],
+        "timeout_seconds": 30
+      },
+      "preflight": {
+        "required_env": [],
+        "required_tools": [],
+        "required_directories": [],
+        "external_services": []
+      },
+      "permissions": {
+        "rules": {
+          "run_checks": "REQUIRE_APPROVAL"
+        }
+      }
+    },
+    "plan": {
+      "human_requirements": [],
+      "requirements": [
+        {
+          "id": "r",
+          "text": "Deliver an independently verified local report"
+        }
+      ],
+      "milestones": [
+        {
+          "id": "m1",
+          "goal": "Verification failure fixture",
+          "task_ids": [
+            "A"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": [
+            "Task A artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        }
+      ]
+    },
+    "approved_at": "2026-10-21T14:33:56.315991Z",
+    "planner": {
+      "id": "f5243d11-028f-4820-8466-8df05fe97c2d",
+      "role": "planner",
+      "provider": "claude",
+      "provider_session_id": "72c83bf3-f1eb-48a9-9cec-06ad8b823f57",
+      "resumed_from": null,
+      "process_key": "9b8dda58-3a80-4c83-841a-e749cee88675",
+      "process_run_id": "7c09d0cc-c6df-4860-a1c0-3e9b36d1e509",
+      "outcome": "succeeded"
+    },
+    "planning_workspace": {
+      "id": "64f3227a-06f5-4bf2-b751-2ff2129f68ec",
+      "path": "/tmp/autono-native-bru342-observability-03/engineering/15b6aac4-3970-47fd-939a-12ab4728bb91/planner",
+      "branch": "autono/15b6aac4-3970-47fd-939a-12ab4728bb91/planner",
+      "base_commit": "0d79b5b414ed30a01da21c4f74cb842de6e29451",
+      "head_commit": null,
+      "git": {
+        "worktree": "/private/tmp/autono-native-bru342-observability-03/engineering/15b6aac4-3970-47fd-939a-12ab4728bb91/planner",
+        "git_dir": "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/planner",
+        "common_dir": "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git",
+        "metadata": {
+          "/private/tmp/autono-native-bru342-observability-03/engineering/15b6aac4-3970-47fd-939a-12ab4728bb91/planner/.git": "ab2f39f2567733cb39209c6e12ed6aad7471a1c81694f1d9e140ff43c2174abe",
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/attributes": null,
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/grafts": null,
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/objects/info/alternates": null,
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/objects/info/http-alternates": null,
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/planner/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/planner/config.worktree": null,
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/planner/gitdir": "f4e6933bb8565765ccb834057ffc014890f7919559fea1af8f7ebcf5a508321c",
+          "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/planner/info/exclude": null
+        }
+      }
+    },
+    "tasks": [
+      {
+        "plan": {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": [
+            "Task A artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "FAILED",
+        "workspace": {
+          "id": "be45d961-642e-4432-8630-a63a6fea8da1",
+          "path": "/tmp/autono-native-bru342-observability-03/engineering/15b6aac4-3970-47fd-939a-12ab4728bb91/task-A",
+          "branch": "autono/15b6aac4-3970-47fd-939a-12ab4728bb91/task-A",
+          "base_commit": "0d79b5b414ed30a01da21c4f74cb842de6e29451",
+          "head_commit": null,
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-observability-03/engineering/15b6aac4-3970-47fd-939a-12ab4728bb91/task-A",
+            "git_dir": "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/task-A",
+            "common_dir": "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-observability-03/engineering/15b6aac4-3970-47fd-939a-12ab4728bb91/task-A/.git": "bb58070099af1663f7add7bba628c3e2a6dc50f1d754a75ef22815bd90e2a199",
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/task-A/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/task-A/config.worktree": null,
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/task-A/gitdir": "65875475ecd3714ce3f63de5ddf6b07a313fd35228a6b38b8e1db38aa8e41fdc",
+              "/private/tmp/autono-native-bru342-observability-03/fixture-repository/.git/worktrees/task-A/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "3f189b8f-22b4-44fe-baaa-acece714a4cc",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "6c2b022c-be6f-48f4-814f-61894c6debae",
+              "resumed_from": null,
+              "process_key": "50bceb95-1d78-469c-96eb-aa6907bf1c5c",
+              "process_run_id": "eea0518e-73f6-4252-a78a-f6779384de17",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "fda0b735-d008-4ca5-b65e-218afcd88e12",
+                "process_run_id": "4f87562c-eb3c-42ba-8a50-702e7102437f",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: intentional failure\\n'; exit 1"
+                ],
+                "exit_code": 1,
+                "passed": false,
+                "outcome": "test_failure",
+                "output_complete": true,
+                "summary": "process=4f87562c-eb3c-42ba-8a50-702e7102437f status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1fixture verification: intentional failure\n"
+              }
+            ],
+            "reviewer": null,
+            "reviews": [],
+            "review": null,
+            "snapshot": null,
+            "verified_tree": null,
+            "preserved_tree": null,
+            "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"fda0b735-d008-4ca5-b65e-218afcd88e12\",\"process_run_id\":\"4f87562c-eb3c-42ba-8a50-702e7102437f\",\"command\":[\"sh\",\"-c\",\"printf 'fixture verification: intentional failure\\\\n'; exit 1\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=4f87562c-eb3c-42ba-8a50-702e7102437f status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1fixture verification: intentional failure\\n\"}]"
+          },
+          {
+            "number": 2,
+            "coder": {
+              "id": "2aef2964-4691-42b0-a230-bb101c0a20f0",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "e99d925b-2d1c-4b44-bc0d-6412a5830983",
+              "resumed_from": "6c2b022c-be6f-48f4-814f-61894c6debae",
+              "process_key": "8a8bb7d9-7904-47d6-bc62-df07ac042d6c",
+              "process_run_id": "9558e392-bd9f-431d-8ef8-00ea5b49799f",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "f94d3197-4ace-4863-a77e-e29ab5d1a09d",
+                "process_run_id": "2b075e5a-3bfc-4cc0-aca6-f46daaeb3493",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: intentional failure\\n'; exit 1"
+                ],
+                "exit_code": 1,
+                "passed": false,
+                "outcome": "test_failure",
+                "output_complete": true,
+                "summary": "process=2b075e5a-3bfc-4cc0-aca6-f46daaeb3493 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1fixture verification: intentional failure\n"
+              }
+            ],
+            "reviewer": null,
+            "reviews": [],
+            "review": null,
+            "snapshot": null,
+            "verified_tree": null,
+            "preserved_tree": null,
+            "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"f94d3197-4ace-4863-a77e-e29ab5d1a09d\",\"process_run_id\":\"2b075e5a-3bfc-4cc0-aca6-f46daaeb3493\",\"command\":[\"sh\",\"-c\",\"printf 'fixture verification: intentional failure\\\\n'; exit 1\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=2b075e5a-3bfc-4cc0-aca6-f46daaeb3493 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1fixture verification: intentional failure\\n\"}]"
+          },
+          {
+            "number": 3,
+            "coder": {
+              "id": "d81de1a7-4011-4b70-ab2d-9cd57cf7a043",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "f9b86764-fde1-4abc-8e47-e171ebc93e05",
+              "resumed_from": "e99d925b-2d1c-4b44-bc0d-6412a5830983",
+              "process_key": "e731bc65-17bb-499d-bacd-291fb2096501",
+              "process_run_id": "2d82725a-ebd2-473c-93f2-ec7747856854",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "6130ddb7-d8c5-4e15-84d7-8f1682a74170",
+                "process_run_id": "ad7eeb65-46a8-4a36-aca4-559d30ab9c5b",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: intentional failure\\n'; exit 1"
+                ],
+                "exit_code": 1,
+                "passed": false,
+                "outcome": "test_failure",
+                "output_complete": true,
+                "summary": "process=ad7eeb65-46a8-4a36-aca4-559d30ab9c5b status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1fixture verification: intentional failure\n"
+              }
+            ],
+            "reviewer": null,
+            "reviews": [],
+            "review": null,
+            "snapshot": null,
+            "verified_tree": null,
+            "preserved_tree": null,
+            "detail": "coding attempt limit exhausted for A: Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"6130ddb7-d8c5-4e15-84d7-8f1682a74170\",\"process_run_id\":\"ad7eeb65-46a8-4a36-aca4-559d30ab9c5b\",\"command\":[\"sh\",\"-c\",\"printf 'fixture verification: intentional failure\\\\n'; exit 1\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=ad7eeb65-46a8-4a36-aca4-559d30ab9c5b status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1fixture verification: intentional failure\\n\"}]"
+          }
+        ],
+        "artifact_commit": null
+      }
+    ],
+    "blockers": [],
+    "human_actions": [
+      {
+        "id": "H-29eedfbef02d394e5f69ca6d2f4a7e8a",
+        "requirement": {
+          "kind": "permission",
+          "reason": "Execution requires a configured permission",
+          "requested_action": "Approve or reject this exact run operation",
+          "affected_tasks": [],
+          "blocking": true,
+          "evidence": "Daemon host check; values were not read",
+          "confidence": 100,
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run 15b6aac4-3970-47fd-939a-12ab4728bb91 immutable configured verification commands"
+          }
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "475f4738-eb73-4869-86ec-b2e8f9757cf7",
+          "disposition": "approve",
+          "note": "Exact intentional failing shell command approved only for disposable verification-failure acceptance.",
+          "effect": "unknown",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run 15b6aac4-3970-47fd-939a-12ab4728bb91 immutable configured verification commands"
+          }
+        },
+        "created_at": "2026-10-21T14:32:31.825860Z",
+        "updated_at": "2026-10-21T14:33:56.195559Z",
+        "audit": [
+          {
+            "at": "2026-10-21T14:32:31.825860Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T14:33:56.195559Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "475f4738-eb73-4869-86ec-b2e8f9757cf7",
+              "disposition": "approve",
+              "note": "Exact intentional failing shell command approved only for disposable verification-failure acceptance.",
+              "effect": "unknown",
+              "permission": {
+                "operation": "run_checks",
+                "scope": "run 15b6aac4-3970-47fd-939a-12ab4728bb91 immutable configured verification commands"
+              }
+            }
+          }
+        ],
+        "continuable": false,
+        "workspace_snapshot": null
+      }
+    ],
+    "preflight": {
+      "checked_at": "2026-10-21T14:33:56.313909Z",
+      "checks": [
+        {
+          "id": "repository",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Repository accessibility and pinned Git ownership"
+        },
+        {
+          "id": "planning-workspace",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Planning checkout accessibility and pinned Git ownership"
+        },
+        {
+          "id": "git-working-state",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees"
+        },
+        {
+          "id": "installed-codex",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "installed-claude",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "verification-0",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Configured verification executable availability; command behavior is validated during execution"
+        },
+        {
+          "id": "permission-WorkspaceWrite",
+          "ready": true,
+          "blocking": false,
+          "evidence": "WorkspaceWrite: Allow; scope run 15b6aac4-3970-47fd-939a-12ab4728bb91 assigned task worktrees"
+        },
+        {
+          "id": "permission-RunChecks",
+          "ready": false,
+          "blocking": false,
+          "evidence": "RunChecks: RequireApproval; scope run 15b6aac4-3970-47fd-939a-12ab4728bb91 immutable configured verification commands"
+        },
+        {
+          "id": "injected-provider",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Injected runtime availability contract"
+        }
+      ],
+      "action_ids": [
+        "H-29eedfbef02d394e5f69ca6d2f4a7e8a"
+      ],
+      "ready": true,
+      "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation."
+    },
+    "integration_workspace": null,
+    "integration_verification": [],
+    "summary": "0 of 1 tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate."
+  },
+  "events": [
+    {
+      "sequence": 1,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:29.150901+00:00",
+      "kind": "created",
+      "detail": "Feature specification and configuration preserved; planning requested"
+    },
+    {
+      "sequence": 2,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:29.252636+00:00",
+      "kind": "planning_workspace_ready",
+      "detail": "Pinned Git ownership"
+    },
+    {
+      "sequence": 3,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:29.595486+00:00",
+      "kind": "agent_started",
+      "detail": "Planner Claude; session=f5243d11-028f-4820-8466-8df05fe97c2d process_key=9b8dda58-3a80-4c83-841a-e749cee88675"
+    },
+    {
+      "sequence": 4,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:29.614907+00:00",
+      "kind": "agent_process",
+      "detail": "Planner process=7c09d0cc-c6df-4860-a1c0-3e9b36d1e509"
+    },
+    {
+      "sequence": 5,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:31.645509+00:00",
+      "kind": "agent_finished",
+      "detail": "Planner session=f5243d11-028f-4820-8466-8df05fe97c2d outcome=succeeded"
+    },
+    {
+      "sequence": 6,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:31.802174+00:00",
+      "kind": "plan_ready",
+      "detail": "Validated plan awaits developer approval"
+    },
+    {
+      "sequence": 7,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:31.802212+00:00",
+      "kind": "task_state",
+      "detail": "A: None -> Ready"
+    },
+    {
+      "sequence": 8,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:32:31.827043+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 19,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.197265+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 20,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.278450+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 21,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.315583+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 22,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.317664+00:00",
+      "kind": "approved",
+      "detail": "Developer approved the persisted plan and configured checks"
+    },
+    {
+      "sequence": 23,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.320707+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 24,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.323054+00:00",
+      "kind": "task_started",
+      "detail": "A"
+    },
+    {
+      "sequence": 25,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.325799+00:00",
+      "kind": "workspace_reserved",
+      "detail": "A: /tmp/autono-native-bru342-observability-03/engineering/15b6aac4-3970-47fd-939a-12ab4728bb91/task-A (autono/15b6aac4-3970-47fd-939a-12ab4728bb91/task-A)"
+    },
+    {
+      "sequence": 26,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.325865+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 27,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.556677+00:00",
+      "kind": "workspace_ready",
+      "detail": "A"
+    },
+    {
+      "sequence": 28,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.765244+00:00",
+      "kind": "attempt_started",
+      "detail": "A: attempt 1"
+    },
+    {
+      "sequence": 29,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.822915+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=3f189b8f-22b4-44fe-baaa-acece714a4cc process_key=50bceb95-1d78-469c-96eb-aa6907bf1c5c"
+    },
+    {
+      "sequence": 30,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:56.837464+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=eea0518e-73f6-4252-a78a-f6779384de17"
+    },
+    {
+      "sequence": 31,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:58.871420+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=3f189b8f-22b4-44fe-baaa-acece714a4cc outcome=succeeded"
+    },
+    {
+      "sequence": 32,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:59.564677+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 1)) process_key=fda0b735-d008-4ca5-b65e-218afcd88e12 command=[\"sh\",\"-c\",\"printf 'fixture verification: intentional failure\\\\n'; exit 1\"]"
+    },
+    {
+      "sequence": 33,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:59.567926+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 1)) process=4f87562c-eb3c-42ba-8a50-702e7102437f"
+    },
+    {
+      "sequence": 34,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:59.576058+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 1)) process=4f87562c-eb3c-42ba-8a50-702e7102437f passed=false"
+    },
+    {
+      "sequence": 35,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:59.978387+00:00",
+      "kind": "attempt_feedback",
+      "detail": "A: attempt 1"
+    },
+    {
+      "sequence": 36,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:33:59.980941+00:00",
+      "kind": "attempt_started",
+      "detail": "A: attempt 2"
+    },
+    {
+      "sequence": 37,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:00.124876+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=2aef2964-4691-42b0-a230-bb101c0a20f0 process_key=8a8bb7d9-7904-47d6-bc62-df07ac042d6c"
+    },
+    {
+      "sequence": 38,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:00.150405+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=9558e392-bd9f-431d-8ef8-00ea5b49799f"
+    },
+    {
+      "sequence": 39,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:02.176782+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=2aef2964-4691-42b0-a230-bb101c0a20f0 outcome=succeeded"
+    },
+    {
+      "sequence": 40,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:02.967174+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 2)) process_key=f94d3197-4ace-4863-a77e-e29ab5d1a09d command=[\"sh\",\"-c\",\"printf 'fixture verification: intentional failure\\\\n'; exit 1\"]"
+    },
+    {
+      "sequence": 41,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:02.970396+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 2)) process=2b075e5a-3bfc-4cc0-aca6-f46daaeb3493"
+    },
+    {
+      "sequence": 42,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:02.980898+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 2)) process=2b075e5a-3bfc-4cc0-aca6-f46daaeb3493 passed=false"
+    },
+    {
+      "sequence": 43,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:03.414451+00:00",
+      "kind": "attempt_feedback",
+      "detail": "A: attempt 2"
+    },
+    {
+      "sequence": 44,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:03.416729+00:00",
+      "kind": "attempt_started",
+      "detail": "A: attempt 3"
+    },
+    {
+      "sequence": 45,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:03.504473+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=d81de1a7-4011-4b70-ab2d-9cd57cf7a043 process_key=e731bc65-17bb-499d-bacd-291fb2096501"
+    },
+    {
+      "sequence": 46,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:03.520221+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=2d82725a-ebd2-473c-93f2-ec7747856854"
+    },
+    {
+      "sequence": 47,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:05.541309+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=d81de1a7-4011-4b70-ab2d-9cd57cf7a043 outcome=succeeded"
+    },
+    {
+      "sequence": 48,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.075645+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 3)) process_key=6130ddb7-d8c5-4e15-84d7-8f1682a74170 command=[\"sh\",\"-c\",\"printf 'fixture verification: intentional failure\\\\n'; exit 1\"]"
+    },
+    {
+      "sequence": 49,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.078486+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 3)) process=ad7eeb65-46a8-4a36-aca4-559d30ab9c5b"
+    },
+    {
+      "sequence": 50,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.085749+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 3)) process=ad7eeb65-46a8-4a36-aca4-559d30ab9c5b passed=false"
+    },
+    {
+      "sequence": 51,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.488107+00:00",
+      "kind": "attempt_feedback",
+      "detail": "A: attempt 3"
+    },
+    {
+      "sequence": 52,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.491978+00:00",
+      "kind": "task_stopped",
+      "detail": "A: coding attempt limit exhausted for A: Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"6130ddb7-d8c5-4e15-84d7-8f1682a74170\",\"process_run_id\":\"ad7eeb65-46a8-4a36-aca4-559d30ab9c5b\",\"command\":[\"sh\",\"-c\",\"printf 'fixture verification: intentional failure\\\\n'; exit 1\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=ad7eeb65-46a8-4a36-aca4-559d30ab9c5b status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1fixture verification: intentional failure\\n\"}]"
+    },
+    {
+      "sequence": 53,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.492088+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Running) -> Failed"
+    },
+    {
+      "sequence": 54,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.495681+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 55,
+      "run_id": "15b6aac4-3970-47fd-939a-12ab4728bb91",
+      "timestamp": "2026-10-21T14:34:06.498556+00:00",
+      "kind": "execution_finished",
+      "detail": "All currently runnable tasks finished"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
+import { ViewBoundary } from "./components/view-boundary";
 import "./styles.css";
 const client = new QueryClient({
   defaultOptions: {
@@ -16,8 +17,10 @@ const client = new QueryClient({
 });
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <QueryClientProvider client={client}>
-      <App />
-    </QueryClientProvider>
+    <ViewBoundary>
+      <QueryClientProvider client={client}>
+        <App />
+      </QueryClientProvider>
+    </ViewBoundary>
   </React.StrictMode>,
 );

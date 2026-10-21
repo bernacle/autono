@@ -398,16 +398,16 @@ impl Bridge {
                     let bytes = STANDARD.decode(data).map_err(|_| BridgeError::new("protocol", "Invalid output encoding"))?;
                     let index = match stream { autono_protocol::OutputStream::Stdout => 0, autono_protocol::OutputStream::Stderr => 1 };
                     for byte in bytes { if byte == b'\n' {
-                        if !reader.discard[index] { lines.push(json!({"sequence":event.sequence,"stream":stream,"text":redactor.output_line(&String::from_utf8_lossy(&reader.pending[index]))})); }
+                        if !reader.discard[index] { lines.push(json!({"sequence":event.sequence,"timestamp":event.timestamp,"stream":stream,"text":redactor.output_line(&String::from_utf8_lossy(&reader.pending[index]))})); }
                         reader.pending[index].clear(); reader.discard[index] = false;
                     } else if reader.pending[index].len() < 16 * 1024 && !reader.discard[index] { reader.pending[index].push(byte); }
                     else { reader.pending[index].clear(); reader.discard[index] = true; }
                     }
                 }
-                EventKind::Warning { message } => lines.push(json!({"sequence":event.sequence,"stream":"warning","text":redactor.text(message)})),
+                EventKind::Warning { message } => lines.push(json!({"sequence":event.sequence,"timestamp":event.timestamp,"stream":"warning","text":redactor.text(message)})),
                 EventKind::StateChanged { to, detail, .. } => {
-                    if to.is_terminal() { for index in 0..2 { if !reader.pending[index].is_empty() && !reader.discard[index] { lines.push(json!({"sequence":event.sequence,"stream":if index==0 {"stdout"}else{"stderr"},"text":redactor.output_line(&String::from_utf8_lossy(&reader.pending[index]))})); } reader.pending[index].clear(); } }
-                    lines.push(json!({"sequence":event.sequence,"stream":"state","text":format!("{}: {}",to.as_str(),redactor.text(detail.as_deref().unwrap_or("")))}));
+                    if to.is_terminal() { for index in 0..2 { if !reader.pending[index].is_empty() && !reader.discard[index] { lines.push(json!({"sequence":event.sequence,"timestamp":event.timestamp,"stream":if index==0 {"stdout"}else{"stderr"},"text":redactor.output_line(&String::from_utf8_lossy(&reader.pending[index]))})); } reader.pending[index].clear(); } }
+                    lines.push(json!({"sequence":event.sequence,"timestamp":event.timestamp,"stream":"state","text":format!("{}: {}",to.as_str(),redactor.text(detail.as_deref().unwrap_or("")))}));
                 }
                 _ => {}
             }

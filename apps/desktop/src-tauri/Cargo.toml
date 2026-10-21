@@ -28,6 +28,7 @@ uuid.workspace = true
 tauri-build = { version = "2", features = [] }
 
 [dev-dependencies]
+toml.workspace = true
 tempfile.workspace = true
 autono-daemon = { path = "../../../crates/autono-daemon" }
 axum.workspace = true

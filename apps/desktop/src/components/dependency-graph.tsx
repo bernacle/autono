@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import type { Run, Task } from "../lib/types";
 import { blockedAncestors } from "../lib/utils";
+import { useId } from "react";
+import { relatedTasks } from "../lib/execution";
 import { taskDepths } from "../lib/presentation";
 import { Badge } from "./common";
 export function DependencyGraph({
@@ -14,6 +16,8 @@ export function DependencyGraph({
   selected?: string | null;
   onSelect?: (id: string) => void;
 }) {
+  const markerId = useId().replaceAll(":", "");
+  const related = relatedTasks({ tasks } as Run, selected ?? null);
   const depths = taskDepths(tasks),
     maxDepth = Math.max(0, ...depths.values());
   const [focused, setFocused] = useState(tasks[0]?.plan.id);
@@ -113,6 +117,18 @@ export function DependencyGraph({
           className="graph-edges"
           aria-hidden="true"
         >
+          <defs>
+            <marker
+              id={markerId}
+              markerWidth="7"
+              markerHeight="7"
+              refX="6"
+              refY="3.5"
+              orient="auto"
+            >
+              <path d="M0 0 L7 3.5 L0 7" fill="none" stroke="context-stroke" />
+            </marker>
+          </defs>
           {tasks.flatMap((task) =>
             task.plan.dependencies.map((dep) => {
               const from = positions.get(dep),
@@ -139,8 +155,9 @@ export function DependencyGraph({
               return (
                 <path
                   key={`${dep}-${task.plan.id}`}
-                  className={`edge-${kind}`}
-                  d={`M${start} ${from.y + 32} C${mid} ${from.y + 32},${mid} ${to.y + 32},${end} ${to.y + 32}`}
+                  markerEnd={`url(#${markerId})`}
+                  className={`edge-${kind} ${selected && (dep === selected || task.plan.id === selected || related.upstream.has(task.plan.id) || related.downstream.has(dep)) ? "edge-selected" : ""}`}
+                  d={`M${start} ${from.y + 32} C${mid} ${from.y + 32},${mid} ${to.y + 32},${end - 5} ${to.y + 32}`}
                 />
               );
             }),
@@ -158,7 +175,7 @@ export function DependencyGraph({
             <button
               key={task.plan.id}
               data-task={task.plan.id}
-              className="task-node"
+              className={`task-node ${selected && selected !== task.plan.id && !related.upstream.has(task.plan.id) && !related.downstream.has(task.plan.id) ? "node-unrelated" : ""}`}
               style={{ left: pos.x, top: pos.y }}
               tabIndex={
                 (focused ?? tasks[0]?.plan.id) === task.plan.id ? 0 : -1

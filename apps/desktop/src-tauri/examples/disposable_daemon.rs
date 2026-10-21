@@ -13,9 +13,10 @@ use autono_core::{
 use autono_protocol::{API_VERSION, DaemonMetadata};
 use serde_json::json;
 use std::{
+    collections::HashMap,
     path::PathBuf,
     sync::{
-        Arc,
+        Arc, Mutex,
         atomic::{AtomicBool, Ordering},
     },
 };
@@ -24,6 +25,7 @@ use uuid::Uuid;
 #[derive(Default)]
 struct Fixture {
     paused: AtomicBool,
+    calls: Mutex<HashMap<String, usize>>,
 }
 impl AgentRuntime for Fixture {
     fn prepare<'a>(
@@ -40,30 +42,55 @@ impl AgentRuntime for Fixture {
                 .and_then(|value| value.parse::<u64>().ok())
                 .filter(|value| (1..=60).contains(value))
                 .unwrap_or(2);
+            let permanent_failure =
+                std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("verification-failure");
+            let observable =
+                std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("observability");
             let mut before = format!("sleep {delay}; ");
             let value = match r.role {
                 AgentRole::Planner => {
-                    let tasks = vec![
-                        ("A", vec![]),
-                        ("B", vec!["A"]),
-                        ("C", vec![]),
-                        ("D", vec!["B"]),
-                        ("E", vec!["C"]),
-                    ];
-                    json!({"human_requirements":[{"kind":"product_decision","reason":"The fixture specification leaves the export format open","requested_action":"Choose the report export format","affected_tasks":["B"],"blocking":true,"evidence":"CSV or JSON is not specified","confidence":100,"permission":null}],"requirements":[{"id":"r","text":"Deliver an independently verified local report"}],"milestones":[{"id":"m1","goal":"Foundation and parallel checks","task_ids":["A","C","E"]},{"id":"m2","goal":"Report and final assembly","task_ids":["B","D"]}],"tasks":tasks.into_iter().map(|(id,deps)|json!({"id":id,"goal":match id {"A"=>"Prepare report foundation","B"=>"Implement report export","C"=>"Add validation helpers","D"=>"Assemble report workflow",_=>"Verify validation coverage"},"description":format!("Implement fixture task {id}"),"acceptance_criteria":[format!("Task {id} artifact exists")],"dependencies":deps,"requirement_ids":["r"],"verification_expectations":["Configured shell check passes"],"role":"coder"})).collect::<Vec<_>>()})
+                    let tasks = if permanent_failure {
+                        vec![("A", vec![])]
+                    } else {
+                        vec![
+                            ("A", vec![]),
+                            ("B", vec!["A"]),
+                            ("C", vec![]),
+                            ("D", vec!["B"]),
+                            ("E", vec!["C"]),
+                        ]
+                    };
+                    let requirements = if permanent_failure {
+                        json!([])
+                    } else {
+                        json!([{"kind":"product_decision","reason":"The fixture specification leaves the export format open","requested_action":"Choose the report export format","affected_tasks":["B"],"blocking":true,"evidence":"CSV or JSON is not specified","confidence":100,"permission":null}])
+                    };
+                    let milestones = if permanent_failure {
+                        json!([{"id":"m1","goal":"Verification failure fixture","task_ids":["A"]}])
+                    } else {
+                        json!([{"id":"m1","goal":"Foundation and parallel checks","task_ids":["A","C","E"]},{"id":"m2","goal":"Report and final assembly","task_ids":["B","D"]}])
+                    };
+                    json!({"human_requirements":requirements,"requirements":[{"id":"r","text":"Deliver an independently verified local report"}],"milestones":milestones,"tasks":tasks.into_iter().map(|(id,deps)|json!({"id":id,"goal":match id {"A"=>"Prepare report foundation","B"=>"Implement report export","C"=>"Add validation helpers","D"=>"Assemble report workflow",_=>"Verify validation coverage"},"description":format!("Implement fixture task {id}"),"acceptance_criteria":[format!("Task {id} artifact exists")],"dependencies":deps,"requirement_ids":["r"],"verification_expectations":["Configured shell check passes"],"role":"coder"})).collect::<Vec<_>>()})
                 }
                 AgentRole::Coder => {
                     let id = r
-                        .prompt
-                        .split("\"id\":\"")
-                        .nth(1)
-                        .and_then(|s| s.split('"').next())
+                        .cwd
+                        .file_name()
+                        .and_then(|name| name.to_str())
+                        .and_then(|name| name.strip_prefix("task-"))
+                        .filter(|id| ["A", "B", "C", "D", "E"].contains(id))
                         .unwrap_or("A");
-                    let id = if ["A", "B", "C", "D", "E"].contains(&id) {
-                        id
-                    } else {
-                        "A"
+                    let call = {
+                        let mut calls = self.calls.lock().expect("fixture call counter");
+                        let count = calls
+                            .entry(format!("coder:{id}:{}", r.cwd.display()))
+                            .or_default();
+                        *count += 1;
+                        *count
                     };
+                    if observable && id == "C" && call > 1 {
+                        before.push_str("printf 'checked\\n' > C.checked; ");
+                    }
                     if id == "B" && !self.paused.swap(true, Ordering::SeqCst) {
                         json!({"summary":"Paused before producing the export","blocker":"Inspect fixture export destination; confirm that no external report was sent before continuing"})
                     } else {
@@ -81,7 +108,25 @@ impl AgentRuntime for Fixture {
                         .and_then(|s| s.chars().last())
                         .filter(|c| "ABCDE".contains(*c))
                         .unwrap_or('A');
-                    json!({"accepted":true,"criteria":[{"criterion_id":format!("{id}-C1"),"criterion":format!("Task {id} artifact exists"),"satisfied":true,"evidence":"Fixture artifact and deterministic check inspected"}],"findings":[],"blocker":""})
+                    let call = {
+                        let mut calls = self.calls.lock().expect("fixture call counter");
+                        // Review worktrees differ by cycle; use the task id for this single-run fixture.
+                        let count = calls.entry(format!("reviewer:{id}")).or_default();
+                        *count += 1;
+                        *count
+                    };
+                    if observable && id == 'E' && call == 1 {
+                        json!({"invalid_fixture_review":true})
+                    } else if observable && id == 'A' && call == 1 {
+                        json!({"accepted":false,"criteria":[{"criterion_id":"A-C1","criterion":"Task A artifact exists","satisfied":false,"evidence":"Fixture review requires the next coding attempt"}],"findings":[{"severity":"medium","file":"A.txt","line":1,"explanation":"Fixture report foundation needs an explicit header","recommended_fix":"Add the header in the next attempt","confidence":0.98}],"blocker":""})
+                    } else {
+                        let findings = if observable && id == 'A' {
+                            json!([{"severity":"low","file":"A.txt","line":1,"explanation":"Consider a more descriptive fixture header","recommended_fix":"Optional naming improvement","confidence":0.9}])
+                        } else {
+                            json!([])
+                        };
+                        json!({"accepted":true,"criteria":[{"criterion_id":format!("{id}-C1"),"criterion":format!("Task {id} artifact exists"),"satisfied":true,"evidence":"Fixture artifact and deterministic check inspected"}],"findings":findings,"blocker":""})
+                    }
                 }
             };
             let session = Uuid::new_v4();
@@ -130,7 +175,16 @@ async fn main() -> Result<()> {
         "-c".into(),
         "printf 'fixture verification: passed\\n'; test -f README.md".into(),
     ]];
-    tokio::fs::write(paths.config(), toml_config()).await?;
+    config.verification.timeout_seconds = 30;
+    if std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("observability") {
+        config.verification.commands[0][2] = "printf 'fixture verification: inspected\\n'; test -f README.md && { test ! -f C.txt || test -f C.checked; }".into();
+    }
+    if std::env::var("AUTONO_FIXTURE_SCENARIO").as_deref() == Ok("verification-failure") {
+        config.verification.commands[0][2] =
+            "printf 'fixture verification: intentional failure\\n'; exit 1".into();
+    }
+    // Keep the bridge's read-only settings view identical to the injected daemon config.
+    tokio::fs::write(paths.config(), toml::to_string(&config)?).await?;
     let store = Store::open(&paths.database()).await?;
     let supervisor = Supervisor::configured(store, &config.runner);
     let runner = ProcessRunner::new(supervisor.clone());
@@ -198,7 +252,4 @@ async fn main() -> Result<()> {
     service.shutdown().await?;
     tokio::fs::remove_file(paths.metadata()).await?;
     Ok(())
-}
-fn toml_config() -> &'static str {
-    "[runner]\nkeep_awake = false\n[permissions.rules]\nrun_checks = 'REQUIRE_APPROVAL'\n[verification]\ncommands = [['sh', '-c', \"printf 'fixture verification: passed\\\\n'; test -f README.md\"]]\ntimeout_seconds = 30\n"
 }

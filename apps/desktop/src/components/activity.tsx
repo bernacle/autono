@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEvents, useLogs } from "../lib/queries";
 import { date } from "../lib/utils";
@@ -79,10 +79,24 @@ export function Activity({
 export function ProcessLogs({ id }: { id: string }) {
   const logs = useLogs(id),
     client = useQueryClient();
+  const [following, setFollowing] = useState(true),
+    output = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (following && output.current)
+      output.current.scrollTop = output.current.scrollHeight;
+  }, [logs.data, following]);
   return (
     <>
       <div className="row-between">
         <code>{id}</code>
+        <label className="checkbox-label log-follow">
+          <input
+            type="checkbox"
+            checked={following}
+            onChange={(e) => setFollowing(e.target.checked)}
+          />
+          Follow output
+        </label>
         <Button
           size="sm"
           variant="secondary"
@@ -102,6 +116,7 @@ export function ProcessLogs({ id }: { id: string }) {
         <ErrorNotice error={logs.error} retry={() => void logs.refetch()} />
       )}
       <div
+        ref={output}
         className="terminal"
         role="log"
         aria-live="off"
@@ -116,7 +131,14 @@ export function ProcessLogs({ id }: { id: string }) {
                 : ""
             }
           >
-            <span>{line.stream}</span>
+            <span title={line.timestamp}>
+              {line.timestamp
+                ? new Date(line.timestamp).toLocaleTimeString([], {
+                    hour12: false,
+                  })
+                : "—"}{" "}
+              · {line.stream}
+            </span>
             <code>{line.text}</code>
           </div>
         ))}
