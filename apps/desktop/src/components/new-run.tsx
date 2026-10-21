@@ -1,19 +1,47 @@
 import { useRef, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { FolderOpen, ArrowRight } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FolderOpen, ArrowRight, FileText, LockKeyhole } from "lucide-react";
 import { useTransport } from "../lib/transport";
-import type { Run } from "../lib/types";
-import { Dialog } from "./ui/dialog";
+import type { LocalSettings, Run } from "../lib/types";
 import { Button } from "./ui/button";
 import { ErrorNotice, Field } from "./common";
+export function RunGuide({ readiness = false }: { readiness?: boolean }) {
+  return (
+    <aside className="run-guide" aria-label="New run steps">
+      <div className="guide-group">
+        <span>Planning · may use paid inference</span>
+        <ol start={1}>
+          <li aria-current={!readiness ? "step" : undefined}>Specification</li>
+          <li>Planning</li>
+        </ol>
+      </div>
+      <div className="guide-group">
+        <span>Readiness · no code runs</span>
+        <ol start={3}>
+          <li aria-current={readiness ? "step" : undefined}>Review plan</li>
+          <li>Preflight</li>
+          <li>Resolve</li>
+        </ol>
+      </div>
+      <div className="guide-group">
+        <span>Execution · explicit approval</span>
+        <ol start={6}>
+          <li>Approve</li>
+        </ol>
+      </div>
+    </aside>
+  );
+}
 export function NewRun({
   onClose,
   onCreated,
   connected,
+  activeRun,
 }: {
   onClose: () => void;
   onCreated: (id: string) => void;
   connected: boolean;
+  activeRun?: boolean;
 }) {
   const [repository, setRepository] = useState(""),
     [base, setBase] = useState("HEAD"),
@@ -23,6 +51,12 @@ export function NewRun({
   const transport = useTransport(),
     client = useQueryClient(),
     receipt = useRef<{ signature: string; id: string } | null>(null);
+  const settings = useQuery({
+    queryKey: ["settings"],
+    queryFn: () => transport.request<LocalSettings>({ type: "settings" }),
+    retry: false,
+  });
+  const planner = settings.data?.agents?.planner;
   const mutation = useMutation({
     mutationFn: () => {
       const payload = { repository, base, specification },
@@ -37,8 +71,8 @@ export function NewRun({
     retry: false,
     onSuccess: async (run) => {
       await client.invalidateQueries({ queryKey: ["runs"] });
-      onCreated(run.id);
       onClose();
+      onCreated(run.id);
     },
   });
   const pick = async () => {
@@ -50,97 +84,148 @@ export function NewRun({
       setPickerError(error);
     }
   };
+  const bytes = new TextEncoder().encode(specification).length;
+  const missing = !connected
+    ? "Reconnect to a healthy daemon"
+    : !repository
+      ? "Select a repository"
+      : !base.trim()
+        ? "Enter a base revision"
+        : !specification.trim()
+          ? "Add a specification"
+          : bytes > 131072
+            ? "Specification exceeds 131,072 bytes"
+            : !ack
+              ? "Acknowledge planner inference"
+              : "";
   return (
-    <Dialog
-      wide
-      title="New engineering run"
-      description="Choose a local repository, then ask the daemon to prepare a plan."
-      onClose={onClose}
-      busy={mutation.isPending}
+    <div
+      className="new-run-page"
+      onKeyDown={(e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+          e.preventDefault();
+          if (!missing && !mutation.isPending) mutation.mutate();
+        }
+      }}
     >
-      <div className="steps">
-        <span className="current">1 · Specification</span>
-        <ArrowRight size={14} />
-        <span>2 · Plan & preflight</span>
-        <ArrowRight size={14} />
-        <span>3 · Approve execution</span>
-      </div>
-      <Field label="Existing local repository">
-        <div className="input-with-button">
+      <RunGuide />
+      <div className="new-run-form">
+        <h1>Describe the feature</h1>
+        <p className="muted">
+          The daemon prepares a plan. You review it before any coding starts.
+        </p>
+        <Field label="Existing local repository">
+          <div className="repository-picker">
+            <FolderOpen size={20} />
+            <div>
+              <input
+                value={repository}
+                placeholder="Select a Git repository…"
+                readOnly
+              />
+              <small className="meta">
+                An existing local checkout. Autono creates its own worktrees.
+              </small>
+            </div>
+            <Button
+              variant="secondary"
+              aria-label="Browse…"
+              onClick={() => void pick()}
+              disabled={mutation.isPending}
+            >
+              Browse…
+            </Button>
+          </div>
+        </Field>
+        {!!pickerError && <ErrorNotice error={pickerError} />}
+        <Field
+          label="Base branch or commit"
+          hint="The daemon resolves and pins this revision before planning."
+        >
           <input
-            value={repository}
-            placeholder="Select a Git repository…"
-            readOnly
+            value={base}
+            onChange={(e) => setBase(e.target.value)}
+            maxLength={512}
           />
+        </Field>
+        <Field
+          label="Feature specification"
+          hint={`${bytes.toLocaleString()} / 131,072 bytes · nonsecret requirements only`}
+        >
+          <textarea
+            className="spec-editor"
+            value={specification}
+            onChange={(e) => setSpecification(e.target.value)}
+            rows={12}
+            placeholder={
+              "# Feature name\n\nDescribe behavior, constraints and acceptance criteria."
+            }
+          />
+        </Field>
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={ack}
+            onChange={(e) => setAck(e.target.checked)}
+          />
+          Start the configured planner. This may use paid inference.
+        </label>
+        {activeRun && (
+          <p className="notice notice-warning">
+            The daemon accepts one active engineering run. Its admission
+            response remains authoritative.
+          </p>
+        )}
+        {mutation.isError && <ErrorNotice error={mutation.error} />}
+        <div className="form-submit">
           <Button
             variant="secondary"
-            onClick={() => void pick()}
+            onClick={onClose}
             disabled={mutation.isPending}
           >
-            <FolderOpen size={15} />
-            Browse…
+            Back
+          </Button>
+          <span id="planning-reason" className="meta">
+            {missing || "Ready to submit · ⌘↵"}
+          </span>
+          <Button
+            aria-describedby="planning-reason"
+            disabled={!!missing || mutation.isPending}
+            onClick={() => mutation.mutate()}
+          >
+            {mutation.isPending ? "Submitting to daemon…" : "Start planning"}
+            <ArrowRight size={14} />
           </Button>
         </div>
-      </Field>
-      {!!pickerError && <ErrorNotice error={pickerError} />}
-      <Field
-        label="Base branch or commit"
-        hint="The daemon resolves and pins this revision before planning."
-      >
-        <input
-          value={base}
-          onChange={(e) => setBase(e.target.value)}
-          maxLength={512}
-        />
-      </Field>
-      <Field
-        label="Feature specification"
-        hint={`${new TextEncoder().encode(specification).length.toLocaleString()} / 131,072 bytes · nonsecret requirements only`}
-      >
-        <textarea
-          value={specification}
-          onChange={(e) => setSpecification(e.target.value)}
-          rows={10}
-          placeholder="# Feature name\n\nDescribe behavior, constraints and acceptance criteria."
-        />
-      </Field>
-      <label className="checkbox-label">
-        <input
-          type="checkbox"
-          checked={ack}
-          onChange={(e) => setAck(e.target.checked)}
-        />
-        Start the configured planner. This may use paid inference.
-      </label>
-      <p className="footnote">
-        Coding begins only after you inspect the plan, resolve preflight, and
-        explicitly approve execution.
-      </p>
-      {mutation.isError && <ErrorNotice error={mutation.error} />}
-      <div className="dialog-actions">
-        <Button
-          variant="secondary"
-          onClick={onClose}
-          disabled={mutation.isPending}
-        >
-          Back
-        </Button>
-        <Button
-          onClick={() => mutation.mutate()}
-          disabled={
-            !connected ||
-            !repository ||
-            !base.trim() ||
-            !specification.trim() ||
-            new TextEncoder().encode(specification).length > 131072 ||
-            !ack ||
-            mutation.isPending
-          }
-        >
-          {mutation.isPending ? "Submitting to daemon…" : "Submit planning"}
-          <ArrowRight size={15} />
-        </Button>
       </div>
-    </Dialog>
+      <aside className="planner-rail">
+        <div className="well">
+          <h3>
+            <FileText size={15} />
+            Planner
+          </h3>
+          <strong>{planner?.provider ?? "Configured by daemon"}</strong>
+          <p>{planner?.model ?? "Provider default model"}</p>
+          {planner && (
+            <span className="meta">{planner.timeout_seconds}s timeout</span>
+          )}
+          {settings.isError && (
+            <ErrorNotice
+              error={settings.error}
+              retry={() => void settings.refetch()}
+            />
+          )}
+          <p className="meta">
+            User defaults shown. The daemon pins effective project settings on
+            the run.
+          </p>
+        </div>
+        <p className="meta">
+          <LockKeyhole size={14} />
+          Coding begins only after you inspect the plan, resolve preflight and
+          explicitly approve execution.
+        </p>
+      </aside>
+    </div>
   );
 }

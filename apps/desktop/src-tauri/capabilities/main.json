@@ -2,5 +2,11 @@
   "identifier": "main",
   "description": "Local mission control only. No shell, HTTP, credential filesystem or remote window access.",
   "windows": ["main"],
-  "permissions": ["allow-daemon", "allow-inspect-artifact", "dialog:allow-open"]
+  "permissions": [
+    "allow-daemon",
+    "allow-inspect-artifact",
+    "dialog:allow-open",
+    "core:window:allow-start-dragging",
+    "core:window:allow-internal-toggle-maximize"
+  ]
 }

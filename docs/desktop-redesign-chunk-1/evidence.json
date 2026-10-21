@@ -1,0 +1,381 @@
+{
+  "acceptance": "Real release Tauri macOS application; authenticated daemon router, SQLite, supervisor and Git; injected shell-only test agents",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "daemon": {
+    "pid": 18941,
+    "address": "127.0.0.1:50176",
+    "api_version": 1,
+    "health": {
+      "active_run": null,
+      "persistence_error": null
+    }
+  },
+  "window_close": {
+    "daemon_pid": 18941,
+    "daemon_responds_after_window_close": true,
+    "run_status": "RUNNING",
+    "revision": 98,
+    "tasks": {
+      "A": "COMPLETED",
+      "B": "RUNNING",
+      "C": "COMPLETED",
+      "D": "WAITING",
+      "E": "COMPLETED"
+    }
+  },
+  "resolution_without_launch": {
+    "status_after_resolution": "BLOCKED",
+    "revision": 80,
+    "tasks": {
+      "A": "COMPLETED",
+      "B": "BLOCKED_HUMAN",
+      "C": "COMPLETED",
+      "D": "WAITING",
+      "E": "COMPLETED"
+    },
+    "actions": [
+      {
+        "id": "H-559f2a4cf9e185da907630d02d1ce37f",
+        "kind": "product_decision",
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "5e3647e2-dd66-4dc2-85d8-1c02c47644f4",
+          "disposition": "resolve",
+          "note": "Use JSON for the disposable local report. The report remains local and no external destination is authorized.",
+          "effect": "not_performed",
+          "permission": null
+        },
+        "continuable": false
+      },
+      {
+        "id": "H-02422ced3ac6c9faebf8dcb90e62f4ab",
+        "kind": "permission",
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "840e7f1d-6986-4011-b22c-633c0cfba944",
+          "disposition": "approve",
+          "note": "Inspected the exact run_checks operation, run scope and immutable shell verification command. This permits only the disposable fixture checks; no report has been sent.",
+          "effect": "not_performed",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run d331b265-857b-4219-b50b-9c344fdf4585 immutable configured verification commands"
+          }
+        },
+        "continuable": false
+      },
+      {
+        "id": "H-00233add00c77b49336bfb0680ab102b",
+        "kind": "runtime",
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "24046507-09a8-43a4-85aa-0b7e6b0b8852",
+          "disposition": "resolve",
+          "note": "Inspected the preserved task-B worktree and process evidence. No external report was sent; the requested export operation has not been performed. Continue only in the disposable repository.",
+          "effect": "not_performed",
+          "permission": null
+        },
+        "continuable": true
+      }
+    ]
+  },
+  "fixture_main_after_acceptance": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+  "fixture_main_unchanged": true,
+  "runs": [
+    {
+      "id": "b9736a16-cc09-420f-b775-144dda8afc84",
+      "name": "Cancellation acceptance",
+      "status": "CANCELLED",
+      "revision": 7,
+      "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+      "approved_at": null,
+      "tasks": [
+        {
+          "id": "A",
+          "dependencies": [],
+          "status": "CANCELLED",
+          "attempts": 0,
+          "verification_checks": 0,
+          "accepted_reviews": 0,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": null
+        },
+        {
+          "id": "B",
+          "dependencies": [
+            "A"
+          ],
+          "status": "CANCELLED",
+          "attempts": 0,
+          "verification_checks": 0,
+          "accepted_reviews": 0,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": null
+        },
+        {
+          "id": "C",
+          "dependencies": [],
+          "status": "CANCELLED",
+          "attempts": 0,
+          "verification_checks": 0,
+          "accepted_reviews": 0,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": null
+        },
+        {
+          "id": "D",
+          "dependencies": [
+            "B"
+          ],
+          "status": "CANCELLED",
+          "attempts": 0,
+          "verification_checks": 0,
+          "accepted_reviews": 0,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": null
+        },
+        {
+          "id": "E",
+          "dependencies": [
+            "C"
+          ],
+          "status": "CANCELLED",
+          "attempts": 0,
+          "verification_checks": 0,
+          "accepted_reviews": 0,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": null
+        }
+      ],
+      "human_actions": [
+        {
+          "id": "H-559f2a4cf9e185da907630d02d1ce37f",
+          "status": "PENDING",
+          "kind": "product_decision",
+          "permission": null,
+          "resolution": null
+        },
+        {
+          "id": "H-d5202e5a4a595b2a5cc833077140e559",
+          "status": "PENDING",
+          "kind": "permission",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run b9736a16-cc09-420f-b775-144dda8afc84 immutable configured verification commands"
+          },
+          "resolution": null
+        }
+      ],
+      "events": {
+        "count": 18,
+        "cursor": 173,
+        "strictly_increasing": true,
+        "kinds": [
+          "agent_finished",
+          "agent_process",
+          "agent_started",
+          "cancelled",
+          "created",
+          "plan_ready",
+          "planning_workspace_ready",
+          "preflight",
+          "task_state"
+        ]
+      },
+      "integration_workspace": null,
+      "integration_checks": []
+    },
+    {
+      "id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "name": "Local report export",
+      "status": "COMPLETED",
+      "revision": 133,
+      "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+      "approved_at": "2026-10-21T01:08:12.623490Z",
+      "tasks": [
+        {
+          "id": "A",
+          "dependencies": [],
+          "status": "COMPLETED",
+          "attempts": 1,
+          "verification_checks": 1,
+          "accepted_reviews": 1,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": "10675344003a512b62646e02560b9f05ddf534bf"
+        },
+        {
+          "id": "B",
+          "dependencies": [
+            "A"
+          ],
+          "status": "COMPLETED",
+          "attempts": 2,
+          "verification_checks": 1,
+          "accepted_reviews": 1,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": "d6b122bac94c0ae6c5d43822f7beca130108fcd1"
+        },
+        {
+          "id": "C",
+          "dependencies": [],
+          "status": "COMPLETED",
+          "attempts": 1,
+          "verification_checks": 1,
+          "accepted_reviews": 1,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": "caec69043122ae6d7442000dd002f02b141410ee"
+        },
+        {
+          "id": "D",
+          "dependencies": [
+            "B"
+          ],
+          "status": "COMPLETED",
+          "attempts": 1,
+          "verification_checks": 1,
+          "accepted_reviews": 1,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": "5a98499d971afda2c50748f1f7dc5aa1f6648b34"
+        },
+        {
+          "id": "E",
+          "dependencies": [
+            "C"
+          ],
+          "status": "COMPLETED",
+          "attempts": 1,
+          "verification_checks": 1,
+          "accepted_reviews": 1,
+          "verified_preserved_tree_match": true,
+          "artifact_commit": "7940736d79ddce15c1b46fd5a597abf67f41e6e4"
+        }
+      ],
+      "human_actions": [
+        {
+          "id": "H-559f2a4cf9e185da907630d02d1ce37f",
+          "status": "RESOLVED",
+          "kind": "product_decision",
+          "permission": null,
+          "resolution": {
+            "request_id": "5e3647e2-dd66-4dc2-85d8-1c02c47644f4",
+            "disposition": "resolve",
+            "note": "Use JSON for the disposable local report. The report remains local and no external destination is authorized.",
+            "effect": "not_performed",
+            "permission": null
+          }
+        },
+        {
+          "id": "H-02422ced3ac6c9faebf8dcb90e62f4ab",
+          "status": "RESOLVED",
+          "kind": "permission",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run d331b265-857b-4219-b50b-9c344fdf4585 immutable configured verification commands"
+          },
+          "resolution": {
+            "request_id": "840e7f1d-6986-4011-b22c-633c0cfba944",
+            "disposition": "approve",
+            "note": "Inspected the exact run_checks operation, run scope and immutable shell verification command. This permits only the disposable fixture checks; no report has been sent.",
+            "effect": "not_performed",
+            "permission": {
+              "operation": "run_checks",
+              "scope": "run d331b265-857b-4219-b50b-9c344fdf4585 immutable configured verification commands"
+            }
+          }
+        },
+        {
+          "id": "H-00233add00c77b49336bfb0680ab102b",
+          "status": "RESOLVED",
+          "kind": "runtime",
+          "permission": null,
+          "resolution": {
+            "request_id": "24046507-09a8-43a4-85aa-0b7e6b0b8852",
+            "disposition": "resolve",
+            "note": "Inspected the preserved task-B worktree and process evidence. No external report was sent; the requested export operation has not been performed. Continue only in the disposable repository.",
+            "effect": "not_performed",
+            "permission": null
+          }
+        }
+      ],
+      "events": {
+        "count": 155,
+        "cursor": 155,
+        "strictly_increasing": true,
+        "kinds": [
+          "agent_finished",
+          "agent_process",
+          "agent_started",
+          "approved",
+          "attempt_started",
+          "completed",
+          "continued",
+          "created",
+          "execution_finished",
+          "human_resolution",
+          "integration_merge",
+          "integration_requested",
+          "integration_workspace_ready",
+          "plan_ready",
+          "planning_workspace_ready",
+          "preflight",
+          "review_finished",
+          "review_reserved",
+          "review_workspace_ready",
+          "scheduler",
+          "task_completed",
+          "task_started",
+          "task_state",
+          "task_stopped",
+          "verification_finished",
+          "verification_passed",
+          "verification_process",
+          "verification_started",
+          "workspace_ready",
+          "workspace_reserved"
+        ]
+      },
+      "integration_workspace": {
+        "id": "2af22d7e-4078-451e-81cc-2c488ec4006a",
+        "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/integration",
+        "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/integration",
+        "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+        "head_commit": "585fe0029c7d7864e84af343cf56f857d42149ef",
+        "git": {
+          "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/integration",
+          "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration",
+          "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+          "metadata": {
+            "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/integration/.git": "425d3169b8615c9d8c9e339c2435673920d049cec2a1396d06620a9656deb960",
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/config.worktree": null,
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/gitdir": "aeb84e6f39f5ece307d97344ee4b1f0f671235e59df7e8509ba7cc5c22a37670",
+            "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/info/exclude": null
+          }
+        }
+      },
+      "integration_checks": [
+        {
+          "process_key": "e35316a2-dd47-4405-a0a5-49a82c5a6948",
+          "process_run_id": "d64bb329-3755-48d5-922b-c45acf4ef645",
+          "command": [
+            "sh",
+            "-c",
+            "printf 'fixture verification: passed\\n'; test -f README.md"
+          ],
+          "exit_code": 0,
+          "passed": true,
+          "outcome": "passed",
+          "output_complete": true,
+          "summary": "process=d64bb329-3755-48d5-922b-c45acf4ef645 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+        }
+      ]
+    }
+  ],
+  "paid_provider_calls": 0,
+  "native_warning": "Existing daemon process events reported process-group cleanup uncertain / EPERM on this host; retained visibly in logs. Task checks, reviews and local integration still completed."
+}

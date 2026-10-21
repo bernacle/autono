@@ -14,15 +14,17 @@
       {
         "label": "main",
         "title": "Autono \u2014 Mission Control",
-        "width": 1320,
-        "height": 880,
+        "width": 1440,
+        "height": 900,
         "minWidth": 960,
         "minHeight": 680,
-        "backgroundColor": "#111315"
+        "backgroundColor": "#060607",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'",
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'",
       "capabilities": ["main"]
     }
   },

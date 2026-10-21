@@ -5,6 +5,8 @@ afterEach(() => cleanup());
 Object.defineProperty(window, "matchMedia", {
   value: vi.fn(() => ({
     matches: true,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
     addListener: vi.fn(),
     removeListener: vi.fn(),
   })),

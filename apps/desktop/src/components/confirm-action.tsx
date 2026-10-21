@@ -4,7 +4,7 @@ import { useTransport } from "../lib/transport";
 import { title } from "../lib/utils";
 import { Dialog } from "./ui/dialog";
 import { Button } from "./ui/button";
-import { ErrorNotice } from "./common";
+import { Badge, ErrorNotice } from "./common";
 const labels: Record<RunAction, string> = {
   execute: "Approve execution",
   continue: "Continue resolved tasks",
@@ -62,9 +62,13 @@ export function ConfirmAction({
           <dt>Repository</dt>
           <dd>{run.repository}</dd>
           <dt>Pinned base</dt>
-          <dd>{run.base_commit}</dd>
+          <dd>
+            <code>{run.base_commit}</code>
+          </dd>
           <dt>Current state</dt>
-          <dd>{run.status}</dd>
+          <dd>
+            <Badge status={run.status} />
+          </dd>
         </dl>
       </div>
       {action === "execute" && (
@@ -77,13 +81,19 @@ export function ConfirmAction({
             <strong>Configured roles</strong>
             {Object.entries(run.settings.agents).map(([role, config]) => (
               <p key={role}>
-                {role}: {config.provider} · {config.model ?? "provider default"}
+                {role}: {config.provider} · {config.model ?? "provider default"}{" "}
+                · {config.timeout_seconds}s timeout
               </p>
             ))}
-            <strong>Exact verification argument arrays</strong>
-            <pre>
-              {JSON.stringify(run.settings.verification.commands, null, 2)}
-            </pre>
+            <details className="confirmation-commands">
+              <summary>
+                Exact verification argument arrays ·{" "}
+                {run.settings.verification.commands.length} commands
+              </summary>
+              <pre>
+                {JSON.stringify(run.settings.verification.commands, null, 2)}
+              </pre>
+            </details>
             <p>
               {run.settings.execution.max_parallel} parallel tasks ·{" "}
               {run.settings.execution.max_attempts} coding attempts ·{" "}
@@ -113,6 +123,11 @@ export function ConfirmAction({
         </p>
       )}
       {mutation.isError && <ErrorNotice error={mutation.error} />}
+      {!connected && (
+        <p className="warning-text">
+          Reconnect to a healthy daemon before confirming.
+        </p>
+      )}
       <div className="dialog-actions">
         <Button
           variant="secondary"

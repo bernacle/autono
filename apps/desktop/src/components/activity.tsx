@@ -7,17 +7,29 @@ import { Button } from "./ui/button";
 export function Activity({
   id,
   compact = false,
+  showErrors = true,
 }: {
   id: string;
   compact?: boolean;
+  showErrors?: boolean;
 }) {
   const events = useEvents(id),
     [filter, setFilter] = useState("all");
   const items = events.data?.items ?? [],
     kinds = [...new Set(items.map((e) => e.kind))].sort();
   const visible = items
+    .filter(
+      (e) =>
+        !compact ||
+        ![
+          "scheduler",
+          "workspace_reserved",
+          "workspace_ready",
+          "task_state",
+        ].includes(e.kind),
+    )
     .filter((e) => filter === "all" || e.kind === filter)
-    .slice(compact ? -8 : -500);
+    .slice(compact ? -4 : -500);
   return (
     <>
       {!compact && (
@@ -36,10 +48,10 @@ export function Activity({
           </span>
         </div>
       )}
-      {events.isError && (
+      {showErrors && events.isError && (
         <ErrorNotice error={events.error} retry={() => void events.refetch()} />
       )}
-      <div className="event-list">
+      <div className={compact ? "event-list event-list-compact" : "event-list"}>
         {visible.map((event) => (
           <div className="event" key={event.sequence}>
             <time>{date(event.timestamp)}</time>
@@ -89,7 +101,12 @@ export function ProcessLogs({ id }: { id: string }) {
       {logs.isError && (
         <ErrorNotice error={logs.error} retry={() => void logs.refetch()} />
       )}
-      <div className="terminal" role="log" aria-label="Process output">
+      <div
+        className="terminal"
+        role="log"
+        aria-live="off"
+        aria-label="Process output"
+      >
         {logs.data?.items.map((line, index) => (
           <div
             key={`${line.sequence}-${index}`}

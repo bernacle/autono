@@ -33,7 +33,14 @@ impl AgentRuntime for Fixture {
         _: &'a CancellationToken,
     ) -> AgentFuture<'a> {
         Box::pin(async move {
-            let mut before = String::from("sleep 2; ");
+            // Optional test-only pacing leaves live states visible for native UI QA.
+            // Keep the command numeric and bounded; production agents are unchanged.
+            let delay = std::env::var("AUTONO_FIXTURE_DELAY_SECONDS")
+                .ok()
+                .and_then(|value| value.parse::<u64>().ok())
+                .filter(|value| (1..=60).contains(value))
+                .unwrap_or(2);
+            let mut before = format!("sleep {delay}; ");
             let value = match r.role {
                 AgentRole::Planner => {
                     let tasks = vec![

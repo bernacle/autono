@@ -3,6 +3,12 @@
 Tauri 2 + React/TypeScript/Vite, Tailwind, shadcn-style Radix components,
 TanStack Query and Lucide. This is a client of the existing Rust daemon.
 
+The Instrument shell uses an inset opaque content sheet over an Observatory
+ground. Soft Neon colors identify live work, human attention and failures;
+verified states use small mint glyphs. Dark is the first-launch default. Settings
+offers explicit System / Dark / Light choices and a local background-texture
+toggle. Inter, JetBrains Mono and the static grain tile are bundled for offline use.
+
 ## Develop and build
 
 Install Node 24+, Rust 1.90+ and the [Tauri system prerequisites](https://v2.tauri.app/start/prerequisites/).
@@ -45,8 +51,10 @@ npm run build
   retry automatically. Explicit confirmations cover execution, continuation,
   cancellation and integration. Accepted means accepted, not completed.
 - A planning submission UUID is retained while its payload is unchanged. Human
-  resolution retries retain the exact request UUID/payload, including the exact
-  permission object. The bridge allows matching audited receipts to be retried
+  resolution retries retain the exact request UUID/payload across panel remounts
+  for the desktop session, including the exact permission object. Decisions start
+  empty; effects start Not inspected. Changed action objects require explicit
+  reinspection. The bridge allows matching audited receipts to be retried
   after the run revision changes. An ambiguous action response is never shown as
   success: refresh state before taking another action.
 - Run/task states are displayed as stored. The dependency view labels every edge
@@ -57,7 +65,7 @@ npm run build
   page. A full page catches up at 250ms; normal polling is 2 seconds. Each viewer
   retains at most 500 entries. Replay starts at zero on a fresh app session;
   disconnects retain the last confirmed cursor. Run aggregates are paged 20 at a
-  time. Overview counters clearly identify their loaded-run coverage. The daemon
+  time. Overview and human-action queues identify their recent-run coverage. The daemon
   supplies total executing-process counts; the recent process list is the latest
   50, not an asserted complete inventory.
 - Process environments, command argv and structured agent results are excluded
@@ -74,6 +82,25 @@ npm run build
   command invocation. Effective project settings are the immutable run snapshot.
   Configuration editing is intentionally left to the user's editor.
 
+## Navigation and keyboard
+
+Overview prioritizes Working now and Needs you. Runs have Tasks (List / Graph),
+Execution, Verification, Plan, Preflight and Integration tabs, with one eligible
+primary action and cancellation in the overflow menu. Tasks open a contextual
+inspector. Human actions use pinned exact scope, scrolling context and a separate
+decision bar. New run and Readiness are full-sheet flows.
+
+`⌘N` opens New run; `⌘1/2/3` selects Overview / Human actions / Runs; `⌘K`
+opens safe navigation; `⌘\\` toggles the sidebar; `⌘R` refreshes daemon state;
+`⌘⇧C` copies the selected run ID. Lists support J/K and Enter; graph arrows
+follow dependencies; Esc closes the inspector. G then L/G selects task List/Graph
+outside text inputs. `⌘↵` submits a valid planning or human-decision form.
+Opening a form or page never grants execution authority.
+
+The full execution timeline, journal-derived intervals, new log dock and
+observability engine are a separate Chunk 2. Existing sessions, journal filters,
+review evidence and bounded process logs remain available in this chunk.
+
 ## Native acceptance without inference
 
 The example is test-only and requires a fresh absolute disposable directory:
@@ -86,7 +113,9 @@ AUTONO_HOME=/tmp/autono-desktop-check target/debug/bundle/macos/Autono.app/Conte
 It uses the existing daemon API/router, supervisor, SQLite, real Git worktrees,
 preflight, permissions, verification and integration, injecting only fake provider
 commands through the existing `AgentRuntime` test seam. No Codex/Claude executable
-or paid API is called. Select its printed fixture repository using Browse, paste a
+or paid API is called. For slower native inspection, set
+`AUTONO_FIXTURE_DELAY_SECONDS=8` (numeric 1–60; default 2). Select its printed
+fixture repository using Browse, paste a
 specification, acknowledge planning, inspect the graph, resolve the product choice
 and exact checks permission, refresh preflight and approve execution. B pauses for
 an effect inspection while A/C/E finish; D waits on B. Resolve the live pause with
@@ -95,6 +124,9 @@ Inspect process output, close the native window and query the still-running
 daemon. Stop the disposable daemon yourself afterward.
 
 Native screenshots and observed results: [acceptance evidence](../../docs/desktop-acceptance.md).
+The redesign's separate validation status is in
+[Chunk 1 report](../../docs/desktop-redesign-chunk-1.md); the original M4 captures
+do not certify the redesigned native layouts.
 
 ## Current limits
 

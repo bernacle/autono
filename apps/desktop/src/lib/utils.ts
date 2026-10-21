@@ -27,6 +27,9 @@ export function date(value: string) {
 export function pending(action: HumanAction) {
   return action.status !== "RESOLVED";
 }
+export function canResolve(run: Run) {
+  return ["AWAITING_APPROVAL", "RUNNING", "BLOCKED"].includes(run.status);
+}
 // Presentation eligibility only. The Rust bridge rechecks revision; the daemon decides admission.
 export function can(run: Run, action: RunAction) {
   switch (action) {
