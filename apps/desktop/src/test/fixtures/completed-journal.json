@@ -1,0 +1,2396 @@
+{
+  "provenance": "Real shell-only disposable daemon, Chunk 1 native acceptance; provider result fields omitted to match bridge projection.",
+  "run": {
+    "id": "d331b265-857b-4219-b50b-9c344fdf4585",
+    "revision": 133,
+    "status": "COMPLETED",
+    "created_at": "2026-10-21T01:04:36.429941Z",
+    "updated_at": "2026-10-21T01:15:24.975100Z",
+    "repository": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository",
+    "repository_git": {
+      "worktree": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository",
+      "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+      "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+      "metadata": {
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/commondir": null,
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config.worktree": null,
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/gitdir": null,
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+        "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null
+      }
+    },
+    "requested_base": "main",
+    "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+    "specification": "# Local report export\n\nDeliver an independently verified local report. Preserve parallel task dependencies, pause for the export destination decision, and require explicit local integration. Acceptance uses shell-only fixture agents; no external report is sent.",
+    "settings": {
+      "agents": {
+        "planner": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "coder": {
+          "provider": "codex",
+          "model": null,
+          "timeout_seconds": 600
+        },
+        "reviewer": {
+          "provider": "claude",
+          "model": null,
+          "timeout_seconds": 600
+        }
+      },
+      "execution": {
+        "max_parallel": 2,
+        "max_attempts": 3,
+        "max_review_cycles": 2
+      },
+      "verification": {
+        "commands": [
+          [
+            "sh",
+            "-c",
+            "printf 'fixture verification: passed\\n'; test -f README.md"
+          ]
+        ],
+        "timeout_seconds": 300
+      },
+      "preflight": {
+        "required_env": [],
+        "required_tools": [],
+        "required_directories": [],
+        "external_services": []
+      },
+      "permissions": {
+        "rules": {
+          "run_checks": "REQUIRE_APPROVAL"
+        }
+      }
+    },
+    "plan": {
+      "human_requirements": [
+        {
+          "kind": "product_decision",
+          "reason": "The fixture specification leaves the export format open",
+          "requested_action": "Choose the report export format",
+          "affected_tasks": [
+            "B"
+          ],
+          "blocking": true,
+          "evidence": "CSV or JSON is not specified",
+          "confidence": 100,
+          "permission": null
+        }
+      ],
+      "requirements": [
+        {
+          "id": "r",
+          "text": "Deliver an independently verified local report"
+        }
+      ],
+      "milestones": [
+        {
+          "id": "m1",
+          "goal": "Foundation and parallel checks",
+          "task_ids": [
+            "A",
+            "C",
+            "E"
+          ]
+        },
+        {
+          "id": "m2",
+          "goal": "Report and final assembly",
+          "task_ids": [
+            "B",
+            "D"
+          ]
+        }
+      ],
+      "tasks": [
+        {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": [
+            "Task A artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "B",
+          "goal": "Implement report export",
+          "description": "Implement fixture task B",
+          "acceptance_criteria": [
+            "Task B artifact exists"
+          ],
+          "dependencies": [
+            "A"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "C",
+          "goal": "Add validation helpers",
+          "description": "Implement fixture task C",
+          "acceptance_criteria": [
+            "Task C artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "D",
+          "goal": "Assemble report workflow",
+          "description": "Implement fixture task D",
+          "acceptance_criteria": [
+            "Task D artifact exists"
+          ],
+          "dependencies": [
+            "B"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        {
+          "id": "E",
+          "goal": "Verify validation coverage",
+          "description": "Implement fixture task E",
+          "acceptance_criteria": [
+            "Task E artifact exists"
+          ],
+          "dependencies": [
+            "C"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        }
+      ]
+    },
+    "approved_at": "2026-10-21T01:08:12.623490Z",
+    "planner": {
+      "id": "77a6b07e-a405-4fbc-8ed4-7658f8094c40",
+      "role": "planner",
+      "provider": "claude",
+      "provider_session_id": "55db5723-b178-4977-9e65-e639b683b442",
+      "resumed_from": null,
+      "process_key": "294d9e3e-812c-4d49-b576-0599a335e816",
+      "process_run_id": "e57d1670-f275-44f8-8d08-03f16614eef7",
+      "outcome": "succeeded"
+    },
+    "planning_workspace": {
+      "id": "b9c06c94-905c-4124-b698-d33d1167380e",
+      "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/planner",
+      "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/planner",
+      "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+      "head_commit": null,
+      "git": {
+        "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/planner",
+        "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/planner",
+        "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+        "metadata": {
+          "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/planner/.git": "b6f101186678cb4928e6b22f2217c17ac6361a07c15db4b0ae5821e7f92e5843",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/planner/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/planner/config.worktree": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/planner/gitdir": "b60f090b3a83253002b9b70ae2be6345818730b52850914d8ea99b8ff41ca8ea",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/planner/info/exclude": null
+        }
+      }
+    },
+    "tasks": [
+      {
+        "plan": {
+          "id": "A",
+          "goal": "Prepare report foundation",
+          "description": "Implement fixture task A",
+          "acceptance_criteria": [
+            "Task A artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "2b02c85d-c83b-42db-8d40-b077ea83d30d",
+          "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-A",
+          "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/task-A",
+          "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+          "head_commit": "10675344003a512b62646e02560b9f05ddf534bf",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-A",
+            "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-A",
+            "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-A/.git": "989ea268039a4b3180267e320e5a7613c6901ddadca2cb422da5239fa724ca74",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-A/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-A/config.worktree": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-A/gitdir": "045057bdcda2c094fd9a1419f3aa9ef75370a0c107a2a324eda77f4387ea6fe2",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-A/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "c11bd79c-45ae-470a-9dcf-dbb9ee9adb10",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "28686d98-c177-4903-aa9b-8da042a470c2",
+              "resumed_from": null,
+              "process_key": "6e44122d-d066-4374-afcb-c6c9e2ab99fd",
+              "process_run_id": "2ea0e452-ebbb-44c1-acd6-46e825ff6525",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "1885301a-c722-48eb-8951-3d195fb529f9",
+                "process_run_id": "73d51e3b-8d47-459b-b0d1-f38e68b25392",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: passed\\n'; test -f README.md"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=73d51e3b-8d47-459b-b0d1-f38e68b25392 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+              }
+            ],
+            "reviewer": {
+              "id": "37b6e0fe-6dce-4eee-b6d1-cd342501b685",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "25b25d64-eeb1-40d3-8520-233f34dd6c90",
+              "resumed_from": null,
+              "process_key": "0e9b0a9e-0c13-4dfb-b30a-ce3768a346bd",
+              "process_run_id": "91b9814b-3273-4df1-be1f-eb2f5292bd11",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "37b6e0fe-6dce-4eee-b6d1-cd342501b685",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "25b25d64-eeb1-40d3-8520-233f34dd6c90",
+                  "resumed_from": null,
+                  "process_key": "0e9b0a9e-0c13-4dfb-b30a-ce3768a346bd",
+                  "process_run_id": "91b9814b-3273-4df1-be1f-eb2f5292bd11",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "7f165090-6f9e-4f7e-bf5a-b9c3d8fe2a33",
+                  "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-A-1",
+                  "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/review-A-1",
+                  "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-A-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-A-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-A-1/.git": "c9d31467dc10d47cbe0b78f9fe8544199a63c0c677d456e8ff2da782aa59c244",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-A-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-A-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-A-1/gitdir": "b56fff840e1989c746950045c8e37b4d0975218119e5aa303eadeccb6ad0ece7",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-A-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "A-C1",
+                      "criterion": "Task A artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "A-C1",
+                  "criterion": "Task A artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "b357946ac4f57f7b2a2622950d96f6959c1b2736d28ad2667a0a619e43469da5",
+            "verified_tree": "fb2d36e9a07fc38c73a1b621a021a553b090167c",
+            "preserved_tree": "fb2d36e9a07fc38c73a1b621a021a553b090167c",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "10675344003a512b62646e02560b9f05ddf534bf"
+      },
+      {
+        "plan": {
+          "id": "B",
+          "goal": "Implement report export",
+          "description": "Implement fixture task B",
+          "acceptance_criteria": [
+            "Task B artifact exists"
+          ],
+          "dependencies": [
+            "A"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "29e8f363-5462-4f95-bb5e-4cff23728781",
+          "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-B",
+          "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/task-B",
+          "base_commit": "35a31a41e69f6d865dd58451dbefe818eaf4514b",
+          "head_commit": "d6b122bac94c0ae6c5d43822f7beca130108fcd1",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-B",
+            "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-B",
+            "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-B/.git": "a4cf07e7d8713b536fb81ce776e79cd6e7cee3842207e244f912853c0af2a7c9",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-B/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-B/config.worktree": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-B/gitdir": "4c1a8ff69ea2683071a0a75dccf82b94d1b2ec159726f729622b186849b32701",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-B/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "259097b0-83ed-4bd0-a1ce-116dec334898",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "2b58167e-7a13-412f-82a0-63a26a2c025d",
+              "resumed_from": null,
+              "process_key": "fe64dc88-7315-4b40-ac76-145aadf11578",
+              "process_run_id": "ce14f55e-4462-4697-86f0-724c87c7c39f",
+              "outcome": "succeeded"
+            },
+            "verification": [],
+            "reviewer": null,
+            "reviews": [],
+            "review": null,
+            "snapshot": null,
+            "verified_tree": null,
+            "preserved_tree": null,
+            "detail": "human_action: Inspect fixture export destination; confirm that no external report was sent before continuing"
+          },
+          {
+            "number": 2,
+            "coder": {
+              "id": "5ac94256-b1f2-4027-8303-1a4880e97938",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "1185bd04-7152-42f6-9954-7957cfdca1cd",
+              "resumed_from": null,
+              "process_key": "a1621d20-a00d-4e7d-b225-7e139b746db1",
+              "process_run_id": "ed41fc23-2644-4c90-a8e6-b33e5328fe8b",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "9c751dc4-3846-4016-af7e-e03825bd2661",
+                "process_run_id": "21be5e5b-d75e-4622-a501-6e71b093c82d",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: passed\\n'; test -f README.md"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=21be5e5b-d75e-4622-a501-6e71b093c82d status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+              }
+            ],
+            "reviewer": {
+              "id": "5a15ba82-a5e6-4992-bda7-5110d09e3794",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "024f9867-189d-48f5-8765-972464541e39",
+              "resumed_from": null,
+              "process_key": "989a50c5-c9f7-4513-b27e-5e105dfe5213",
+              "process_run_id": "e89424f7-b782-440b-a03c-66705ed324b8",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "5a15ba82-a5e6-4992-bda7-5110d09e3794",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "024f9867-189d-48f5-8765-972464541e39",
+                  "resumed_from": null,
+                  "process_key": "989a50c5-c9f7-4513-b27e-5e105dfe5213",
+                  "process_run_id": "e89424f7-b782-440b-a03c-66705ed324b8",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "7de3a32d-5720-4996-92c0-6817b6673ed0",
+                  "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-B-1",
+                  "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/review-B-1",
+                  "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-B-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-B-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-B-1/.git": "9205b36172c984c87c5c16a6c1d7bbf2cdb5f15dc3da781a7c48afa32a76f717",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-B-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-B-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-B-1/gitdir": "15525c03a8723d8895a7d7ba9e9a13294613fce2dac54ebc85d11b0798f1ef9d",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-B-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "B-C1",
+                      "criterion": "Task B artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "B-C1",
+                  "criterion": "Task B artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "eda93a3bcb3a359dfecb661a551bbb1ae59070ed28ffd05de30dfc4cb998120a",
+            "verified_tree": "74bff7768d9bf3821a67fb313e7b1e23aff460bc",
+            "preserved_tree": "74bff7768d9bf3821a67fb313e7b1e23aff460bc",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "d6b122bac94c0ae6c5d43822f7beca130108fcd1"
+      },
+      {
+        "plan": {
+          "id": "C",
+          "goal": "Add validation helpers",
+          "description": "Implement fixture task C",
+          "acceptance_criteria": [
+            "Task C artifact exists"
+          ],
+          "dependencies": [],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "8430230f-7d97-4f36-927c-daf2c0c1a3d6",
+          "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-C",
+          "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/task-C",
+          "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+          "head_commit": "caec69043122ae6d7442000dd002f02b141410ee",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-C",
+            "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-C",
+            "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-C/.git": "d845a47639792d6eb51c00ae3b579fb4c3d9bc3fd74b050f36b902a54c4e5c0e",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-C/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-C/config.worktree": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-C/gitdir": "36fbb4b3b058b9bc9a52ad54bb8414b7ff3e27938a537f7e5c3c8b4950079255",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-C/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "31bfafff-e2f1-4528-8dc6-04952b91de33",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "59a6e669-7c8b-42a7-95e0-fadaadb32a1a",
+              "resumed_from": null,
+              "process_key": "094c663d-dc55-48dd-bcd2-9d9f30165c81",
+              "process_run_id": "9215ea70-5a23-454a-bb81-3cb77f1a3032",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "60bb444d-6bd7-4845-b49f-f0826f1e8d46",
+                "process_run_id": "a1c3e8b9-34d1-4f79-a345-1551af411c0c",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: passed\\n'; test -f README.md"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=a1c3e8b9-34d1-4f79-a345-1551af411c0c status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+              }
+            ],
+            "reviewer": {
+              "id": "64f4ca48-dd44-41b2-ab85-12ddbcedadb4",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "d7863323-872c-4657-8e6b-5c75016d4dcc",
+              "resumed_from": null,
+              "process_key": "81726fed-716c-46f0-bf14-72f3a6efd1c7",
+              "process_run_id": "6cae9315-5e3b-4686-b932-fc1214f3c3a7",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "64f4ca48-dd44-41b2-ab85-12ddbcedadb4",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "d7863323-872c-4657-8e6b-5c75016d4dcc",
+                  "resumed_from": null,
+                  "process_key": "81726fed-716c-46f0-bf14-72f3a6efd1c7",
+                  "process_run_id": "6cae9315-5e3b-4686-b932-fc1214f3c3a7",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "3f80ec00-ccdd-4e56-a6c3-f452b83bdbdb",
+                  "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-C-1",
+                  "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/review-C-1",
+                  "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-C-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-C-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-C-1/.git": "bde54bf73930ded8a6e5f5759ccff32cc5f85f82472a69c060cba15585588faf",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-C-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-C-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-C-1/gitdir": "673a069da40a8d26d6d8713b3c35a32dd287b0c564598ac6c1a50d375b308003",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-C-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "C-C1",
+                      "criterion": "Task C artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "C-C1",
+                  "criterion": "Task C artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "d5533fd2097d2eca8b8134c2a3e6dd7840776bd06086a1cd1e5be30a2c0172c3",
+            "verified_tree": "db08a3111154a86df6f723bca97efd9de867a3be",
+            "preserved_tree": "db08a3111154a86df6f723bca97efd9de867a3be",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "caec69043122ae6d7442000dd002f02b141410ee"
+      },
+      {
+        "plan": {
+          "id": "D",
+          "goal": "Assemble report workflow",
+          "description": "Implement fixture task D",
+          "acceptance_criteria": [
+            "Task D artifact exists"
+          ],
+          "dependencies": [
+            "B"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "66d916d5-b892-4141-9f35-9f8480892c27",
+          "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-D",
+          "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/task-D",
+          "base_commit": "0ffef813ddc054113541fceaf3f13978af4d4834",
+          "head_commit": "5a98499d971afda2c50748f1f7dc5aa1f6648b34",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-D",
+            "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-D",
+            "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-D/.git": "3d62c31ec6bc57574a6b30e4f9427f1a7af26a5113f3a4e3007ba34262a251a4",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-D/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-D/config.worktree": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-D/gitdir": "1305476ac6b09435040b40e1dd32850e2cb99eba941b9dc3e64e4534e4bb262b",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-D/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "628f9c3c-703b-498b-aedf-780453bbe150",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "9a14fc00-294e-46fc-85f4-191a95ccbaf9",
+              "resumed_from": null,
+              "process_key": "2bdbe579-5d8a-4b10-b891-09dc9a4e5db1",
+              "process_run_id": "e3ceaec0-bac4-4587-92f8-e369b6417bd9",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "88f84b38-8727-4747-8c65-401bca276498",
+                "process_run_id": "eb917dc8-5c29-4d40-93ef-6ce8784a3f8b",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: passed\\n'; test -f README.md"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=eb917dc8-5c29-4d40-93ef-6ce8784a3f8b status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+              }
+            ],
+            "reviewer": {
+              "id": "cf3d9783-66da-468f-9bd0-11ca5dbb08fd",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "06701a8a-3957-499a-ab00-91863793e2b6",
+              "resumed_from": null,
+              "process_key": "859cfcfd-18a6-4913-911a-1d0799b66bc3",
+              "process_run_id": "72bf95df-f8d2-4406-ae33-339325fe8657",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "cf3d9783-66da-468f-9bd0-11ca5dbb08fd",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "06701a8a-3957-499a-ab00-91863793e2b6",
+                  "resumed_from": null,
+                  "process_key": "859cfcfd-18a6-4913-911a-1d0799b66bc3",
+                  "process_run_id": "72bf95df-f8d2-4406-ae33-339325fe8657",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "5a76c047-1f4c-41d8-9f7f-1acb56110747",
+                  "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-D-1",
+                  "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/review-D-1",
+                  "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-D-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-D-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-D-1/.git": "2084707614e990905650df28d41c9b4f9e3b26523c08773f1f8a56095b28051a",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-D-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-D-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-D-1/gitdir": "a52df5405b75309288524294fed867873e592a2c0cc57f6e0efe9d4369d1fe79",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-D-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "D-C1",
+                      "criterion": "Task D artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "D-C1",
+                  "criterion": "Task D artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "94977679a7abcfd1f00574819a76225f60227c486e74c81c54a1ec70e53beae9",
+            "verified_tree": "69f8203430b0d467c2ed206c9424240dcd095f92",
+            "preserved_tree": "69f8203430b0d467c2ed206c9424240dcd095f92",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "5a98499d971afda2c50748f1f7dc5aa1f6648b34"
+      },
+      {
+        "plan": {
+          "id": "E",
+          "goal": "Verify validation coverage",
+          "description": "Implement fixture task E",
+          "acceptance_criteria": [
+            "Task E artifact exists"
+          ],
+          "dependencies": [
+            "C"
+          ],
+          "requirement_ids": [
+            "r"
+          ],
+          "verification_expectations": [
+            "Configured shell check passes"
+          ],
+          "role": "coder"
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "id": "4d669f7d-9222-4a32-bda7-b91272795284",
+          "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-E",
+          "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/task-E",
+          "base_commit": "72521cabb0703bf332c30e037d5fe96e922076fb",
+          "head_commit": "7940736d79ddce15c1b46fd5a597abf67f41e6e4",
+          "git": {
+            "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-E",
+            "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-E",
+            "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+            "metadata": {
+              "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-E/.git": "d0d41454ae57455bd03d1ca15bee4c58c637d0021f12297b2b85164415f7f700",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-E/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-E/config.worktree": null,
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-E/gitdir": "ed0eda7d873227f625d6403c61dc66a747ba428603b77ad146ea88b9b85d069a",
+              "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/task-E/info/exclude": null
+            }
+          }
+        },
+        "attempts": [
+          {
+            "number": 1,
+            "coder": {
+              "id": "17f925e0-686c-4ea0-845e-9a3ffed43fba",
+              "role": "coder",
+              "provider": "codex",
+              "provider_session_id": "b7e23240-cd01-4205-9856-99bc37fd372f",
+              "resumed_from": null,
+              "process_key": "b7034b7b-94fd-412d-87aa-0e79ea48fc92",
+              "process_run_id": "612ae241-181c-4414-abdd-8e5d40c6101f",
+              "outcome": "succeeded"
+            },
+            "verification": [
+              {
+                "process_key": "bf5ca3f8-759b-462a-ae4f-152c9f9345bc",
+                "process_run_id": "24403564-d863-49ab-a83f-a679e7db7975",
+                "command": [
+                  "sh",
+                  "-c",
+                  "printf 'fixture verification: passed\\n'; test -f README.md"
+                ],
+                "exit_code": 0,
+                "passed": true,
+                "outcome": "passed",
+                "output_complete": true,
+                "summary": "process=24403564-d863-49ab-a83f-a679e7db7975 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+              }
+            ],
+            "reviewer": {
+              "id": "36970504-09b0-4a47-9635-376bdc5e9f1a",
+              "role": "reviewer",
+              "provider": "claude",
+              "provider_session_id": "9f2d0289-4015-4bff-9dd1-65f0b180b3d4",
+              "resumed_from": null,
+              "process_key": "69332ae3-e985-4a65-b9ca-c145953710b8",
+              "process_run_id": "f6bfc359-4180-410b-ae30-9b787c56150c",
+              "outcome": "succeeded"
+            },
+            "reviews": [
+              {
+                "session": {
+                  "id": "36970504-09b0-4a47-9635-376bdc5e9f1a",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "9f2d0289-4015-4bff-9dd1-65f0b180b3d4",
+                  "resumed_from": null,
+                  "process_key": "69332ae3-e985-4a65-b9ca-c145953710b8",
+                  "process_run_id": "f6bfc359-4180-410b-ae30-9b787c56150c",
+                  "outcome": "succeeded"
+                },
+                "workspace": {
+                  "id": "83fbb243-90a7-4e2d-8c14-c515bff8d2e5",
+                  "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-E-1",
+                  "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/review-E-1",
+                  "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+                  "head_commit": null,
+                  "git": {
+                    "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-E-1",
+                    "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-E-1",
+                    "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+                    "metadata": {
+                      "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/review-E-1/.git": "d5539bd9600058f4346de166dbf6f2a1c88efde5c805d5d5ba3967cd1a6f714b",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-E-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-E-1/config.worktree": null,
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-E-1/gitdir": "0fd061f527f2da4ced06cee4ad51e63b08c14617bd28fd5459e75242e5251d1a",
+                      "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/review-E-1/info/exclude": null
+                    }
+                  }
+                },
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "E-C1",
+                      "criterion": "Task E artifact exists",
+                      "satisfied": true,
+                      "evidence": "Fixture artifact and deterministic check inspected"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "diagnostic": null
+              }
+            ],
+            "review": {
+              "accepted": true,
+              "criteria": [
+                {
+                  "criterion_id": "E-C1",
+                  "criterion": "Task E artifact exists",
+                  "satisfied": true,
+                  "evidence": "Fixture artifact and deterministic check inspected"
+                }
+              ],
+              "findings": [],
+              "blocker": ""
+            },
+            "snapshot": "27cabb07920a89f675381510f0f82305107d6a6f51de483d20e0be2400e0c293",
+            "verified_tree": "c144edaa8671d4b4dac1a0aff3497c66569c5e3d",
+            "preserved_tree": "c144edaa8671d4b4dac1a0aff3497c66569c5e3d",
+            "detail": null
+          }
+        ],
+        "artifact_commit": "7940736d79ddce15c1b46fd5a597abf67f41e6e4"
+      }
+    ],
+    "blockers": [
+      {
+        "task_id": "B",
+        "kind": "human_action",
+        "detail": "human_action: Inspect fixture export destination; confirm that no external report was sent before continuing",
+        "action": "Inspect human actions; resolve externally and explicitly continue eligible live pauses",
+        "created_at": "2026-10-21T01:08:40.674050Z"
+      }
+    ],
+    "human_actions": [
+      {
+        "id": "H-559f2a4cf9e185da907630d02d1ce37f",
+        "requirement": {
+          "kind": "product_decision",
+          "reason": "The fixture specification leaves the export format open",
+          "requested_action": "Choose the report export format",
+          "affected_tasks": [
+            "B"
+          ],
+          "blocking": true,
+          "evidence": "CSV or JSON is not specified",
+          "confidence": 100,
+          "permission": null
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "5e3647e2-dd66-4dc2-85d8-1c02c47644f4",
+          "disposition": "resolve",
+          "note": "Use JSON for the disposable local report. The report remains local and no external destination is authorized.",
+          "effect": "not_performed",
+          "permission": null
+        },
+        "created_at": "2026-10-21T01:04:45.247726Z",
+        "updated_at": "2026-10-21T01:06:39.142181Z",
+        "audit": [
+          {
+            "at": "2026-10-21T01:04:45.247726Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T01:06:39.142181Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "5e3647e2-dd66-4dc2-85d8-1c02c47644f4",
+              "disposition": "resolve",
+              "note": "Use JSON for the disposable local report. The report remains local and no external destination is authorized.",
+              "effect": "not_performed",
+              "permission": null
+            }
+          }
+        ],
+        "continuable": false,
+        "workspace_snapshot": null
+      },
+      {
+        "id": "H-02422ced3ac6c9faebf8dcb90e62f4ab",
+        "requirement": {
+          "kind": "permission",
+          "reason": "Execution requires a configured permission",
+          "requested_action": "Approve or reject this exact run operation",
+          "affected_tasks": [],
+          "blocking": true,
+          "evidence": "Daemon host check; values were not read",
+          "confidence": 100,
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run d331b265-857b-4219-b50b-9c344fdf4585 immutable configured verification commands"
+          }
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "840e7f1d-6986-4011-b22c-633c0cfba944",
+          "disposition": "approve",
+          "note": "Inspected the exact run_checks operation, run scope and immutable shell verification command. This permits only the disposable fixture checks; no report has been sent.",
+          "effect": "not_performed",
+          "permission": {
+            "operation": "run_checks",
+            "scope": "run d331b265-857b-4219-b50b-9c344fdf4585 immutable configured verification commands"
+          }
+        },
+        "created_at": "2026-10-21T01:04:45.247768Z",
+        "updated_at": "2026-10-21T01:06:25.942908Z",
+        "audit": [
+          {
+            "at": "2026-10-21T01:04:45.247768Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T01:06:25.942908Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "840e7f1d-6986-4011-b22c-633c0cfba944",
+              "disposition": "approve",
+              "note": "Inspected the exact run_checks operation, run scope and immutable shell verification command. This permits only the disposable fixture checks; no report has been sent.",
+              "effect": "not_performed",
+              "permission": {
+                "operation": "run_checks",
+                "scope": "run d331b265-857b-4219-b50b-9c344fdf4585 immutable configured verification commands"
+              }
+            }
+          }
+        ],
+        "continuable": false,
+        "workspace_snapshot": null
+      },
+      {
+        "id": "H-00233add00c77b49336bfb0680ab102b",
+        "requirement": {
+          "kind": "runtime",
+          "reason": "human_action: human_action: Inspect fixture export destination; confirm that no external report was sent before continuing",
+          "requested_action": "human_action: Inspect fixture export destination; confirm that no external report was sent before continuing",
+          "affected_tasks": [
+            "B"
+          ],
+          "blocking": true,
+          "evidence": "Task B; attempt 1; retained process evidence",
+          "confidence": 100,
+          "permission": null
+        },
+        "status": "RESOLVED",
+        "resolution": {
+          "request_id": "24046507-09a8-43a4-85aa-0b7e6b0b8852",
+          "disposition": "resolve",
+          "note": "Inspected the preserved task-B worktree and process evidence. No external report was sent; the requested export operation has not been performed. Continue only in the disposable repository.",
+          "effect": "not_performed",
+          "permission": null
+        },
+        "created_at": "2026-10-21T01:08:40.674052Z",
+        "updated_at": "2026-10-21T01:12:43.109215Z",
+        "audit": [
+          {
+            "at": "2026-10-21T01:08:40.674052Z",
+            "status": "PENDING",
+            "request": null
+          },
+          {
+            "at": "2026-10-21T01:12:43.109215Z",
+            "status": "RESOLVED",
+            "request": {
+              "request_id": "24046507-09a8-43a4-85aa-0b7e6b0b8852",
+              "disposition": "resolve",
+              "note": "Inspected the preserved task-B worktree and process evidence. No external report was sent; the requested export operation has not been performed. Continue only in the disposable repository.",
+              "effect": "not_performed",
+              "permission": null
+            }
+          }
+        ],
+        "continuable": true,
+        "workspace_snapshot": "863d6536f686a2adb2e008a89189b51d1a28b2ed3b9cdc3686d69db5a5d4c9a7"
+      }
+    ],
+    "preflight": {
+      "checked_at": "2026-10-21T01:13:20.144726Z",
+      "checks": [
+        {
+          "id": "repository",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Repository accessibility and pinned Git ownership"
+        },
+        {
+          "id": "planning-workspace",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Planning checkout accessibility and pinned Git ownership"
+        },
+        {
+          "id": "git-working-state",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees"
+        },
+        {
+          "id": "installed-codex",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "installed-claude",
+          "ready": true,
+          "blocking": false,
+          "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately"
+        },
+        {
+          "id": "verification-0",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Configured verification executable availability; command behavior is validated during execution"
+        },
+        {
+          "id": "permission-WorkspaceWrite",
+          "ready": true,
+          "blocking": false,
+          "evidence": "WorkspaceWrite: Allow; scope run d331b265-857b-4219-b50b-9c344fdf4585 assigned task worktrees"
+        },
+        {
+          "id": "permission-RunChecks",
+          "ready": false,
+          "blocking": false,
+          "evidence": "RunChecks: RequireApproval; scope run d331b265-857b-4219-b50b-9c344fdf4585 immutable configured verification commands"
+        },
+        {
+          "id": "injected-provider",
+          "ready": true,
+          "blocking": true,
+          "evidence": "Injected runtime availability contract"
+        }
+      ],
+      "action_ids": [
+        "H-559f2a4cf9e185da907630d02d1ce37f",
+        "H-02422ced3ac6c9faebf8dcb90e62f4ab"
+      ],
+      "ready": true,
+      "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation."
+    },
+    "integration_workspace": {
+      "id": "2af22d7e-4078-451e-81cc-2c488ec4006a",
+      "path": "/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/integration",
+      "branch": "autono/d331b265-857b-4219-b50b-9c344fdf4585/integration",
+      "base_commit": "ac5b3b07024b7339f8e498964b79b6295dc1cc36",
+      "head_commit": "585fe0029c7d7864e84af343cf56f857d42149ef",
+      "git": {
+        "worktree": "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/integration",
+        "git_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration",
+        "common_dir": "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git",
+        "metadata": {
+          "/private/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/integration/.git": "425d3169b8615c9d8c9e339c2435673920d049cec2a1396d06620a9656deb960",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/attributes": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/info/grafts": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/alternates": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/objects/info/http-alternates": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/config.worktree": null,
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/gitdir": "aeb84e6f39f5ece307d97344ee4b1f0f671235e59df7e8509ba7cc5c22a37670",
+          "/private/tmp/autono-native-bru342-redesign-02/fixture-repository/.git/worktrees/integration/info/exclude": null
+        }
+      }
+    },
+    "integration_verification": [
+      {
+        "process_key": "e35316a2-dd47-4405-a0a5-49a82c5a6948",
+        "process_run_id": "d64bb329-3755-48d5-922b-c45acf4ef645",
+        "command": [
+          "sh",
+          "-c",
+          "printf 'fixture verification: passed\\n'; test -f README.md"
+        ],
+        "exit_code": 0,
+        "passed": true,
+        "outcome": "passed",
+        "output_complete": true,
+        "summary": "process=d64bb329-3755-48d5-922b-c45acf4ef645 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; fixture verification: passed\n"
+      }
+    ],
+    "summary": "All 5 tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch autono/d331b265-857b-4219-b50b-9c344fdf4585/integration at 585fe0029c7d7864e84af343cf56f857d42149ef (/tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/integration). No merge to main was performed."
+  },
+  "events": [
+    {
+      "sequence": 1,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:36.431804+00:00",
+      "kind": "created",
+      "detail": "Feature specification and configuration preserved; planning requested"
+    },
+    {
+      "sequence": 2,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:36.523756+00:00",
+      "kind": "planning_workspace_ready",
+      "detail": "Pinned Git ownership"
+    },
+    {
+      "sequence": 3,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:36.807116+00:00",
+      "kind": "agent_started",
+      "detail": "Planner Claude; session=77a6b07e-a405-4fbc-8ed4-7658f8094c40 process_key=294d9e3e-812c-4d49-b576-0599a335e816"
+    },
+    {
+      "sequence": 4,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:36.825034+00:00",
+      "kind": "agent_process",
+      "detail": "Planner process=e57d1670-f275-44f8-8d08-03f16614eef7"
+    },
+    {
+      "sequence": 5,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:44.901928+00:00",
+      "kind": "agent_finished",
+      "detail": "Planner session=77a6b07e-a405-4fbc-8ed4-7658f8094c40 outcome=succeeded"
+    },
+    {
+      "sequence": 6,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:45.207704+00:00",
+      "kind": "plan_ready",
+      "detail": "Validated plan awaits developer approval"
+    },
+    {
+      "sequence": 7,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:45.207840+00:00",
+      "kind": "task_state",
+      "detail": "A: None -> Ready"
+    },
+    {
+      "sequence": 8,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:45.207989+00:00",
+      "kind": "task_state",
+      "detail": "B: None -> Waiting"
+    },
+    {
+      "sequence": 9,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:45.208095+00:00",
+      "kind": "task_state",
+      "detail": "C: None -> Ready"
+    },
+    {
+      "sequence": 10,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:45.208196+00:00",
+      "kind": "task_state",
+      "detail": "D: None -> Waiting"
+    },
+    {
+      "sequence": 11,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:45.208296+00:00",
+      "kind": "task_state",
+      "detail": "E: None -> Waiting"
+    },
+    {
+      "sequence": 12,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:04:45.253201+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 13,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:06:25.946208+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 14,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:06:39.148302+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 15,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:06:48.024110+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 16,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.623174+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 17,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.625690+00:00",
+      "kind": "approved",
+      "detail": "Developer approved the persisted plan and configured checks"
+    },
+    {
+      "sequence": 18,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.629364+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 19,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.634394+00:00",
+      "kind": "task_started",
+      "detail": "A"
+    },
+    {
+      "sequence": 20,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.637993+00:00",
+      "kind": "workspace_reserved",
+      "detail": "A: /tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-A (autono/d331b265-857b-4219-b50b-9c344fdf4585/task-A)"
+    },
+    {
+      "sequence": 21,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.638080+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 22,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.641879+00:00",
+      "kind": "task_started",
+      "detail": "C"
+    },
+    {
+      "sequence": 23,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.645139+00:00",
+      "kind": "workspace_reserved",
+      "detail": "C: /tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-C (autono/d331b265-857b-4219-b50b-9c344fdf4585/task-C)"
+    },
+    {
+      "sequence": 24,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.645176+00:00",
+      "kind": "task_state",
+      "detail": "C: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 25,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.852968+00:00",
+      "kind": "workspace_ready",
+      "detail": "A"
+    },
+    {
+      "sequence": 26,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.857775+00:00",
+      "kind": "workspace_ready",
+      "detail": "C"
+    },
+    {
+      "sequence": 27,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:12.998888+00:00",
+      "kind": "attempt_started",
+      "detail": "A: attempt 1"
+    },
+    {
+      "sequence": 28,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:13.002231+00:00",
+      "kind": "attempt_started",
+      "detail": "C: attempt 1"
+    },
+    {
+      "sequence": 29,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:13.062371+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=31bfafff-e2f1-4528-8dc6-04952b91de33 process_key=094c663d-dc55-48dd-bcd2-9d9f30165c81"
+    },
+    {
+      "sequence": 30,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:13.066420+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=c11bd79c-45ae-470a-9dcf-dbb9ee9adb10 process_key=6e44122d-d066-4374-afcb-c6c9e2ab99fd"
+    },
+    {
+      "sequence": 31,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:13.085064+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=9215ea70-5a23-454a-bb81-3cb77f1a3032"
+    },
+    {
+      "sequence": 32,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:13.095594+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=2ea0e452-ebbb-44c1-acd6-46e825ff6525"
+    },
+    {
+      "sequence": 33,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.109059+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=31bfafff-e2f1-4528-8dc6-04952b91de33 outcome=succeeded"
+    },
+    {
+      "sequence": 34,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.113112+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=c11bd79c-45ae-470a-9dcf-dbb9ee9adb10 outcome=succeeded"
+    },
+    {
+      "sequence": 35,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.649758+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"A\", 1)) process_key=1885301a-c722-48eb-8951-3d195fb529f9 command=[\"sh\",\"-c\",\"printf 'fixture verification: passed\\\\n'; test -f README.md\"]"
+    },
+    {
+      "sequence": 36,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.653139+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"C\", 1)) process_key=60bb444d-6bd7-4845-b49f-f0826f1e8d46 command=[\"sh\",\"-c\",\"printf 'fixture verification: passed\\\\n'; test -f README.md\"]"
+    },
+    {
+      "sequence": 37,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.656590+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"A\", 1)) process=73d51e3b-8d47-459b-b0d1-f38e68b25392"
+    },
+    {
+      "sequence": 38,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.660615+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"C\", 1)) process=a1c3e8b9-34d1-4f79-a345-1551af411c0c"
+    },
+    {
+      "sequence": 39,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.667267+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"A\", 1)) process=73d51e3b-8d47-459b-b0d1-f38e68b25392 passed=true"
+    },
+    {
+      "sequence": 40,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:21.672141+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"C\", 1)) process=a1c3e8b9-34d1-4f79-a345-1551af411c0c passed=true"
+    },
+    {
+      "sequence": 41,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.055230+00:00",
+      "kind": "verification_passed",
+      "detail": "C"
+    },
+    {
+      "sequence": 42,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.058879+00:00",
+      "kind": "verification_passed",
+      "detail": "A"
+    },
+    {
+      "sequence": 43,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.318450+00:00",
+      "kind": "review_reserved",
+      "detail": "A: review 1"
+    },
+    {
+      "sequence": 44,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.322853+00:00",
+      "kind": "review_reserved",
+      "detail": "C: review 1"
+    },
+    {
+      "sequence": 45,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.448816+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "C"
+    },
+    {
+      "sequence": 46,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.455466+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "A"
+    },
+    {
+      "sequence": 47,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.615985+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=37b6e0fe-6dce-4eee-b6d1-cd342501b685 process_key=0e9b0a9e-0c13-4dfb-b30a-ce3768a346bd"
+    },
+    {
+      "sequence": 48,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.636760+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=64f4ca48-dd44-41b2-ab85-12ddbcedadb4 process_key=81726fed-716c-46f0-bf14-72f3a6efd1c7"
+    },
+    {
+      "sequence": 49,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.659445+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=91b9814b-3273-4df1-be1f-eb2f5292bd11"
+    },
+    {
+      "sequence": 50,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:22.664722+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=6cae9315-5e3b-4686-b932-fc1214f3c3a7"
+    },
+    {
+      "sequence": 51,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:30.680411+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=64f4ca48-dd44-41b2-ab85-12ddbcedadb4 outcome=succeeded"
+    },
+    {
+      "sequence": 52,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:30.685714+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=37b6e0fe-6dce-4eee-b6d1-cd342501b685 outcome=succeeded"
+    },
+    {
+      "sequence": 53,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:30.995230+00:00",
+      "kind": "review_finished",
+      "detail": "C: accepted=true findings=0"
+    },
+    {
+      "sequence": 54,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:31.004807+00:00",
+      "kind": "review_finished",
+      "detail": "A: accepted=true findings=0"
+    },
+    {
+      "sequence": 55,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.074398+00:00",
+      "kind": "task_completed",
+      "detail": "C: caec69043122ae6d7442000dd002f02b141410ee"
+    },
+    {
+      "sequence": 56,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.074430+00:00",
+      "kind": "task_state",
+      "detail": "C: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 57,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.078952+00:00",
+      "kind": "task_completed",
+      "detail": "A: 10675344003a512b62646e02560b9f05ddf534bf"
+    },
+    {
+      "sequence": 58,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.078980+00:00",
+      "kind": "task_state",
+      "detail": "A: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 59,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.083998+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 60,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.088551+00:00",
+      "kind": "task_started",
+      "detail": "B"
+    },
+    {
+      "sequence": 61,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.088589+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Waiting) -> Ready"
+    },
+    {
+      "sequence": 62,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.093179+00:00",
+      "kind": "workspace_reserved",
+      "detail": "B: /tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-B (autono/d331b265-857b-4219-b50b-9c344fdf4585/task-B)"
+    },
+    {
+      "sequence": 63,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.093216+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 64,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.097802+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 65,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.102806+00:00",
+      "kind": "task_started",
+      "detail": "E"
+    },
+    {
+      "sequence": 66,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.102847+00:00",
+      "kind": "task_state",
+      "detail": "E: Some(Waiting) -> Ready"
+    },
+    {
+      "sequence": 67,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.108594+00:00",
+      "kind": "workspace_reserved",
+      "detail": "E: /tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-E (autono/d331b265-857b-4219-b50b-9c344fdf4585/task-E)"
+    },
+    {
+      "sequence": 68,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.108678+00:00",
+      "kind": "task_state",
+      "detail": "E: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 69,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.312076+00:00",
+      "kind": "workspace_ready",
+      "detail": "B"
+    },
+    {
+      "sequence": 70,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.317595+00:00",
+      "kind": "attempt_started",
+      "detail": "B: attempt 1"
+    },
+    {
+      "sequence": 71,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.324516+00:00",
+      "kind": "workspace_ready",
+      "detail": "E"
+    },
+    {
+      "sequence": 72,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.330485+00:00",
+      "kind": "attempt_started",
+      "detail": "E: attempt 1"
+    },
+    {
+      "sequence": 73,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.364095+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=259097b0-83ed-4bd0-a1ce-116dec334898 process_key=fe64dc88-7315-4b40-ac76-145aadf11578"
+    },
+    {
+      "sequence": 74,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.393239+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=ce14f55e-4462-4697-86f0-724c87c7c39f"
+    },
+    {
+      "sequence": 75,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.400190+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=17f925e0-686c-4ea0-845e-9a3ffed43fba process_key=b7034b7b-94fd-412d-87aa-0e79ea48fc92"
+    },
+    {
+      "sequence": 76,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:32.420639+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=612ae241-181c-4414-abdd-8e5d40c6101f"
+    },
+    {
+      "sequence": 77,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.419038+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=259097b0-83ed-4bd0-a1ce-116dec334898 outcome=succeeded"
+    },
+    {
+      "sequence": 78,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.435295+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=17f925e0-686c-4ea0-845e-9a3ffed43fba outcome=succeeded"
+    },
+    {
+      "sequence": 79,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.679541+00:00",
+      "kind": "task_stopped",
+      "detail": "B: human_action: Inspect fixture export destination; confirm that no external report was sent before continuing"
+    },
+    {
+      "sequence": 80,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.679584+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Running) -> BlockedHuman"
+    },
+    {
+      "sequence": 81,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.686168+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 82,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.886109+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"E\", 1)) process_key=bf5ca3f8-759b-462a-ae4f-152c9f9345bc command=[\"sh\",\"-c\",\"printf 'fixture verification: passed\\\\n'; test -f README.md\"]"
+    },
+    {
+      "sequence": 83,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.892079+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"E\", 1)) process=24403564-d863-49ab-a83f-a679e7db7975"
+    },
+    {
+      "sequence": 84,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:40.900573+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"E\", 1)) process=24403564-d863-49ab-a83f-a679e7db7975 passed=true"
+    },
+    {
+      "sequence": 85,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:41.220680+00:00",
+      "kind": "verification_passed",
+      "detail": "E"
+    },
+    {
+      "sequence": 86,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:41.423321+00:00",
+      "kind": "review_reserved",
+      "detail": "E: review 1"
+    },
+    {
+      "sequence": 87,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:41.534988+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "E"
+    },
+    {
+      "sequence": 88,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:41.669744+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=36970504-09b0-4a47-9635-376bdc5e9f1a process_key=69332ae3-e985-4a65-b9ca-c145953710b8"
+    },
+    {
+      "sequence": 89,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:41.697334+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=f6bfc359-4180-410b-ae30-9b787c56150c"
+    },
+    {
+      "sequence": 90,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:49.723490+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=36970504-09b0-4a47-9635-376bdc5e9f1a outcome=succeeded"
+    },
+    {
+      "sequence": 91,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:49.972445+00:00",
+      "kind": "review_finished",
+      "detail": "E: accepted=true findings=0"
+    },
+    {
+      "sequence": 92,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:50.833266+00:00",
+      "kind": "task_completed",
+      "detail": "E: 7940736d79ddce15c1b46fd5a597abf67f41e6e4"
+    },
+    {
+      "sequence": 93,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:50.833305+00:00",
+      "kind": "task_state",
+      "detail": "E: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 94,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:50.839622+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 95,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:08:50.845368+00:00",
+      "kind": "execution_finished",
+      "detail": "All currently runnable tasks finished"
+    },
+    {
+      "sequence": 96,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:12:43.136789+00:00",
+      "kind": "human_resolution",
+      "detail": "Explicit developer resolution recorded; no operation was executed"
+    },
+    {
+      "sequence": 97,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.154369+00:00",
+      "kind": "preflight",
+      "detail": "Preflight checks and human checklist refreshed (no credential values)"
+    },
+    {
+      "sequence": 98,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.162353+00:00",
+      "kind": "continued",
+      "detail": "Developer explicitly continued eligible live pauses; completed artifacts retained"
+    },
+    {
+      "sequence": 99,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.162397+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(BlockedHuman) -> Ready"
+    },
+    {
+      "sequence": 100,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.174051+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 101,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.194965+00:00",
+      "kind": "task_started",
+      "detail": "B"
+    },
+    {
+      "sequence": 102,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.204431+00:00",
+      "kind": "workspace_reserved",
+      "detail": "B: /tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-B (autono/d331b265-857b-4219-b50b-9c344fdf4585/task-B)"
+    },
+    {
+      "sequence": 103,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.204509+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 104,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.571641+00:00",
+      "kind": "workspace_ready",
+      "detail": "B"
+    },
+    {
+      "sequence": 105,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.802116+00:00",
+      "kind": "attempt_started",
+      "detail": "B: attempt 2"
+    },
+    {
+      "sequence": 106,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.880650+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=5ac94256-b1f2-4027-8303-1a4880e97938 process_key=a1621d20-a00d-4e7d-b225-7e139b746db1"
+    },
+    {
+      "sequence": 107,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:20.955065+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=ed41fc23-2644-4c90-a8e6-b33e5328fe8b"
+    },
+    {
+      "sequence": 108,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:28.975202+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=5ac94256-b1f2-4027-8303-1a4880e97938 outcome=succeeded"
+    },
+    {
+      "sequence": 109,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:29.548354+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"B\", 2)) process_key=9c751dc4-3846-4016-af7e-e03825bd2661 command=[\"sh\",\"-c\",\"printf 'fixture verification: passed\\\\n'; test -f README.md\"]"
+    },
+    {
+      "sequence": 110,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:29.564180+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"B\", 2)) process=21be5e5b-d75e-4622-a501-6e71b093c82d"
+    },
+    {
+      "sequence": 111,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:29.573124+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"B\", 2)) process=21be5e5b-d75e-4622-a501-6e71b093c82d passed=true"
+    },
+    {
+      "sequence": 112,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:30.043531+00:00",
+      "kind": "verification_passed",
+      "detail": "B"
+    },
+    {
+      "sequence": 113,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:30.364901+00:00",
+      "kind": "review_reserved",
+      "detail": "B: review 1"
+    },
+    {
+      "sequence": 114,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:30.487547+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "B"
+    },
+    {
+      "sequence": 115,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:30.721921+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=5a15ba82-a5e6-4992-bda7-5110d09e3794 process_key=989a50c5-c9f7-4513-b27e-5e105dfe5213"
+    },
+    {
+      "sequence": 116,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:30.767804+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=e89424f7-b782-440b-a03c-66705ed324b8"
+    },
+    {
+      "sequence": 117,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:38.790867+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=5a15ba82-a5e6-4992-bda7-5110d09e3794 outcome=succeeded"
+    },
+    {
+      "sequence": 118,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:39.139685+00:00",
+      "kind": "review_finished",
+      "detail": "B: accepted=true findings=0"
+    },
+    {
+      "sequence": 119,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:40.962741+00:00",
+      "kind": "task_completed",
+      "detail": "B: d6b122bac94c0ae6c5d43822f7beca130108fcd1"
+    },
+    {
+      "sequence": 120,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:40.962867+00:00",
+      "kind": "task_state",
+      "detail": "B: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 121,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:40.972743+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 122,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:40.982123+00:00",
+      "kind": "task_started",
+      "detail": "D"
+    },
+    {
+      "sequence": 123,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:40.982165+00:00",
+      "kind": "task_state",
+      "detail": "D: Some(Waiting) -> Ready"
+    },
+    {
+      "sequence": 124,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:40.991368+00:00",
+      "kind": "workspace_reserved",
+      "detail": "D: /tmp/autono-native-bru342-redesign-02/engineering/d331b265-857b-4219-b50b-9c344fdf4585/task-D (autono/d331b265-857b-4219-b50b-9c344fdf4585/task-D)"
+    },
+    {
+      "sequence": 125,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:40.991416+00:00",
+      "kind": "task_state",
+      "detail": "D: Some(Ready) -> Running"
+    },
+    {
+      "sequence": 126,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:41.339142+00:00",
+      "kind": "workspace_ready",
+      "detail": "D"
+    },
+    {
+      "sequence": 127,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:41.351049+00:00",
+      "kind": "attempt_started",
+      "detail": "D: attempt 1"
+    },
+    {
+      "sequence": 128,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:41.457900+00:00",
+      "kind": "agent_started",
+      "detail": "Coder Codex; session=628f9c3c-703b-498b-aedf-780453bbe150 process_key=2bdbe579-5d8a-4b10-b891-09dc9a4e5db1"
+    },
+    {
+      "sequence": 129,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:41.499745+00:00",
+      "kind": "agent_process",
+      "detail": "Coder process=e3ceaec0-bac4-4587-92f8-e369b6417bd9"
+    },
+    {
+      "sequence": 130,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:49.515182+00:00",
+      "kind": "agent_finished",
+      "detail": "Coder session=628f9c3c-703b-498b-aedf-780453bbe150 outcome=succeeded"
+    },
+    {
+      "sequence": 131,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:50.098934+00:00",
+      "kind": "verification_started",
+      "detail": "target=Some((\"D\", 1)) process_key=88f84b38-8727-4747-8c65-401bca276498 command=[\"sh\",\"-c\",\"printf 'fixture verification: passed\\\\n'; test -f README.md\"]"
+    },
+    {
+      "sequence": 132,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:50.116866+00:00",
+      "kind": "verification_process",
+      "detail": "target=Some((\"D\", 1)) process=eb917dc8-5c29-4d40-93ef-6ce8784a3f8b"
+    },
+    {
+      "sequence": 133,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:50.128271+00:00",
+      "kind": "verification_finished",
+      "detail": "target=Some((\"D\", 1)) process=eb917dc8-5c29-4d40-93ef-6ce8784a3f8b passed=true"
+    },
+    {
+      "sequence": 134,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:50.623550+00:00",
+      "kind": "verification_passed",
+      "detail": "D"
+    },
+    {
+      "sequence": 135,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:50.967658+00:00",
+      "kind": "review_reserved",
+      "detail": "D: review 1"
+    },
+    {
+      "sequence": 136,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:51.120625+00:00",
+      "kind": "review_workspace_ready",
+      "detail": "D"
+    },
+    {
+      "sequence": 137,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:51.396597+00:00",
+      "kind": "agent_started",
+      "detail": "Reviewer Claude; session=cf3d9783-66da-468f-9bd0-11ca5dbb08fd process_key=859cfcfd-18a6-4913-911a-1d0799b66bc3"
+    },
+    {
+      "sequence": 138,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:51.433528+00:00",
+      "kind": "agent_process",
+      "detail": "Reviewer process=72bf95df-f8d2-4406-ae33-339325fe8657"
+    },
+    {
+      "sequence": 139,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:59.453780+00:00",
+      "kind": "agent_finished",
+      "detail": "Reviewer session=cf3d9783-66da-468f-9bd0-11ca5dbb08fd outcome=succeeded"
+    },
+    {
+      "sequence": 140,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:13:59.802372+00:00",
+      "kind": "review_finished",
+      "detail": "D: accepted=true findings=0"
+    },
+    {
+      "sequence": 141,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:14:01.291296+00:00",
+      "kind": "task_completed",
+      "detail": "D: 5a98499d971afda2c50748f1f7dc5aa1f6648b34"
+    },
+    {
+      "sequence": 142,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:14:01.291339+00:00",
+      "kind": "task_state",
+      "detail": "D: Some(Running) -> Completed"
+    },
+    {
+      "sequence": 143,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:14:01.303095+00:00",
+      "kind": "scheduler",
+      "detail": "Dependency states evaluated"
+    },
+    {
+      "sequence": 144,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:14:01.314923+00:00",
+      "kind": "execution_finished",
+      "detail": "All currently runnable tasks finished"
+    },
+    {
+      "sequence": 145,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:20.665260+00:00",
+      "kind": "integration_requested",
+      "detail": "Developer requested local integration and combined checks"
+    },
+    {
+      "sequence": 146,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:20.872349+00:00",
+      "kind": "integration_workspace_ready",
+      "detail": "Pinned Git ownership"
+    },
+    {
+      "sequence": 147,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:21.445505+00:00",
+      "kind": "integration_merge",
+      "detail": "A: 10675344003a512b62646e02560b9f05ddf534bf"
+    },
+    {
+      "sequence": 148,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:21.977695+00:00",
+      "kind": "integration_merge",
+      "detail": "B: d6b122bac94c0ae6c5d43822f7beca130108fcd1"
+    },
+    {
+      "sequence": 149,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:22.532863+00:00",
+      "kind": "integration_merge",
+      "detail": "C: caec69043122ae6d7442000dd002f02b141410ee"
+    },
+    {
+      "sequence": 150,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:23.080588+00:00",
+      "kind": "integration_merge",
+      "detail": "D: 5a98499d971afda2c50748f1f7dc5aa1f6648b34"
+    },
+    {
+      "sequence": 151,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:23.579117+00:00",
+      "kind": "integration_merge",
+      "detail": "E: 7940736d79ddce15c1b46fd5a597abf67f41e6e4"
+    },
+    {
+      "sequence": 152,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:24.265903+00:00",
+      "kind": "verification_started",
+      "detail": "target=None process_key=e35316a2-dd47-4405-a0a5-49a82c5a6948 command=[\"sh\",\"-c\",\"printf 'fixture verification: passed\\\\n'; test -f README.md\"]"
+    },
+    {
+      "sequence": 153,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:24.330225+00:00",
+      "kind": "verification_process",
+      "detail": "target=None process=d64bb329-3755-48d5-922b-c45acf4ef645"
+    },
+    {
+      "sequence": 154,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:24.354972+00:00",
+      "kind": "verification_finished",
+      "detail": "target=None process=d64bb329-3755-48d5-922b-c45acf4ef645 passed=true"
+    },
+    {
+      "sequence": 155,
+      "run_id": "d331b265-857b-4219-b50b-9c344fdf4585",
+      "timestamp": "2026-10-21T01:15:24.985315+00:00",
+      "kind": "completed",
+      "detail": "Verified integration commit 585fe0029c7d7864e84af343cf56f857d42149ef"
+    }
+  ]
+}

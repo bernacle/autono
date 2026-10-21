@@ -1,0 +1,48 @@
+{
+  "home": "/tmp/autono-native-bru342-pr4-fixes-01",
+  "no_paid_inference": true,
+  "capture_after_timeout": {
+    "run_id": "76896ca5-11b9-42e2-ad7d-43b2ac744b58",
+    "status": "BLOCKED",
+    "revision": 27,
+    "configured_checks": 2,
+    "results": [
+      {
+        "passed": true,
+        "outcome": "passed"
+      },
+      {
+        "passed": false,
+        "outcome": "timeout"
+      }
+    ]
+  },
+  "native_partial_capture": {
+    "source": "Actual native AX and screenshot partial-verification-dark-1440.jpg",
+    "status": "RUNNING",
+    "revision": 23,
+    "visible_label": "Checks partial (1/2)"
+  },
+  "timeout_journal_records": 31,
+  "review_ordinal_smoke": {
+    "run_id": "60c19237-51ff-4096-97e1-5fa5d1609003",
+    "task": "E",
+    "attempt": 1,
+    "reviews": [
+      {
+        "ordinal": 1,
+        "session_id": "69bbc638-5e0f-4345-89d2-238142768e4b",
+        "provider_session_id": "eb969641-06c4-4fd9-a309-141ac86d0bd8",
+        "review_available": false,
+        "diagnostic": "invalid structured review: unknown field `invalid_fixture_review`, expected one of `accepted`, `criteria`, `findings`, `blocker`"
+      },
+      {
+        "ordinal": 2,
+        "session_id": "61ef20f1-0588-4724-bf94-0b969f31c206",
+        "provider_session_id": "3ea9deb3-6b73-4359-8271-82d823000c2e",
+        "review_available": true,
+        "diagnostic": null
+      }
+    ]
+  }
+}

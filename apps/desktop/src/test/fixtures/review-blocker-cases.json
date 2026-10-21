@@ -1,0 +1,62 @@
+[
+  {
+    "name": "ESC-only blocker",
+    "original": "\u001b",
+    "projected": "[redacted]",
+    "accepts": false
+  },
+  {
+    "name": "NUL and CR blocker",
+    "original": "\u0000\r",
+    "projected": "[redacted]",
+    "accepts": false
+  },
+  {
+    "name": "DEL and C1 blocker",
+    "original": "\u007f\u0085",
+    "projected": "[redacted]",
+    "accepts": false
+  },
+  {
+    "name": "space and ESC blocker",
+    "original": " \u001b",
+    "projected": " ",
+    "accepts": false
+  },
+  {
+    "name": "whitespace blocker",
+    "original": " \t\n",
+    "projected": " \t\n",
+    "accepts": false
+  },
+  {
+    "name": "credential-only blocker",
+    "original": "desktop-only-authentication-token-1234567890",
+    "projected": "[redacted]",
+    "accepts": false
+  },
+  {
+    "name": "control-split credential blocker",
+    "original": "desktop-only-\u001bauthentication-token-1234567890",
+    "projected": "[redacted]",
+    "accepts": false
+  },
+  {
+    "name": "safe readable blocker",
+    "original": "Needs explicit inspection",
+    "projected": "Needs explicit inspection",
+    "accepts": false
+  },
+  {
+    "name": "safe text and ESC blocker",
+    "original": "Needs\u001b inspection",
+    "projected": "Needs inspection",
+    "accepts": false
+  },
+  {
+    "name": "normal accepted review",
+    "original": "",
+    "projected": "",
+    "accepts": true
+  }
+]
