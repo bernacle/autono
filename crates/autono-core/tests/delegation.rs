@@ -1454,6 +1454,7 @@ async fn verification_and_local_integration_observe_cancellation_and_expiry() ->
     if !sandbox_present() {
         return Ok(());
     }
+    let mut evidence = Vec::new();
     for case in [Case::PauseVerification, Case::PauseIntegration] {
         for cancel in [true, false] {
             let h = Harness::new(case).await?;
@@ -1526,8 +1527,10 @@ async fn verification_and_local_integration_observe_cancellation_and_expiry() ->
                     RunStatus::Cancelled
                 } else {
                     RunStatus::Failed
-                }
+                },
+                "case={case:?} cancel={cancel} expiry={expiry} receipt={receipt:?}"
             );
+            evidence.push(json!({"case":format!("{case:?}"),"cancel":cancel,"expiry":expiry,"cutoff":cutoff,"run_status":stopped.status,"receipt":receipt}));
             assert!(receipt.started_at.is_some());
             assert!(receipt.finished_at.is_some());
             assert!(
@@ -1554,6 +1557,9 @@ async fn verification_and_local_integration_observe_cancellation_and_expiry() ->
             assert_eq!(*h.fake.calls.lock().expect("calls"), calls);
             h.shutdown().await?;
         }
+    }
+    if let Some(path) = std::env::var_os("AUTONO_EXPIRY_EVIDENCE") {
+        std::fs::write(path, serde_json::to_vec_pretty(&evidence)?)?;
     }
     Ok(())
 }

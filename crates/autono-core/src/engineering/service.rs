@@ -618,13 +618,13 @@ impl EngineeringService {
             };
             runner = runner.with_deadline(auth.as_ref().map(|a| a.expires_at));
             if let Some(auth) = &auth {
-                let remaining = (auth.expires_at - Utc::now()).to_std().unwrap_or_default();
+                let deadline = auth.expires_at;
                 let token = workflow_stop.clone();
                 self.inner.jobs.spawn(async move {
                     tokio::select! {
                         biased;
                         _ = done.cancelled() => {},
-                        _ = tokio::time::sleep(remaining) => token.cancel(),
+                        _ = crate::supervisor::wait_for_deadline(deadline) => token.cancel(),
                     }
                 });
             }
