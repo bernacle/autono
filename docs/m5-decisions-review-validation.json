@@ -163,5 +163,38 @@
     "The exact intermittent pre-existing A2 Cancelled receipt was not reproduced locally; absolute-cutoff timer regression and all four workflow receipt expectations pass.",
     "Requirements compatibility is a conservative lexical gate, not semantic understanding.",
     "Dependency and unreviewed workspace artifacts are candidate context and cannot establish Category A conventions."
-  ]
+  ],
+  "ci_observation_race_followup": {
+    "validated_at": "2026-10-22T18:35:26.832534+00:00",
+    "initial_head": "0acb23e1f0df4b7bed29324480cbfa560404ec64",
+    "initial_pr_workflow": {
+      "url": "https://github.com/bernacle/autono/actions/runs/39828906599",
+      "passed_jobs": 4
+    },
+    "initial_push_workflow": {
+      "url": "https://github.com/bernacle/autono/actions/runs/39828896897",
+      "passed_jobs": 3,
+      "failed_job": "check (macos-latest)",
+      "failure": "CLI fixture returned a stale plan summary after observing controller idle"
+    },
+    "deterministic_regression_before_fix": {
+      "exit_code": 101,
+      "returned_revision": 1,
+      "expected_revision": 2,
+      "log_sha256": "9441afff6f711785e3213459fc8af2f18bfd82cffb6c655a8b013a4789b7fae6"
+    },
+    "focused_cli_validation": {
+      "command": "cargo test -p autono-cli --test delegation --test decisions --locked",
+      "passed": 3,
+      "failed": 0,
+      "a3_fixture_seconds": 26.27,
+      "a2_and_publication_regression_seconds": 22.36,
+      "log_sha256": "c9cc1f164508167fb3bf56ddda123483caa5fe4b29cc22d9fdca244e11c9156c"
+    },
+    "formatting": "passed: cargo fmt --all --check",
+    "strict_clippy": "passed: cargo clippy --workspace --all-targets --locked -- -D warnings",
+    "strict_clippy_log_sha256": "67ec371f25e52366af6cb404a33e35c246fad92943e231406268664d5e61d36c",
+    "scope": "Test helper publication ordering and one deterministic HTTP regression; runtime and frontend unchanged",
+    "workspace_test_count_change": "+1 from the previously recorded 138 passed tests; full CI reruns on the follow-up commit"
+  }
 }

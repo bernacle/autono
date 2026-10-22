@@ -113,7 +113,7 @@ The unchanged reproductions passed 3/3 before fixes. Corrected deterministic
 regressions cover stale replay, explicit negative requirements, manufactured
 conventions, independent per-revision rejection, immutable attempt bindings,
 append-only history, SQLite reopen, and ordered same-attempt/tree status predicates.
-Final macOS arm64 validation passed:
+Full macOS arm64 validation before the CI fixture follow-up passed:
 
 - `RUST_TEST_THREADS=2 cargo test --workspace --locked`: 138 passed, zero failed,
   two intentional exclusions (the paid-agent suite and isolated helper).
@@ -143,3 +143,14 @@ The first full run had 137 tests; the final run adds the absolute-cutoff regress
 The SQLite fixture now uses the explicit positive requirement `Use feature`, so it
 continues testing a genuinely eligible accepted decision under the stricter policy;
 negative and contradictory specifications have dedicated classification regressions.
+
+The initial push's duplicate macOS workflow subsequently exposed a CLI fixture
+observation race even though all four PR jobs passed. Its helper could return an
+old plan snapshot read before the controller published the expiry diagnostic.
+The test now observes controller idle before reading the run, with a deterministic
+publication-order regression. This is separate from the original A2 receipt
+finding; no runtime budget, authorization check or semantic assertion changes.
+The new regression fails against the old helper (returned revision 1 instead of
+2). After correction, both CLI fixtures and the regression passed: three tests,
+zero failures. This adds one test to the previously validated workspace total.
+See [the CI race disposition](m5-delegation-expiry-receipts.md#separate-ci-observation-race).

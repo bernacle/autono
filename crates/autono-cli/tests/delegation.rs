@@ -12,6 +12,96 @@ use std::{
 };
 use support::*;
 use uuid::Uuid;
+
+/// Model failure publication between the run snapshot and the idle response.
+/// The controller persists its final diagnostic before clearing active_run.
+#[tokio::test]
+async fn draining_reads_the_checkpoint_published_before_idle() -> Result<()> {
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
+    let metadata = autono_protocol::DaemonMetadata {
+        api_version: autono_protocol::API_VERSION,
+        pid: std::process::id(),
+        address: listener.local_addr()?,
+        token: "disposable-drain-fixture".into(),
+    };
+    let id = Uuid::new_v4();
+    let now = chrono::Utc::now();
+    let mut run = EngineeringRun {
+        decisions: vec![],
+        id,
+        revision: 1,
+        status: EngineeringStatus::AwaitingApproval,
+        created_at: now,
+        updated_at: now,
+        repository: PathBuf::from("/disposable/repo"),
+        repository_git: None,
+        requested_base: "main".into(),
+        base_commit: "a".repeat(40),
+        specification: "Feature".into(),
+        settings: WorkflowSettings::default(),
+        delegation: None,
+        plan: None,
+        approved_at: None,
+        planner: None,
+        planning_workspace: autono_core::engineering::workspace::reference(
+            Path::new("/disposable/home"),
+            id,
+            "planner",
+            &"a".repeat(40),
+        ),
+        tasks: vec![],
+        blockers: vec![],
+        human_actions: vec![],
+        preflight: None,
+        integration_workspace: None,
+        integration_verification: vec![],
+        summary: "Plan validated".into(),
+    };
+    let server = tokio::spawn(async move {
+        for _ in 0..2 {
+            let (mut socket, _) = listener.accept().await?;
+            let mut request = Vec::new();
+            while !request.ends_with(b"\r\n\r\n") {
+                let byte = socket.read_u8().await?;
+                request.push(byte);
+                anyhow::ensure!(request.len() <= 8192, "oversized fixture request");
+            }
+            let request = String::from_utf8(request)?;
+            let body = if request.starts_with("GET /v1/engineering/health ") {
+                // Persist the failure checkpoint, then announce controller idle.
+                run.revision = 2;
+                run.summary = "total runtime budget exhausted".into();
+                json!({"active_run": null, "persistence_error": null})
+            } else {
+                anyhow::ensure!(
+                    request.starts_with(&format!("GET /v1/engineering/{id} ")),
+                    "unexpected fixture request"
+                );
+                serde_json::to_value(&run)?
+            }
+            .to_string();
+            socket
+                .write_all(
+                    format!(
+                        "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                        body.len()
+                    )
+                    .as_bytes(),
+                )
+                .await?;
+        }
+        anyhow::Ok(())
+    });
+    let http = reqwest::Client::builder().no_proxy().build()?;
+    let observed = drained(&http, &metadata, id).await?;
+    server.await??;
+    assert_eq!(observed.revision, 2);
+    assert_eq!(observed.summary, "total runtime budget exhausted");
+    Ok(())
+}
+
 #[tokio::test]
 async fn detached_cli_consent_real_daemon_safe_retry_integration_and_restart() -> Result<()> {
     if cfg!(target_os = "linux") && !Path::new("/usr/bin/bwrap").exists() {

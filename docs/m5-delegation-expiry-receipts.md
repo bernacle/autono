@@ -63,3 +63,27 @@ timestamps, stop reason and run state. The existing assertions still require
 `Failed` on expiry, `Cancelled` on explicit cancellation, no launch after cutoff,
 retained completed tasks and no replay. Admission-contention, running-control,
 shutdown and immutable-replay fixtures also remain enabled.
+
+## Separate CI observation race
+
+At `0acb23e`, all four pull-request jobs passed, while the duplicate push workflow's
+macOS job failed in the CLI delegation fixture. This was a different assertion:
+the preflight-expiry run summary still said `Plan validated` instead of containing
+the durable runtime-budget reason. It was not a `Cancelled` process receipt.
+See [the failed push run](https://github.com/bernacle/autono/actions/runs/39828896897)
+and [the passing PR run](https://github.com/bernacle/autono/actions/runs/39828906599).
+
+The fixture's `drained` helper read the run snapshot *before* observing controller
+idle. `EngineeringService::run_owned` persists `record_failure` before clearing
+`registry.active`, but the HTTP error response can reach the caller before that
+publication finishes. A snapshot of the earlier `AwaitingApproval` checkpoint
+followed by an idle health response could therefore return the stale snapshot.
+
+The test helper now observes idle first, then reads the authoritative run. It also
+surfaces a reported persistence error. A deterministic HTTP fixture publishes the
+new failure checkpoint immediately before its idle response; the old helper
+returns revision 1 and fails, while the corrected helper returns revision 2 and
+the precise diagnostic. The real CLI fixture retains its original runtime budget,
+expiry timing, summary assertion, exact preflight comparison, no-second-process
+assertion and no-task-launch assertion. No runtime authorization or process code
+changes for this test synchronization correction.

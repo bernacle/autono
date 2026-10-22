@@ -162,7 +162,6 @@ pub async fn drained(
 ) -> Result<EngineeringRun> {
     tokio::time::timeout(Duration::from_secs(90), async {
         loop {
-            let r = run_view(http, m, id).await?;
             let health: serde_json::Value = http
                 .get(format!("http://{}/v1/engineering/health", m.address))
                 .bearer_auth(&m.token)
@@ -171,8 +170,18 @@ pub async fn drained(
                 .error_for_status()?
                 .json()
                 .await?;
-            if !r.status.active() && health["active_run"].is_null() {
-                return Ok(r);
+            ensure!(
+                health["persistence_error"].is_null(),
+                "workflow persistence error: {}",
+                health["persistence_error"]
+            );
+            if health["active_run"].is_null() {
+                // The controller publishes its final checkpoint before going idle.
+                // A snapshot read before this barrier can still be the old plan.
+                let r = run_view(http, m, id).await?;
+                if !r.status.active() {
+                    return Ok(r);
+                }
             }
             tokio::time::sleep(Duration::from_millis(20)).await;
         }
