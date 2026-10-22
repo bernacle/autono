@@ -165,6 +165,7 @@ pub(super) async fn validate(
     let Some(auth) = &run.delegation else {
         return Ok(());
     };
+    runner.check_authority(stop)?;
     let c = &auth.contract;
     let result: Result<()> = async {
         ensure!(
@@ -252,6 +253,7 @@ pub(super) async fn validate(
         Ok(())
     }
     .await;
+    runner.check_authority(stop)?;
     result.map_err(|e| denied(format!("{e:#}")))
 }
 

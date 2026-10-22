@@ -31,17 +31,71 @@ enum Case {
     Unsupported,
     ScopedPermission,
     LiveHuman,
+    PausePlanner,
+    PauseReviewer,
+    PreflightHold,
+    PauseVerification,
+    PauseIntegration,
 }
 struct Fixture {
     case: Case,
     calls: Mutex<BTreeMap<String, usize>>,
     reached: tokio::sync::Notify,
     release: CancellationToken,
+    delayed_readiness: std::sync::atomic::AtomicBool,
 }
 fn quote(s: &str) -> String {
     format!("'{}'", s.replace('\'', "'\\''"))
 }
 impl AgentRuntime for Fixture {
+    fn readiness<'a>(
+        &'a self,
+        runner: &'a ProcessRunner,
+        cwd: &'a std::path::Path,
+        _: &'a WorkflowSettings,
+        stop: &'a CancellationToken,
+    ) -> autono_core::engineering::agent::ReadinessFuture<'a> {
+        Box::pin(async move {
+            if self
+                .delayed_readiness
+                .load(std::sync::atomic::Ordering::SeqCst)
+            {
+                let gate = cwd.join("release-probe");
+                let command = vec![
+                    "/bin/sh".into(),
+                    "-c".into(),
+                    format!(
+                        "while test ! -f {}; do sleep 0.01; done; echo capability",
+                        quote(&gate.to_string_lossy())
+                    ),
+                ];
+                let process = runner.start(command, cwd, 15, Uuid::new_v4(), stop).await?;
+                self.reached.notify_one();
+                let _ = runner.wait(process.id, stop).await?;
+                // Deliberately attempt the next probe even if the first was stopped.
+                // Production adapters also recheck here; the runner must deny it.
+                runner
+                    .run(
+                        vec![
+                            "/bin/sh".into(),
+                            "-c".into(),
+                            "echo forbidden > after-deadline".into(),
+                        ],
+                        cwd,
+                        15,
+                        Uuid::new_v4(),
+                        stop,
+                    )
+                    .await?;
+            }
+            Ok(vec![ReadinessCheck {
+                id: "fixture-readiness".into(),
+                ready: Some(true),
+                blocking: true,
+                evidence: "Deterministic local capability fixture".into(),
+            }])
+        })
+    }
     fn prepare<'a>(
         &'a self,
         r: &'a AgentRequest,
@@ -77,7 +131,9 @@ impl AgentRuntime for Fixture {
                 *v += 1;
                 *v
             };
-            if (self.case == Case::Drift && r.role == AgentRole::Coder)
+            if (self.case == Case::PausePlanner && r.role == AgentRole::Planner)
+                || (self.case == Case::PauseReviewer && r.role == AgentRole::Reviewer)
+                || (self.case == Case::Drift && r.role == AgentRole::Coder)
                 || (self.case == Case::LiveHuman
                     && r.role == AgentRole::Reviewer
                     && label.starts_with("review-a-"))
@@ -123,6 +179,9 @@ impl AgentRuntime for Fixture {
             let mut value = value;
             if self.case == Case::ScopedPermission && r.role == AgentRole::Planner {
                 value["human_requirements"] = json!([{"kind":"permission","reason":"B requests an operation beyond the configured check grant","requested_action":"Approve an unconfigured shell command","affected_tasks":["b"],"blocking":true,"evidence":"Fixture proposes a mismatched verification scope","confidence":100,"permission":{"operation":"run_checks","scope":"arbitrary agent-generated shell command"}}]);
+            }
+            if self.case == Case::PreflightHold && r.role == AgentRole::Planner {
+                value["human_requirements"] = json!([{"kind":"product_decision","reason":"Fixture hold before execution","requested_action":"Choose behavior","affected_tasks":[],"blocking":true,"evidence":"Deterministic preparation fixture","confidence":100,"permission":null}]);
             }
             let envelope = if self.case == Case::Login && r.role == AgentRole::Coder && id == "b" {
                 json!({"type":"result","subtype":"error_during_execution","is_error":true,"error":{"code":"authentication_error"}})
@@ -194,6 +253,15 @@ impl Harness {
                 .insert(PermissionOperation::RunChecks, PermissionRule::Deny);
         }
         config.verification.commands = vec![vec!["/bin/sh".into(),"-c".into(),"for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done".into()]];
+        if matches!(case, Case::PauseVerification | Case::PauseIntegration) {
+            let label = if case == Case::PauseIntegration {
+                "integration"
+            } else {
+                "task-a"
+            };
+            config.verification.commands.insert(0, vec!["/bin/sh".into(), "-c".into(), format!("if test \"${{PWD##*/}}\" = {label}; then echo boundary-{label}; sleep 60; fi")]);
+            config.verification.timeout_seconds = 90;
+        }
         let supervisor = Supervisor::configured(store, &config.runner);
         let runner = ProcessRunner::new(supervisor.clone());
         let stop = CancellationToken::new();
@@ -206,6 +274,7 @@ impl Harness {
             calls: Mutex::new(BTreeMap::new()),
             reached: Default::default(),
             release: Default::default(),
+            delayed_readiness: Default::default(),
         });
         let service =
             EngineeringService::with_agents(supervisor, home.clone(), config.clone(), fake.clone());
@@ -881,4 +950,307 @@ async fn live_resolution_continues_with_healthy_workers_without_manual_admission
         2
     );
     h.shutdown().await
+}
+
+/// Starts an inactive preflight with less than one second of original authority.
+/// A gated capability process spans expiry; an attempted second probe must never run.
+#[tokio::test]
+async fn preparation_deadline_and_cancellation_cover_preflight_and_continue() -> Result<()> {
+    if !sandbox_present() {
+        return Ok(());
+    }
+    for operation in [
+        "preflight-expiry",
+        "preflight-cancel",
+        "execute-expiry",
+        "continue-expiry",
+    ] {
+        let h = Harness::new(if operation.starts_with("continue") {
+            Case::Human
+        } else {
+            Case::PreflightHold
+        })
+        .await?;
+        let c = h
+            .proposal(
+                if operation.starts_with("continue") {
+                    30
+                } else if operation.ends_with("expiry") {
+                    8
+                } else {
+                    120
+                },
+                true,
+            )
+            .await?;
+        let id = c.request.submission.id;
+        h.service.authorize_delegation(c).await?;
+        let paused = h.inactive(id).await?;
+        assert_eq!(
+            paused.status,
+            if operation.starts_with("continue") {
+                EngineeringStatus::Blocked
+            } else {
+                EngineeringStatus::AwaitingApproval
+            },
+            "{}",
+            paused.summary
+        );
+        let expiry = paused
+            .delegation
+            .as_ref()
+            .context("authorization")?
+            .expires_at;
+        if operation.ends_with("expiry") {
+            let delay = (expiry - chrono::Utc::now() - chrono::Duration::milliseconds(900))
+                .to_std()
+                .context("fixture must reach pause before deadline")?;
+            tokio::time::sleep(delay).await;
+        }
+        h.fake
+            .delayed_readiness
+            .store(true, std::sync::atomic::Ordering::SeqCst);
+        let service = h.service.clone();
+        let job = tokio::spawn(async move {
+            if operation.starts_with("continue") {
+                service.continue_run(id).await
+            } else if operation.starts_with("execute") {
+                service.execute(id).await
+            } else {
+                service.preflight(id).await
+            }
+        });
+        tokio::time::timeout(std::time::Duration::from_secs(3), h.fake.reached.notified()).await?;
+        if operation.ends_with("cancel") {
+            h.service.cancel(id).await?;
+        } else {
+            tokio::time::sleep(
+                (expiry - chrono::Utc::now()).to_std().unwrap_or_default()
+                    + std::time::Duration::from_millis(50),
+            )
+            .await;
+        }
+        // On the vulnerable implementation this releases preparation, which then
+        // launches the second process and publishes successful preflight after expiry.
+        std::fs::write(
+            paused.planning_workspace.path.join("release-probe"),
+            "release",
+        )?;
+        let result = tokio::time::timeout(std::time::Duration::from_secs(5), job).await??;
+        assert!(
+            result.is_err(),
+            "expired/cancelled preparation cannot succeed"
+        );
+        if operation.ends_with("expiry") {
+            assert!(
+                format!("{:#}", result.expect_err("expired preparation must fail"))
+                    .contains("runtime budget")
+            );
+        }
+        let stopped = h.inactive(id).await?;
+        assert!(
+            !paused
+                .planning_workspace
+                .path
+                .join("after-deadline")
+                .exists()
+        );
+        assert_eq!(
+            stopped.preflight, paused.preflight,
+            "no new successful preflight checkpoint"
+        );
+        assert_eq!(
+            stopped
+                .tasks
+                .iter()
+                .filter(|t| t.status == TaskStatus::Completed)
+                .count(),
+            paused
+                .tasks
+                .iter()
+                .filter(|t| t.status == TaskStatus::Completed)
+                .count()
+        );
+        if operation.ends_with("expiry") {
+            assert!(
+                stopped.summary.contains("runtime budget"),
+                "{}",
+                stopped.summary
+            );
+            assert!(
+                stopped
+                    .human_actions
+                    .iter()
+                    .any(|a| a.requirement.reason.contains("runtime budget"))
+            );
+        } else {
+            assert_eq!(stopped.status, EngineeringStatus::Cancelled);
+        }
+        h.shutdown().await?;
+    }
+    Ok(())
+}
+
+#[tokio::test]
+async fn planning_and_independent_review_preparation_stop_before_agent_admission() -> Result<()> {
+    if !sandbox_present() {
+        return Ok(());
+    }
+    for case in [Case::PausePlanner, Case::PauseReviewer] {
+        for cancel in [true, false] {
+            let h = Harness::new(case).await?;
+            // Leave time to reach the reviewer even while release builds compete
+            // for CPU. The gate, not a slow provider guess, then spans expiry.
+            let c = h
+                .proposal(
+                    if cancel {
+                        120
+                    } else if case == Case::PauseReviewer {
+                        30
+                    } else {
+                        5
+                    },
+                    true,
+                )
+                .await?;
+            let id = c.request.submission.id;
+            h.service.authorize_delegation(c.clone()).await?;
+            tokio::time::timeout(
+                std::time::Duration::from_secs(40),
+                h.fake.reached.notified(),
+            )
+            .await?;
+            if cancel {
+                h.service.cancel(id).await?;
+            }
+            let stopped = h.inactive(id).await?;
+            assert_eq!(
+                stopped.status,
+                if cancel {
+                    EngineeringStatus::Cancelled
+                } else {
+                    EngineeringStatus::Blocked
+                },
+                "{}",
+                stopped.summary
+            );
+            let calls = h.fake.calls.lock().expect("calls").clone();
+            h.service.authorize_delegation(c).await?;
+            assert_eq!(*h.fake.calls.lock().expect("calls"), calls);
+            assert!(!h.repo.join("a.txt").exists());
+            assert!(stopped.integration_workspace.is_none());
+            h.shutdown().await?;
+        }
+    }
+    Ok(())
+}
+
+#[tokio::test]
+async fn verification_and_local_integration_observe_cancellation_and_expiry() -> Result<()> {
+    use autono_core::{EventKind, RunStatus};
+    if !sandbox_present() {
+        return Ok(());
+    }
+    for case in [Case::PauseVerification, Case::PauseIntegration] {
+        for cancel in [true, false] {
+            let h = Harness::new(case).await?;
+            let c = h
+                .proposal(
+                    if cancel {
+                        120
+                    } else if case == Case::PauseIntegration {
+                        60
+                    } else {
+                        10
+                    },
+                    true,
+                )
+                .await?;
+            let id = c.request.submission.id;
+            let label = if case == Case::PauseIntegration {
+                "integration"
+            } else {
+                "task-a"
+            };
+            let marker = format!("boundary-{label}");
+            h.service.authorize_delegation(c.clone()).await?;
+            let process = tokio::time::timeout(std::time::Duration::from_secs(65), async {
+                loop {
+                    for p in h.service.store().list(500, 0).await? {
+                        if p.spec.cwd.file_name().is_some_and(|name| name == label)
+                            && p.spec.command.iter().any(|a| a.contains(&marker))
+                            && h.service
+                                .store()
+                                .events(p.id, 0, 500)
+                                .await?
+                                .iter()
+                                .any(|e| matches!(e.kind, EventKind::Output { .. }))
+                        {
+                            return Ok::<_, anyhow::Error>(p);
+                        }
+                    }
+                    tokio::time::sleep(std::time::Duration::from_millis(10)).await;
+                }
+            })
+            .await??;
+            let expiry = h
+                .service
+                .store()
+                .engineering_get(id)
+                .await?
+                .delegation
+                .context("authorization")?
+                .expires_at;
+            if cancel {
+                h.service.cancel(id).await?;
+            }
+            let cutoff = if cancel { chrono::Utc::now() } else { expiry };
+            let stopped = h.inactive(id).await?;
+            assert_eq!(
+                stopped.status,
+                if cancel {
+                    EngineeringStatus::Cancelled
+                } else {
+                    EngineeringStatus::Blocked
+                },
+                "{}",
+                stopped.summary
+            );
+            let receipt = h.service.store().get(process.id).await?;
+            assert_eq!(
+                receipt.status,
+                if cancel {
+                    RunStatus::Cancelled
+                } else {
+                    RunStatus::Failed
+                }
+            );
+            assert!(receipt.started_at.is_some());
+            assert!(receipt.finished_at.is_some());
+            assert!(
+                h.service
+                    .store()
+                    .list(500, 0)
+                    .await?
+                    .iter()
+                    .all(|p| p.started_at.is_none_or(|t| t <= cutoff)),
+                "no launch after authoritative boundary"
+            );
+            if case == Case::PauseIntegration {
+                assert!(
+                    stopped
+                        .tasks
+                        .iter()
+                        .all(|t| t.status == TaskStatus::Completed)
+                );
+                assert!(stopped.integration_workspace.is_some());
+            }
+            assert!(!h.repo.join("a.txt").exists());
+            let calls = h.fake.calls.lock().expect("calls").clone();
+            h.service.authorize_delegation(c).await?;
+            assert_eq!(*h.fake.calls.lock().expect("calls"), calls);
+            h.shutdown().await?;
+        }
+    }
+    Ok(())
 }

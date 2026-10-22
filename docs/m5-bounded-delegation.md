@@ -197,8 +197,14 @@ so inspect the current summary for subsequent liveness. The original operation,
 files and all remaining budgets are rechecked. Unknown effects remain blocked;
 failed work with previous effect context still requires fresh reconciliation.
 
-A deadline watcher cancels owned active processes and prevents further admission.
-Cancellation never waits for a SQLite checkpoint to signal processes. All budgets
+A deadline scope is installed before preparation, including provider readiness.
+The workflow token and absolute expiry travel through supervisor-owned queued
+admission and the final pre-spawn check, and directly control running processes.
+In-flight SQLite commits are reconciled before stopped work receives its durable
+unstarted receipt; cancellation never abandons a queued launch future.
+See [independent-review lifecycle repairs](m5-delegation-lifecycle-review-fixes.md)
+for the P1/P2 regressions, race handling and updated validation.
+Cancellation never waits for a SQLite checkpoint to signal running processes. All budgets
 and completed artifacts survive. Interrupted/cancelled/failed runs are not resumed
 by authorization replay. Startup does not adopt saved PIDs or recreate worktrees.
 The existing process-group cleanup and hostile same-UID trust limits remain:
@@ -293,7 +299,7 @@ Sandbox tests attempt real external reads/writes, inherited-secret access and a
 live loopback connection. Existing Supervised, authenticated bridge, immutable
 receipt/evidence, restart and adversarial suites also run unchanged.
 
-Final macOS validation passed: **116 Rust tests**, two intentionally ignored;
+Initial implementation validation (reviewed baseline) passed: **116 Rust tests**, two intentionally ignored;
 **100 frontend tests**; TypeScript; zero-warning ESLint and Clippy; workspace
 formatting/debug and release builds/docs; Rust 1.89.0 checks for all non-desktop targets; production
 frontend/startup smoke; optimized native Tauri build; authenticated bridge and

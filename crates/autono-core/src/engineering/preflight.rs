@@ -76,6 +76,7 @@ pub(super) async fn inspect(
     agents: &Arc<dyn AgentRuntime>,
     stop: &CancellationToken,
 ) -> Result<()> {
+    runner.check_authority(stop)?;
     let run = journal.read().await;
     let mut checks = Vec::new();
     let mut actions = Vec::new();
@@ -279,9 +280,10 @@ pub(super) async fn inspect(
             None,
         ));
     }
-    ensure!(!stop.is_cancelled(), "preflight cancelled");
+    runner.check_authority(stop)?;
     let ids: Vec<_> = actions.iter().map(|a| a.id.clone()).collect();
     journal.change("preflight", "Preflight checks and human checklist refreshed (no credential values)", |r| {
+        runner.check_authority(stop)?;
         for a in &mut r.human_actions {
             let passed = checks.iter().any(|c| c.ready == Some(true) && (a.id == stable_id(&format!("check-{}", c.id)) || (c.id.starts_with("env-") && a.id == stable_id(&c.id))));
             if passed && a.requirement.kind == HumanActionType::Environment && a.status != HumanActionStatus::Resolved {

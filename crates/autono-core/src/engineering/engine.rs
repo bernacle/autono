@@ -155,6 +155,7 @@ impl Engine {
                     "delegation_execution",
                     "Original delegation admits the immutable plan and configured checks",
                     |r| {
+                        self.runner.check_authority(&self.stop)?;
                         r.status = EngineeringStatus::Running;
                         r.approved_at = Some(
                             r.delegation
@@ -183,6 +184,7 @@ impl Engine {
                     "delegation_integration",
                     "Original delegation admits isolated local integration and combined checks",
                     |r| {
+                        self.runner.check_authority(&self.stop)?;
                         r.status = EngineeringStatus::Integrating;
                         r.integration_workspace = Some(w);
                         Ok(())
@@ -264,6 +266,7 @@ impl Engine {
             serde_json::from_value(response?.result).context("decode structured plan")?;
         plan.validate()?;
         self.journal.change("plan_ready","Validated plan awaits developer approval",|r| {
+            self.runner.check_authority(&self.stop)?;
             r.tasks = plan.tasks.iter().map(|p| EngineeringTask { plan: p.clone(), status: if p.dependencies.is_empty() {TaskStatus::Ready} else {TaskStatus::Waiting}, workspace: None, attempts: vec![], artifact_commit: None }).collect();
             r.plan = Some(plan); r.status = EngineeringStatus::AwaitingApproval;
             r.summary = "Plan validated. Inspect requirements, dependencies, and checks; execute explicitly approves this plan.".into(); Ok(())
@@ -383,6 +386,7 @@ impl Engine {
             resume,
         };
         let response = async {
+            self.runner.check_authority(&self.stop)?;
             let command = self
                 .agents
                 .prepare(&request, &self.runner, &self.stop)
@@ -473,6 +477,7 @@ impl Engine {
                     // Dependency failure propagates only to descendants; independent work proceeds.
                     self.journal
                         .change("scheduler", "Dependency states evaluated", |r| {
+                            self.runner.check_authority(&self.stop)?;
                             loop {
                                 let blocked: Vec<_> = r
                                     .tasks
@@ -529,6 +534,7 @@ impl Engine {
                             });
                         self.journal
                             .change("task_started", &id, |r| {
+                                self.runner.check_authority(&self.stop)?;
                                 let t = task_mut(r, &id)?;
                                 if t.status == TaskStatus::Waiting {
                                     t.status = TaskStatus::Ready;
@@ -541,6 +547,7 @@ impl Engine {
                                 "workspace_reserved",
                                 &format!("{id}: {} ({})", w.path.display(), w.branch),
                                 |r| {
+                                    self.runner.check_authority(&self.stop)?;
                                     let t = task_mut(r, &id)?;
                                     t.status = TaskStatus::Running;
                                     t.workspace = Some(w);
@@ -568,6 +575,7 @@ impl Engine {
                 }
                 let mut finished = false;
                 self.journal.change("execution_finished", "All currently runnable tasks finished", |r| {
+                    self.runner.check_authority(&self.stop)?;
                     if !r.ready_tasks().is_empty() { return Ok(()); }
                     r.status = if r.tasks.iter().all(|t|t.status==TaskStatus::Completed) {EngineeringStatus::Verified} else if r.tasks.iter().any(|t|matches!(t.status,TaskStatus::Blocked | TaskStatus::BlockedHuman)) || (r.delegation.is_some() && r.human_actions.iter().any(|a|r.action_blocks(a))) {EngineeringStatus::Blocked} else {EngineeringStatus::Failed};
                     r.summary = format!("{} of {} tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate.", r.tasks.iter().filter(|t| t.status == TaskStatus::Completed).count(), r.tasks.len());
@@ -983,6 +991,7 @@ impl Engine {
             );
             self.journal
                 .change("task_completed", &format!("{id}: {commit}"), |r| {
+                    self.runner.check_authority(&self.stop)?;
                     let t = task_mut(r, id)?;
                     t.status = TaskStatus::Completed;
                     t.artifact_commit = Some(commit.clone());
@@ -1475,7 +1484,7 @@ impl Engine {
             workspace::candidate_tree(&self.runner, &w.path, &self.stop).await? == tree,
             "integration candidate changed before completion"
         );
-        self.journal.change("completed",&format!("Verified integration commit {commit}"),|r|{r.integration_workspace.as_mut().context("missing workspace")?.head_commit=Some(commit.clone());r.status=EngineeringStatus::Completed;r.summary=format!("All {} tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch {} at {} ({}). No merge to main was performed.",r.tasks.len(),w.branch,commit,w.path.display());Ok(())}).await
+        self.journal.change("completed",&format!("Verified integration commit {commit}"),|r|{self.runner.check_authority(&self.stop)?;r.integration_workspace.as_mut().context("missing workspace")?.head_commit=Some(commit.clone());r.status=EngineeringStatus::Completed;r.summary=format!("All {} tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch {} at {} ({}). No merge to main was performed.",r.tasks.len(),w.branch,commit,w.path.display());Ok(())}).await
     }
 }
 fn workspace_blocker(error: anyhow::Error) -> anyhow::Error {

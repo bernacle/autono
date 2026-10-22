@@ -87,7 +87,9 @@ impl AgentRuntime for CliAgentRuntime {
                 ("coder", &settings.agents.coder),
                 ("reviewer", &settings.agents.reviewer),
             ] {
+                runner.check_authority(stop)?;
                 let ready = self.probe(config.provider, runner, cwd, stop).await.is_ok();
+                runner.check_authority(stop)?;
                 checks.push(super::ReadinessCheck { id: format!("provider-{name}"), ready: Some(ready), blocking: true, evidence: "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable".into() });
                 checks.push(super::ReadinessCheck { id: format!("authentication-{name}"), ready: None, blocking: false, evidence: "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login".into() });
             }
@@ -102,6 +104,7 @@ impl AgentRuntime for CliAgentRuntime {
         stop: &'a CancellationToken,
     ) -> AgentFuture<'a> {
         Box::pin(async move {
+            runner.check_authority(stop)?;
             if request.bounded && request.config.provider != Provider::Claude {
                 return Err(super::delegation::denied(
                     "provider cannot enforce tool-free bounded mode",

@@ -84,6 +84,11 @@ fn install_fixture(root: &Path) -> Result<()> {
     let script = r##"#!/bin/sh
 set -eu
 if test "${1:-}" = --help; then
+    printf '%s\n' probe >> "$AUTONO_FIXTURE_ROOT/probe-invocations"
+    if test -f "$AUTONO_FIXTURE_ROOT/delay-probe"; then
+        touch "$AUTONO_FIXTURE_ROOT/probe-started"
+        while ! test -f "$AUTONO_FIXTURE_ROOT/release-probe"; do sleep 0.01; done
+    fi
     printf '%s\n' '--print stream-json --json-schema --permission-prompts --safe-mode --bare --tools --strict-mcp-config --restricted --disallowedTools --disable-slash-commands --settings --setting-sources'
     exit 0
 fi
@@ -122,6 +127,9 @@ review-*)
  result="{\"accepted\":true,\"criteria\":[{\"criterion_id\":\"$id-C1\",\"criterion\":\"Works\",\"satisfied\":true,\"evidence\":\"Independent full diff and passing verification\"}],\"findings\":[],\"blocker\":\"\"}" ;;
 *) exit 92 ;;
 esac
+if test "$label" = planner && test -f "$AUTONO_FIXTURE_ROOT/hold-preflight"; then
+    result=$(printf '%s' "$result" | sed 's/"human_requirements":\[\]/"human_requirements":[{"kind":"product_decision","reason":"Fixture decision","requested_action":"Choose behavior","affected_tasks":[],"blocking":true,"evidence":"Deterministic hold","confidence":100,"permission":null}]/')
+fi
 uuid=$(if test -f /proc/sys/kernel/random/uuid; then cat /proc/sys/kernel/random/uuid; else /usr/bin/uuidgen; fi)
 printf '{"type":"result","subtype":"success","session_id":"%s","structured_output":%s}\n' "$uuid" "$result"
 "##;
@@ -478,6 +486,100 @@ run_checks = "REQUIRE_APPROVAL"
     std::fs::write(
         root.join("adversarial-evidence.json"),
         serde_json::to_vec_pretty(&json!({"interrupted":interrupted,"unavailable":unavailable}))?,
+    )?;
+    // P2: exercise the production adapter's help-only capability probes in an
+    // inactive preflight. The first help process is gated across the deadline.
+    std::fs::rename(root.join("bin/claude-disabled"), root.join("bin/claude"))?;
+    std::fs::write(root.join("hold-preflight"), "pause before execution")?;
+    let mut preparation = c.request.clone();
+    preparation.submission.id = Uuid::new_v4();
+    preparation.max_runtime_seconds = 6;
+    let preparation_id = preparation.submission.id;
+    let contract: DelegationContract = http
+        .post(format!(
+            "http://{}/v1/delegations/propose",
+            after_crash.address
+        ))
+        .bearer_auth(&after_crash.token)
+        .json(&preparation)
+        .send()
+        .await?
+        .error_for_status()?
+        .json()
+        .await?;
+    http.post(format!(
+        "http://{}/v1/delegations/{preparation_id}/authorize",
+        after_crash.address
+    ))
+    .bearer_auth(&after_crash.token)
+    .json(&contract)
+    .send()
+    .await?
+    .error_for_status()?;
+    let paused = drained(&http, &after_crash, preparation_id).await?;
+    assert_eq!(
+        paused.status,
+        EngineeringStatus::AwaitingApproval,
+        "{}",
+        paused.summary
+    );
+    let expiry = paused
+        .delegation
+        .as_ref()
+        .context("authorization")?
+        .expires_at;
+    tokio::time::sleep(
+        (expiry - chrono::Utc::now() - chrono::Duration::milliseconds(900))
+            .to_std()
+            .context("preparation fixture must pause before expiry")?,
+    )
+    .await;
+    let probes = std::fs::read_to_string(root.join("probe-invocations"))?;
+    std::fs::write(root.join("delay-probe"), "gate capability response")?;
+    let request = http
+        .post(format!(
+            "http://{}/v1/engineering/{preparation_id}/preflight",
+            after_crash.address
+        ))
+        .bearer_auth(&after_crash.token);
+    let pending = tokio::spawn(async move { request.send().await });
+    tokio::time::timeout(Duration::from_secs(3), async {
+        while !root.join("probe-started").exists() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+    })
+    .await?;
+    tokio::time::sleep(
+        (expiry - chrono::Utc::now()).to_std().unwrap_or_default() + Duration::from_millis(50),
+    )
+    .await;
+    std::fs::write(root.join("release-probe"), "release after expiry")?;
+    let response = tokio::time::timeout(Duration::from_secs(5), pending).await???;
+    assert!(!response.status().is_success());
+    // Existing API errors conceal internal diagnostics; the authenticated run
+    // view below must carry the precise, durable authorization reason.
+    let _ = response.text().await?;
+    let expired = drained(&http, &after_crash, preparation_id).await?;
+    assert!(
+        expired.summary.contains("runtime budget"),
+        "{}",
+        expired.summary
+    );
+    assert_eq!(expired.preflight, paused.preflight);
+    assert_eq!(
+        std::fs::read_to_string(root.join("probe-invocations"))?
+            .lines()
+            .count(),
+        probes.lines().count() + 1,
+        "no second capability process after expiry"
+    );
+    assert!(expired.tasks.iter().all(|t| t.attempts.is_empty()));
+    assert_eq!(git(&repo, &["rev-parse", "main"]).await?, seed);
+    std::fs::write(
+        root.join("lifecycle-evidence.json"),
+        serde_json::to_vec_pretty(
+            &json!({"expired_preflight":expired,"probe_launches_during_preparation":1,"post_expiry_probe_launches":0,"original_main_unchanged":true,"paid_inference":false}),
+        )?,
     )?;
     daemon.kill().await?;
     if let Some(destination) = std::env::var_os("AUTONO_DELEGATION_EVIDENCE") {

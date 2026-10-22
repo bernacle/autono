@@ -1,0 +1,723 @@
+{
+  "safe_run": {
+    "id": "f0fd9309-9af7-4ac7-9e3f-aba62dd25e7c",
+    "status": "COMPLETED",
+    "base_commit": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+    "integration_workspace": {
+      "base_commit": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+      "branch": "autono/f0fd9309-9af7-4ac7-9e3f-aba62dd25e7c/integration",
+      "git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/integration",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/f0fd9309-9af7-4ac7-9e3f-aba62dd25e7c/integration/.git": "c36eb6e5175879e6e6d45bfdd511b5462deee01ba92eb386ea1747e800e9bde4",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/http-alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/integration/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/integration/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/integration/gitdir": "849444d7579fcb5e9ca7b4b4f716d38790f73bacbfcb107b83f3eb68e43b4591",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/integration/info/exclude": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/f0fd9309-9af7-4ac7-9e3f-aba62dd25e7c/integration"
+      },
+      "head_commit": "35853bc31bce836e69c7e4a6400cd9036647edb0",
+      "id": "d409f318-2f96-4e15-9b0d-785ed68a9ba2",
+      "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/f0fd9309-9af7-4ac7-9e3f-aba62dd25e7c/integration"
+    },
+    "original_main_commit": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+    "no_routine_approval_events": true,
+    "post_restart_replayed": false
+  },
+  "preparation_deadline": {
+    "expired_preflight": {
+      "approved_at": null,
+      "base_commit": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+      "blockers": [],
+      "created_at": "2026-10-21T23:47:40.192949Z",
+      "delegation": {
+        "authorized_at": "2026-10-21T23:47:40.120832Z",
+        "contract": {
+          "base_commit": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+          "limitations": [
+            "Only Claude tool-free structured responses are supported for autonomous agents; Codex tool confinement is unavailable. No agent shell, filesystem tools, MCP, subagents, or session resume. Bare/restricted mode and disabled hooks/customizations are required; the default first-party API endpoint is the only supported backend.",
+            "Daemon may read authorized regular files (256 KiB each, 1 MiB total) and pinned project context, and create/replace authorized regular UTF-8 files inside assigned worktrees. No deletes, links, mode changes, hidden paths or protected instruction/configuration edits.",
+            "Only the exact configured verification argv may run, inside the recorded local sandbox with a cleared environment, no network, and no unrelated user-home file contents. System runtimes and the assigned checkout are readable; checkout and per-command temporary storage are writable. Sandbox availability is required; no unsandboxed fallback. Preflight may run help-only provider probes and a fixed sandboxed /usr/bin/true capability probe.",
+            "Owned worktree creation, dependency merges, immutable-tree preservation and optional local integration are permitted. Remote push, publishing, production deployment, main merge, credentials, dependency installation and arbitrary external operations are excluded.",
+            "Provider/model arguments and time/attempt/review/concurrency limits are enforced. Tool-free prompts, including full review diffs, are limited to 64 KiB; larger work blocks. Token/monetary accounting and spending caps are unavailable; provider defaults and inference charges cannot be certified. The trusted tool-free provider uses its configured API credentials in bare mode; OAuth subscription login and alternate cloud/custom backends are unsupported. Autono never reads or exposes credential values.",
+            "Authorization expires by wall-clock deadline from consent, including idle time. Crash/restart interrupts active runs and never resumes or blindly replays uncertain effects. Same-UID hostile processes and trusted installed provider binaries remain inside the local trust boundary."
+          ],
+          "repository_git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/commondir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/gitdir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/http-alternates": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo"
+          },
+          "repository_identity": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo": "16777232:411814654:501",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git": "16777232:411814659:501"
+          },
+          "request": {
+            "local_integration": true,
+            "max_runtime_seconds": 6,
+            "submission": {
+              "base": "main",
+              "id": "805d1900-347a-4e10-a775-8b3ecf1f449f",
+              "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo",
+              "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n"
+            },
+            "writable_files": [
+              "a.sh",
+              "b.sh",
+              "c.sh"
+            ]
+          },
+          "settings": {
+            "agents": {
+              "coder": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "planner": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "reviewer": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              }
+            },
+            "execution": {
+              "max_attempts": 3,
+              "max_parallel": 2,
+              "max_review_cycles": 2
+            },
+            "permissions": {
+              "rules": {
+                "run_checks": "REQUIRE_APPROVAL",
+                "workspace_write": "REQUIRE_APPROVAL"
+              }
+            },
+            "preflight": {
+              "external_services": [],
+              "required_directories": [],
+              "required_env": [],
+              "required_tools": []
+            },
+            "verification": {
+              "commands": [
+                [
+                  "/bin/sh",
+                  "-c",
+                  "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                ]
+              ],
+              "timeout_seconds": 10
+            }
+          },
+          "user_config_digest": "4d346c4c9e891609e6bde852b08f0de36142abc0ccbc0a091f403179835e35aa",
+          "verification_sandbox": "macos-seatbelt-v1",
+          "version": 1,
+          "worktree_root": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/805d1900-347a-4e10-a775-8b3ecf1f449f"
+        },
+        "expires_at": "2026-10-21T23:47:46.120832Z"
+      },
+      "human_actions": [
+        {
+          "audit": [
+            {
+              "at": "2026-10-21T23:47:41.312227Z",
+              "request": null,
+              "status": "PENDING"
+            }
+          ],
+          "continuable": false,
+          "created_at": "2026-10-21T23:47:41.312227Z",
+          "id": "H-8d7fd115102cade40227b38deae37eb2",
+          "requirement": {
+            "affected_tasks": [],
+            "blocking": true,
+            "confidence": 100,
+            "evidence": "Deterministic hold",
+            "kind": "product_decision",
+            "permission": null,
+            "reason": "Fixture decision",
+            "requested_action": "Choose behavior"
+          },
+          "resolution": null,
+          "status": "PENDING",
+          "updated_at": "2026-10-21T23:47:41.312227Z",
+          "workspace_snapshot": null
+        },
+        {
+          "audit": [
+            {
+              "at": "2026-10-21T23:47:46.125489Z",
+              "request": null,
+              "status": "PENDING"
+            }
+          ],
+          "continuable": false,
+          "created_at": "2026-10-21T23:47:46.125489Z",
+          "id": "H-6d460d1d1d7cb68dff8b94ca1fadc60a",
+          "requirement": {
+            "affected_tasks": [],
+            "blocking": true,
+            "confidence": 100,
+            "evidence": "Daemon stage admission",
+            "kind": "runtime",
+            "permission": null,
+            "reason": "delegation_denied: total runtime budget exhausted; active processes cancelled, completed evidence retained",
+            "requested_action": "Inspect the denied or expired operation; new authority requires a new proposal and consent"
+          },
+          "resolution": null,
+          "status": "PENDING",
+          "updated_at": "2026-10-21T23:47:46.125489Z",
+          "workspace_snapshot": null
+        }
+      ],
+      "id": "805d1900-347a-4e10-a775-8b3ecf1f449f",
+      "integration_verification": [],
+      "integration_workspace": null,
+      "plan": {
+        "human_requirements": [
+          {
+            "affected_tasks": [],
+            "blocking": true,
+            "confidence": 100,
+            "evidence": "Deterministic hold",
+            "kind": "product_decision",
+            "permission": null,
+            "reason": "Fixture decision",
+            "requested_action": "Choose behavior"
+          }
+        ],
+        "milestones": [
+          {
+            "goal": "Feature",
+            "id": "m",
+            "task_ids": [
+              "a",
+              "b",
+              "c"
+            ]
+          }
+        ],
+        "requirements": [
+          {
+            "id": "r",
+            "text": "Safe feature"
+          }
+        ],
+        "tasks": [
+          {
+            "acceptance_criteria": [
+              "A works"
+            ],
+            "dependencies": [],
+            "description": "Create A",
+            "goal": "A",
+            "id": "a",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          {
+            "acceptance_criteria": [
+              "B works"
+            ],
+            "dependencies": [],
+            "description": "Create B",
+            "goal": "B",
+            "id": "b",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          {
+            "acceptance_criteria": [
+              "C works"
+            ],
+            "dependencies": [
+              "a"
+            ],
+            "description": "Create C",
+            "goal": "C",
+            "id": "c",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          }
+        ]
+      },
+      "planner": {
+        "id": "a3caaeb2-270b-4b95-bbd3-5925b79aebe7",
+        "outcome": "succeeded",
+        "process_key": "bbd1697d-dd36-4b67-8b70-d7c99a142670",
+        "process_run_id": "b32bdd02-8aa6-4b1a-a615-1a1fb126ec09",
+        "provider": "claude",
+        "provider_session_id": "8B2B1C6D-10A2-4070-BE66-B972BCD21223",
+        "result": "{\"human_requirements\":[{\"affected_tasks\":[],\"blocking\":true,\"confidence\":100,\"evidence\":\"Deterministic hold\",\"kind\":\"product_decision\",\"permission\":null,\"reason\":\"Fixture decision\",\"requested_action\":\"Choose behavior\"}],\"milestones\":[{\"goal\":\"Feature\",\"id\":\"m\",\"task_ids\":[\"a\",\"b\",\"c\"]}],\"requirements\":[{\"id\":\"r\",\"text\":\"Safe feature\"}],\"tasks\":[{\"acceptance_criteria\":[\"A works\"],\"dependencies\":[],\"description\":\"Create A\",\"goal\":\"A\",\"id\":\"a\",\"requirement_ids\":[\"r\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured check\"]},{\"acceptance_criteria\":[\"B works\"],\"dependencies\":[],\"description\":\"Create B\",\"goal\":\"B\",\"id\":\"b\",\"requirement_ids\":[\"r\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured check\"]},{\"acceptance_criteria\":[\"C works\"],\"dependencies\":[\"a\"],\"description\":\"Create C\",\"goal\":\"C\",\"id\":\"c\",\"requirement_ids\":[\"r\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured check\"]}]}",
+        "resumed_from": null,
+        "role": "planner"
+      },
+      "planning_workspace": {
+        "base_commit": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+        "branch": "autono/805d1900-347a-4e10-a775-8b3ecf1f449f/planner",
+        "git": {
+          "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git",
+          "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/planner3",
+          "metadata": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/805d1900-347a-4e10-a775-8b3ecf1f449f/planner/.git": "4f7d653b921834a00f9d536b32b25bb8a32121e8a5e1732587d4bab0b12b86b1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/attributes": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/grafts": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/http-alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/planner3/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/planner3/config.worktree": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/planner3/gitdir": "103dc54e22256d374b669b0d3a3a7f3a34571240ee9f3b2810868fcc5f7a82a1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/worktrees/planner3/info/exclude": null
+          },
+          "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/805d1900-347a-4e10-a775-8b3ecf1f449f/planner"
+        },
+        "head_commit": null,
+        "id": "08cbec9a-c31e-4977-80a6-62c39039b9d1",
+        "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/805d1900-347a-4e10-a775-8b3ecf1f449f/planner"
+      },
+      "preflight": {
+        "action_ids": [
+          "H-8d7fd115102cade40227b38deae37eb2"
+        ],
+        "checked_at": "2026-10-21T23:47:41.350920Z",
+        "checks": [
+          {
+            "blocking": true,
+            "evidence": "Repository accessibility and pinned Git ownership",
+            "id": "repository",
+            "ready": true
+          },
+          {
+            "blocking": true,
+            "evidence": "Planning checkout accessibility and pinned Git ownership",
+            "id": "planning-workspace",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees",
+            "id": "git-working-state",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately",
+            "id": "installed-codex",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately",
+            "id": "installed-claude",
+            "ready": true
+          },
+          {
+            "blocking": true,
+            "evidence": "Configured verification executable availability; command behavior is validated during execution",
+            "id": "verification-0",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "WorkspaceWrite: RequireApproval; scope run 805d1900-347a-4e10-a775-8b3ecf1f449f assigned task worktrees",
+            "id": "permission-WorkspaceWrite",
+            "ready": false
+          },
+          {
+            "blocking": false,
+            "evidence": "RunChecks: RequireApproval; scope run 805d1900-347a-4e10-a775-8b3ecf1f449f immutable configured verification commands",
+            "id": "permission-RunChecks",
+            "ready": false
+          },
+          {
+            "blocking": true,
+            "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+            "id": "provider-coder",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+            "id": "authentication-coder",
+            "ready": null
+          },
+          {
+            "blocking": true,
+            "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+            "id": "provider-reviewer",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+            "id": "authentication-reviewer",
+            "ready": null
+          },
+          {
+            "blocking": true,
+            "evidence": "Exact configured verification executable must be available within the sandbox's system PATH or the assigned checkout",
+            "id": "delegation-check-0",
+            "ready": true
+          },
+          {
+            "blocking": true,
+            "evidence": "Fixed /usr/bin/true probe in the verification sandbox; no credentials or inference. Unavailable sandbox requires external repair",
+            "id": "delegation-sandbox",
+            "ready": true
+          }
+        ],
+        "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation.",
+        "ready": false
+      },
+      "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo",
+      "repository_git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/commondir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/gitdir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo/.git/objects/info/http-alternates": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/repo"
+      },
+      "requested_base": "main",
+      "revision": 12,
+      "settings": {
+        "agents": {
+          "coder": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "planner": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "reviewer": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          }
+        },
+        "execution": {
+          "max_attempts": 3,
+          "max_parallel": 2,
+          "max_review_cycles": 2
+        },
+        "permissions": {
+          "rules": {
+            "run_checks": "REQUIRE_APPROVAL",
+            "workspace_write": "REQUIRE_APPROVAL"
+          }
+        },
+        "preflight": {
+          "external_services": [],
+          "required_directories": [],
+          "required_env": [],
+          "required_tools": []
+        },
+        "verification": {
+          "commands": [
+            [
+              "/bin/sh",
+              "-c",
+              "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+            ]
+          ],
+          "timeout_seconds": 10
+        }
+      },
+      "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n",
+      "status": "AWAITING_APPROVAL",
+      "summary": "delegation_denied: total runtime budget exhausted; active processes cancelled, completed evidence retained",
+      "tasks": [
+        {
+          "artifact_commit": null,
+          "attempts": [],
+          "plan": {
+            "acceptance_criteria": [
+              "A works"
+            ],
+            "dependencies": [],
+            "description": "Create A",
+            "goal": "A",
+            "id": "a",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          "status": "READY",
+          "workspace": null
+        },
+        {
+          "artifact_commit": null,
+          "attempts": [],
+          "plan": {
+            "acceptance_criteria": [
+              "B works"
+            ],
+            "dependencies": [],
+            "description": "Create B",
+            "goal": "B",
+            "id": "b",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          "status": "READY",
+          "workspace": null
+        },
+        {
+          "artifact_commit": null,
+          "attempts": [],
+          "plan": {
+            "acceptance_criteria": [
+              "C works"
+            ],
+            "dependencies": [
+              "a"
+            ],
+            "description": "Create C",
+            "goal": "C",
+            "id": "c",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          "status": "WAITING",
+          "workspace": null
+        }
+      ],
+      "updated_at": "2026-10-21T23:47:46.125506Z"
+    },
+    "original_main_unchanged": true,
+    "paid_inference": false,
+    "post_expiry_probe_launches": 0,
+    "probe_launches_during_preparation": 1
+  },
+  "queued_admission": [
+    {
+      "boundary": "cancel",
+      "child_marker_created": false,
+      "conflicting_key_denied": true,
+      "matching_key_replayed_after_restart": true,
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-21T23:51:56.304372Z",
+        "detail": "stopped before launch",
+        "exit_code": null,
+        "finished_at": "2026-10-21T23:51:56.377908Z",
+        "id": "0c926f92-614c-4ac6-a3a2-f49e10ed3f40",
+        "output_complete": true,
+        "pid": null,
+        "spec": {
+          "command": [
+            "/bin/sh",
+            "-c",
+            "echo launched > launched; exec /bin/sleep 20"
+          ],
+          "cwd": "/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpCGVmDI",
+          "env": {
+            "GIT_EDITOR": "true",
+            "GIT_MERGE_AUTOEDIT": "no",
+            "GIT_OPTIONAL_LOCKS": "0",
+            "GIT_TERMINAL_PROMPT": "0"
+          },
+          "keep_awake": true,
+          "timeout_seconds": 30
+        },
+        "started_at": null,
+        "status": "CANCELLED",
+        "submission_key": "8a0abf64-51ed-4e00-96c7-97d54eb55c3e",
+        "updated_at": "2026-10-21T23:51:56.379099Z"
+      }
+    },
+    {
+      "boundary": "cancel-disconnected",
+      "child_marker_created": false,
+      "conflicting_key_denied": true,
+      "matching_key_replayed_after_restart": true,
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-21T23:51:56.446190Z",
+        "detail": "stopped before launch",
+        "exit_code": null,
+        "finished_at": "2026-10-21T23:51:56.469166Z",
+        "id": "5d6b9436-7d0a-42eb-858a-a7a92923cea8",
+        "output_complete": true,
+        "pid": null,
+        "spec": {
+          "command": [
+            "/bin/sh",
+            "-c",
+            "echo launched > launched; exec /bin/sleep 20"
+          ],
+          "cwd": "/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmptK7drC",
+          "env": {
+            "GIT_EDITOR": "true",
+            "GIT_MERGE_AUTOEDIT": "no",
+            "GIT_OPTIONAL_LOCKS": "0",
+            "GIT_TERMINAL_PROMPT": "0"
+          },
+          "keep_awake": true,
+          "timeout_seconds": 30
+        },
+        "started_at": null,
+        "status": "CANCELLED",
+        "submission_key": "ba22f989-cc1b-4452-ade8-2e56c2efc885",
+        "updated_at": "2026-10-21T23:51:56.469789Z"
+      }
+    },
+    {
+      "boundary": "expiry",
+      "child_marker_created": false,
+      "conflicting_key_denied": true,
+      "matching_key_replayed_after_restart": true,
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-21T23:51:56.828638Z",
+        "detail": "authorization deadline exceeded before launch",
+        "exit_code": null,
+        "finished_at": "2026-10-21T23:51:56.920868Z",
+        "id": "3c678f0e-4cab-4549-9fb2-3ca3cd154f84",
+        "output_complete": true,
+        "pid": null,
+        "spec": {
+          "command": [
+            "/bin/sh",
+            "-c",
+            "echo launched > launched; exec /bin/sleep 20"
+          ],
+          "cwd": "/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpC7XyTA",
+          "env": {
+            "GIT_EDITOR": "true",
+            "GIT_MERGE_AUTOEDIT": "no",
+            "GIT_OPTIONAL_LOCKS": "0",
+            "GIT_TERMINAL_PROMPT": "0"
+          },
+          "keep_awake": true,
+          "timeout_seconds": 30
+        },
+        "started_at": null,
+        "status": "FAILED",
+        "submission_key": "50a79405-ea2b-4b8c-b6a1-c1ed1795e9b7",
+        "updated_at": "2026-10-21T23:51:56.921710Z"
+      }
+    },
+    {
+      "boundary": "shutdown",
+      "child_marker_created": false,
+      "conflicting_key_denied": true,
+      "matching_key_replayed_after_restart": true,
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-21T23:51:56.955845Z",
+        "detail": "stopped before launch",
+        "exit_code": null,
+        "finished_at": "2026-10-21T23:51:57.015061Z",
+        "id": "8a694153-5a69-48c2-8446-d1bc0c2966c4",
+        "output_complete": true,
+        "pid": null,
+        "spec": {
+          "command": [
+            "/bin/sh",
+            "-c",
+            "echo launched > launched; exec /bin/sleep 20"
+          ],
+          "cwd": "/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmplJrPMk",
+          "env": {
+            "GIT_EDITOR": "true",
+            "GIT_MERGE_AUTOEDIT": "no",
+            "GIT_OPTIONAL_LOCKS": "0",
+            "GIT_TERMINAL_PROMPT": "0"
+          },
+          "keep_awake": true,
+          "timeout_seconds": 30
+        },
+        "started_at": null,
+        "status": "INTERRUPTED",
+        "submission_key": "c9f3add3-7629-40d0-b720-0b9388b84b3c",
+        "updated_at": "2026-10-21T23:51:57.016022Z"
+      }
+    }
+  ],
+  "native_lifetime": {
+    "main_commit_after": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+    "main_unchanged": true,
+    "native_binary": "/Users/brunosimplicio/Dev/autono/target/release/bundle/macos/Autono.app/Contents/MacOS/autono-desktop",
+    "desktop_pid": 19461,
+    "desktop_terminated": true,
+    "daemon_pid": 19143,
+    "daemon_alive_after_desktop_exit": true,
+    "run_id": "6efb98a5-ddb8-4200-adec-bec00d46f5d5",
+    "before_desktop_exit": "PLANNING",
+    "after_desktop_exit": "PLANNING",
+    "final_status": "COMPLETED",
+    "base_commit": "9fce1ae9d147f3371f459d43aa31e8c401839fcc",
+    "paid_inference": false,
+    "provider": "private deterministic shell fixture",
+    "integration": {
+      "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpeazDTo/home/engineering/6efb98a5-ddb8-4200-adec-bec00d46f5d5/integration",
+      "branch": "autono/6efb98a5-ddb8-4200-adec-bec00d46f5d5/integration",
+      "head_commit": "9fa2f37ac2965365d0f8a3511637bb996a96f0e4"
+    }
+  }
+}

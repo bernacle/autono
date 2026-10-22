@@ -28,6 +28,27 @@ use crate::{
     process::Process,
 };
 
+/// Execution controls belong to the workflow, not to its admission waiter.
+/// The absolute deadline is checked independently of timer task scheduling.
+#[derive(Clone, Default)]
+pub(crate) struct ExecutionAuthority {
+    pub cancel: CancellationToken,
+    pub deadline: Option<chrono::DateTime<chrono::Utc>>,
+}
+impl ExecutionAuthority {
+    fn expired(&self) -> bool {
+        self.deadline.is_some_and(|d| chrono::Utc::now() >= d)
+    }
+    pub(crate) async fn deadline_reached(&self) {
+        match self.deadline {
+            Some(d) => {
+                tokio::time::sleep((d - chrono::Utc::now()).to_std().unwrap_or_default()).await
+            }
+            None => std::future::pending().await,
+        }
+    }
+}
+
 struct Registry {
     accepting: bool,
     runs: HashMap<Uuid, Control>,
@@ -157,6 +178,14 @@ impl Supervisor {
         .await
     }
     pub async fn submit_keyed(&self, submission: Submission) -> Result<Run> {
+        self.submit_authorized(submission, ExecutionAuthority::default())
+            .await
+    }
+    pub(crate) async fn submit_authorized(
+        &self,
+        submission: Submission,
+        authority: ExecutionAuthority,
+    ) -> Result<Run> {
         submission.spec.validate()?;
         let pending = self
             .inner
@@ -173,13 +202,13 @@ impl Supervisor {
             // gate shared with shutdown. Dropping HTTP/oneshot cannot cancel it.
             self.inner.tasks.spawn(async move {
                 let _pending = pending;
-                let result = this.accept(submission).await;
+                let result = this.accept(submission, authority).await;
                 let _ = reply.send(result);
             });
         }
         response.await.context("daemon admission task stopped")?
     }
-    async fn accept(&self, submission: Submission) -> Result<Run> {
+    async fn accept(&self, submission: Submission, authority: ExecutionAuthority) -> Result<Run> {
         let _gate = tokio::select! {
             biased;
             _ = self.inner.stop.cancelled() => return Err(ShuttingDown.into()),
@@ -202,6 +231,9 @@ impl Supervisor {
             .clone()
             .try_acquire_owned()
             .map_err(|_| Overloaded("active runs"))?;
+        // Do not cancel an in-flight SQLite mutation: its commit may still finish.
+        // Retain identity through reconciliation, then execute observes authority
+        // before launch and persists an unstarted terminal receipt when stopped.
         let (run, created) = retry(|| {
             self.inner
                 .store
@@ -228,7 +260,10 @@ impl Supervisor {
         let this = self.clone();
         let owned = run.clone();
         self.inner.tasks.spawn(async move {
-            if let Err(error) = this.execute(&owned, cancel, finished.clone()).await {
+            if let Err(error) = this
+                .execute(&owned, cancel, finished.clone(), authority)
+                .await
+            {
                 this.recovery_required(owned.id, format!("process controller failed: {error:#}"));
             }
             finished.cancel();
@@ -256,19 +291,41 @@ impl Supervisor {
         self.registry().accepting = false;
         self.inner.stop.cancel();
     }
+    /// A single observation determines both status and reason when signals race.
+    /// Finalization remains daemon-owned and does not wait on SQLite here.
+    fn finish_if_stopped(
+        &self,
+        id: Uuid,
+        cancel: &CancellationToken,
+        authority: &ExecutionAuthority,
+    ) -> bool {
+        let shutdown = self.inner.stop.is_cancelled();
+        let expired = authority.expired();
+        if shutdown || expired || cancel.is_cancelled() || authority.cancel.is_cancelled() {
+            let (status, reason) = if shutdown {
+                (RunStatus::Interrupted, "daemon stopped before launch")
+            } else if expired {
+                (
+                    RunStatus::Failed,
+                    "authorization deadline exceeded before launch",
+                )
+            } else {
+                (RunStatus::Cancelled, "stopped before launch")
+            };
+            self.complete_unstarted(id, status, reason.into());
+            true
+        } else {
+            false
+        }
+    }
     async fn execute(
         &self,
         run: &Run,
         cancel: CancellationToken,
         finished: CancellationToken,
+        authority: ExecutionAuthority,
     ) -> Result<()> {
-        if cancel.is_cancelled() || self.inner.stop.is_cancelled() {
-            let status = if self.inner.stop.is_cancelled() {
-                RunStatus::Interrupted
-            } else {
-                RunStatus::Cancelled
-            };
-            self.complete_unstarted(run.id, status, "stopped before launch".into());
+        if self.finish_if_stopped(run.id, &cancel, &authority) {
             return Ok(());
         }
         let mut warnings = Vec::new();
@@ -277,7 +334,9 @@ impl Supervisor {
         {
             warnings.push(warning);
         }
-        let result = self.execute_process(run, cancel, warnings, finished).await;
+        let result = self
+            .execute_process(run, cancel, warnings, finished, authority)
+            .await;
         if run.spec.keep_awake {
             self.inner.power.leave().await;
         }
@@ -289,18 +348,8 @@ impl Supervisor {
         cancel: CancellationToken,
         mut warnings: Vec<String>,
         control_finished: CancellationToken,
+        authority: ExecutionAuthority,
     ) -> Result<()> {
-        // Power acquisition can yield. Honor a stop received during it before
-        // launching anything; persistence of the stop may follow asynchronously.
-        if cancel.is_cancelled() || self.inner.stop.is_cancelled() {
-            let status = if self.inner.stop.is_cancelled() {
-                RunStatus::Interrupted
-            } else {
-                RunStatus::Cancelled
-            };
-            self.complete_unstarted(run.id, status, "stopped before launch".into());
-            return Ok(());
-        }
         let mut command = Command::new(&run.spec.command[0]);
         command
             .args(&run.spec.command[1..])
@@ -309,6 +358,11 @@ impl Supervisor {
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
+        // Power acquisition can yield. Honor a stop received during it before
+        // launching anything; persistence of the stop may follow asynchronously.
+        if self.finish_if_stopped(run.id, &cancel, &authority) {
+            return Ok(());
+        }
         let launched = chrono::Utc::now();
         let clock = tokio::time::Instant::now();
         let mut process = match Process::spawn(&mut command) {
@@ -356,6 +410,8 @@ impl Supervisor {
                 status = process.exited() => break status.map(Some),
                 _ = self.inner.stop.cancelled() => break Ok(None),
                 _ = cancel.cancelled() => break Ok(None),
+                _ = authority.cancel.cancelled() => break Ok(None),
+                _ = authority.deadline_reached() => break Ok(None),
                 _ = tokio::time::sleep_until(deadline), if run.spec.timeout_seconds.is_some() => break Ok(None),
                 _ = failed.cancelled() => break Ok(None),
                 result = power_errors.changed(), if run.spec.keep_awake => {
@@ -378,7 +434,12 @@ impl Supervisor {
                 None,
                 Some("daemon shut down".into()),
             ),
-            Ok(None) if cancel.is_cancelled() => {
+            Ok(None) if authority.expired() => (
+                RunStatus::Failed,
+                None,
+                Some("authorization deadline exceeded".into()),
+            ),
+            Ok(None) if cancel.is_cancelled() || authority.cancel.is_cancelled() => {
                 (RunStatus::Cancelled, None, Some("cancelled by user".into()))
             }
             Ok(None)
