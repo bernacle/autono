@@ -1,3 +1,4 @@
+import { PartialHandoff } from "./partial-handoff";
 import { Decisions } from "./decisions";
 import { useCallback, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -259,6 +260,7 @@ export function RunDetail({
           </Button>
         </div>
       )}
+      <PartialHandoff report={run.handoff} />
       <Tabs.Root value={tab} onValueChange={setTab} className="run-tabs">
         <Tabs.List className="tabs" aria-label="Run details">
           {[

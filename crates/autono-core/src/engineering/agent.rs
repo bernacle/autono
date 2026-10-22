@@ -45,6 +45,11 @@ fn failure(kind: &str, detail: impl Into<String>, blocked: bool) -> anyhow::Erro
 pub type ReadinessFuture<'a> =
     Pin<Box<dyn Future<Output = Result<Vec<super::ReadinessCheck>>> + Send + 'a>>;
 pub trait AgentRuntime: Send + Sync {
+    /// Injected runtimes own their credential-free availability contract.
+    fn authentication_readiness(&self, _bounded: bool) -> Vec<super::ReadinessCheck> {
+        vec![]
+    }
+
     /// Injected runtimes explicitly own their availability contract; no real CLI calls in CI.
     fn readiness<'a>(
         &'a self,
@@ -74,6 +79,20 @@ pub trait AgentRuntime: Send + Sync {
 #[derive(Default)]
 pub struct CliAgentRuntime;
 impl AgentRuntime for CliAgentRuntime {
+    fn authentication_readiness(&self, bounded: bool) -> Vec<super::ReadinessCheck> {
+        if !bounded {
+            return vec![];
+        }
+        // A2 bare first-party API mode has no subscription/keychain login fallback.
+        // Presence is necessary, not proof of validity; never retain the value.
+        vec![super::ReadinessCheck {
+            id: "authentication-bounded-api".into(),
+            ready: Some(std::env::var_os("ANTHROPIC_API_KEY").is_some_and(|v| !v.is_empty())),
+            blocking: true,
+            evidence: "Bounded bare provider requires ANTHROPIC_API_KEY in the daemon environment. Only nonempty presence is checked; validity remains unknown until provider invocation. Configure externally, never submit credentials.".into(),
+        }]
+    }
+
     fn readiness<'a>(
         &'a self,
         runner: &'a ProcessRunner,
@@ -84,6 +103,7 @@ impl AgentRuntime for CliAgentRuntime {
         Box::pin(async move {
             let mut checks = vec![];
             for (name, config) in [
+                ("planner", &settings.agents.planner),
                 ("coder", &settings.agents.coder),
                 ("reviewer", &settings.agents.reviewer),
             ] {

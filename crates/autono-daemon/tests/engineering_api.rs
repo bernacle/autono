@@ -166,6 +166,7 @@ async fn authenticated_api_owns_planning_execution_evidence_and_integration() ->
     );
     inactive(&service, id).await?;
     let request = ResolutionRequest {
+        expected_action_version: None,
         request_id: Uuid::new_v4(),
         disposition: ResolutionDisposition::Resolve,
         note: "Use the local feature mode".into(),

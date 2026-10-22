@@ -3789,3 +3789,19 @@ textarea::placeholder {
 .execution-stats .check-outcomes {
   white-space: normal;
 }
+
+
+.handoff-content {
+  display: grid;
+  gap: 12px;
+  padding: 16px 20px;
+}
+.handoff-content ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 20px;
+  list-style: disc;
+}
+.handoff-content li {
+  overflow-wrap: anywhere;
+}

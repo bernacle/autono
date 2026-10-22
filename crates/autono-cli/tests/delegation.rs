@@ -30,6 +30,7 @@ async fn draining_reads_the_checkpoint_published_before_idle() -> Result<()> {
     let now = chrono::Utc::now();
     let mut run = EngineeringRun {
         decisions: vec![],
+        handoff: None,
         id,
         revision: 1,
         status: EngineeringStatus::AwaitingApproval,
@@ -403,11 +404,17 @@ run_checks = "REQUIRE_APPROVAL"
     let unavailable = drained(&http, &after_crash, missing_id).await?;
     assert_eq!(
         unavailable.status,
-        EngineeringStatus::Blocked,
+        EngineeringStatus::AwaitingApproval,
         "{}",
         unavailable.summary
     );
     assert!(!unavailable.human_actions.is_empty());
+    assert!(unavailable.plan.is_none() && unavailable.planner.is_none());
+    assert!(unavailable.human_actions.iter().any(|a| {
+        a.prerequisite
+            .as_ref()
+            .is_some_and(|p| p.category == PrerequisiteCategory::EssentialBeforeStart)
+    }));
     assert_eq!(std::fs::read_to_string(root.join("invocations"))?, before);
     std::fs::write(
         root.join("adversarial-evidence.json"),

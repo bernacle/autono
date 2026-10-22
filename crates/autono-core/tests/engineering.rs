@@ -1585,6 +1585,7 @@ async fn context_comes_from_git_blobs_and_metadata_backreferences_remain_pinned(
 
 fn resolution(note: &str) -> ResolutionRequest {
     ResolutionRequest {
+        expected_action_version: None,
         request_id: Uuid::new_v4(),
         disposition: ResolutionDisposition::Resolve,
         note: note.into(),

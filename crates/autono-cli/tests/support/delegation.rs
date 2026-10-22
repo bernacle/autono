@@ -49,6 +49,7 @@ pub fn start(home: &Path, root: &Path) -> Result<Child> {
             format!("{}:/usr/bin:/bin", root.join("bin").display()),
         )
         .env("AUTONO_FIXTURE_ROOT", root)
+        .env("ANTHROPIC_API_KEY", "fixture-never-sent-to-a-service")
         .stdout(Stdio::from(log.try_clone()?))
         .stderr(Stdio::from(log))
         .process_group(0)

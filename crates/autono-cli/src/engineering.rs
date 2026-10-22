@@ -263,3 +263,29 @@ pub async fn decisions(paths: &Paths, id: Uuid, json_output: bool) -> Result<()>
     }
     Ok(())
 }
+
+pub async fn handoff(paths: &Paths, id: Uuid, json_output: bool) -> Result<()> {
+    let report: autono_protocol::engineering::RunHandoff = Client::connect(paths)
+        .await?
+        .get(&format!("/v1/engineering/{id}/handoff"))
+        .await?;
+    if json_output {
+        println!("{}", serde_json::to_string_pretty(&report)?);
+    } else {
+        println!("Run {id} — {:?}\n{}", report.outcome, report.summary);
+        for task in report.tasks {
+            println!("  {}: {:?}", task.task_id, task.delivery);
+        }
+        for need in report.needs_you {
+            println!(
+                "Needs you: {} ({} version {}; tasks: {}; waiting descendants: {})",
+                need.requested_action,
+                need.action_id,
+                need.action_version,
+                need.affected_tasks.join(", "),
+                need.waiting_descendants.join(", ")
+            );
+        }
+    }
+    Ok(())
+}

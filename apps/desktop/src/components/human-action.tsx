@@ -341,6 +341,7 @@ export function ResolutionPanel({
           "Review this action and complete the required inspection first.",
         );
       const payload = {
+        expected_action_version: snapshot.action.audit.length,
         disposition,
         note,
         effect,

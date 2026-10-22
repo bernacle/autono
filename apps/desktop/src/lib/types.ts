@@ -25,6 +25,7 @@ export interface Permission {
   scope: string;
 }
 export interface Resolution {
+  expected_action_version?: number;
   request_id: string;
   disposition: "resolve" | "approve" | "reject" | "defer";
   note: string;
@@ -32,6 +33,12 @@ export interface Resolution {
   permission: Permission | null;
 }
 export interface HumanAction {
+  prerequisite?: {
+    category: string;
+    basis: string;
+    alternative_decision_id: string | null;
+    verification_remaining: string[];
+  } | null;
   id: string;
   status: "PENDING" | "RESOLVED" | "DEFERRED" | "REJECTED";
   continuable: boolean;
@@ -51,6 +58,7 @@ export interface HumanAction {
   audit: { at: string; status: string; request: Resolution | null }[];
 }
 export interface Preflight {
+  independent_work_ready?: boolean;
   ready: boolean;
   checked_at: string;
   limitation: string;
@@ -160,7 +168,31 @@ export interface Settings {
   };
   verification: { commands: string[][]; timeout_seconds: number };
 }
+export interface RunHandoff {
+  outcome: string;
+  summary: string;
+  tasks: {
+    task_id: string;
+    delivery: string;
+    implementation_recorded: boolean;
+    checks_passed: boolean;
+    artifact_commit: string | null;
+  }[];
+  needs_you: {
+    action_id: string;
+    action_version: number;
+    category: string | null;
+    affected_tasks: string[];
+    waiting_descendants: string[];
+    requested_action: string;
+  }[];
+  combined_checks_passed: boolean;
+  completion_requirements_satisfied: boolean;
+  internal_decision_ids: string[];
+}
 export interface Run {
+  handoff?: RunHandoff | null;
+
   decisions?: DecisionRecord[];
   id: string;
   revision: number;

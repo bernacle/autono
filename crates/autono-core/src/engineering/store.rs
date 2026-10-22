@@ -160,6 +160,23 @@ impl Store {
                 && old.delegation == run.delegation,
             "immutable run inputs changed"
         );
+        if old.status == EngineeringStatus::AwaitingApproval
+            && run.status == EngineeringStatus::Planning
+        {
+            ensure!(
+                old.plan.is_none()
+                    && old.planner.is_none()
+                    && old.tasks.is_empty()
+                    && run.essential_prerequisites_ready(),
+                "only a repaired never-invoked planner admission may enter PLANNING"
+            );
+        }
+        if let Some(handoff) = &run.handoff {
+            ensure!(
+                *handoff == run.partial_completion(),
+                "handoff differs from authoritative evidence"
+            );
+        }
         save_decisions(&mut tx, &old, run).await?;
         if old.status != EngineeringStatus::Running && run.status == EngineeringStatus::Running {
             ensure!(
@@ -182,6 +199,13 @@ impl Store {
         }
         for task in &run.tasks {
             if let Some(previous) = old.tasks.iter().find(|t| t.plan.id == task.plan.id) {
+                if previous.status != TaskStatus::Running && task.status == TaskStatus::Running {
+                    ensure!(
+                        old.ready_tasks().contains(&task.plan.id),
+                        "task admission requires satisfied dependencies and authoritative actions"
+                    );
+                }
+
                 if previous.status == TaskStatus::BlockedHuman && task.status == TaskStatus::Ready {
                     let actions: Vec<_> = run
                         .human_actions
@@ -218,6 +242,24 @@ impl Store {
                 );
             }
             for attempt in &task.attempts {
+                if let Some(tree) = &attempt.implementation_tree {
+                    ensure!(
+                        attempt.verified_tree.as_ref().is_none_or(|v| v == tree),
+                        "verified tree differs from implementation"
+                    );
+                }
+                if let Some(prior) = old
+                    .tasks
+                    .iter()
+                    .find(|t| t.plan.id == task.plan.id)
+                    .and_then(|t| t.attempts.iter().find(|a| a.number == attempt.number))
+                    .and_then(|a| a.implementation_tree.as_ref())
+                {
+                    ensure!(
+                        attempt.implementation_tree.as_ref() == Some(prior),
+                        "implementation receipt is immutable"
+                    );
+                }
                 for review in &attempt.reviews {
                     if let Some(workspace) = &review.workspace {
                         reserve(&mut tx, run, workspace).await?;
@@ -317,6 +359,21 @@ impl Store {
                 "execution requires explicit plan approval"
             );
         }
+        // Gate success/integration admission, while allowing an in-flight
+        // integration to checkpoint a denial before transitioning to BLOCKED.
+        // Recording a new denied-operation finding on already VERIFIED local
+        // artifacts does not recertify them; the handoff exposes the new hold.
+        if run.status == EngineeringStatus::Completed
+            || (matches!(
+                run.status,
+                EngineeringStatus::Verified | EngineeringStatus::Integrating
+            ) && old.status != run.status)
+        {
+            ensure!(
+                !run.human_actions.iter().any(|a| run.action_blocks(a)),
+                "unresolved prerequisites prevent feature verification"
+            );
+        }
         if matches!(
             run.status,
             EngineeringStatus::Verified
@@ -352,6 +409,7 @@ impl Store {
             old.human_actions
                 .iter()
                 .all(|a| run.human_actions.iter().any(|b| b.id == a.id
+                    && b.prerequisite == a.prerequisite
                     && b.requirement == a.requirement
                     && b.created_at == a.created_at
                     && b.continuable == a.continuable
@@ -359,9 +417,39 @@ impl Store {
                     && b.audit.starts_with(&a.audit))),
             "human action identity/history is immutable"
         );
+        ensure!(
+            run.human_actions
+                .iter()
+                .map(|a| &a.id)
+                .collect::<std::collections::BTreeSet<_>>()
+                .len()
+                == run.human_actions.len(),
+            "duplicate human action identity"
+        );
         for action in &run.human_actions {
+            if let Some(p) = &action.prerequisite {
+                ensure!(
+                    p.category != PrerequisiteCategory::SafelyResolvableInternally
+                        && p.alternative_decision_id.is_none(),
+                    "internal choices belong in the A3 ledger, never permission actions"
+                );
+                ensure!(!action.audit.is_empty(), "prerequisite lacks history");
+            }
             sqlx::query("INSERT INTO engineering_human_actions(run_id,action_id,status,document) VALUES(?,?,?,?) ON CONFLICT(run_id,action_id) DO UPDATE SET status=excluded.status,document=excluded.document")
                 .bind(run.id.to_string()).bind(&action.id).bind(serde_json::to_value(action.status)?.as_str().context("action status")?).bind(serde_json::to_string(action)?).execute(&mut *tx).await?;
+            if let Some(classification) = &action.prerequisite {
+                let start = old
+                    .human_actions
+                    .iter()
+                    .find(|a| a.id == action.id)
+                    .map_or(0, |a| a.audit.len());
+                for (i, event) in action.audit.iter().enumerate().skip(start) {
+                    sqlx::query("INSERT INTO engineering_prerequisite_events(run_id,action_id,sequence,document) VALUES(?,?,?,?)")
+                        .bind(run.id.to_string()).bind(&action.id).bind((i + 1) as i64)
+                        .bind(serde_json::to_string(&serde_json::json!({"classification":classification,"event":event}))?)
+                        .execute(&mut *tx).await?;
+                }
+            }
             for request in action.audit.iter().filter_map(|a| a.request.as_ref()) {
                 let payload = serde_json::to_string(request)?;
                 sqlx::query("INSERT INTO engineering_resolution_requests(request_id,run_id,action_id,document,result) VALUES(?,?,?,?,?) ON CONFLICT(request_id) DO NOTHING")
@@ -461,6 +549,7 @@ impl Store {
                     .into(),
                 created_at: Utc::now(),
             });
+            run.handoff = Some(run.partial_completion());
             self.engineering_save(&run, "interrupted", &run.summary)
                 .await?;
         }
@@ -802,6 +891,7 @@ mod tests {
         let now = Utc::now();
         EngineeringRun {
             decisions: vec![],
+            handoff: None,
             id,
             delegation: None,
             revision: 0,
@@ -884,6 +974,7 @@ mod tests {
             .change("approved", "Developer approved", |r| {
                 r.approved_at = Some(Utc::now());
                 r.preflight = Some(PreflightReport {
+                    independent_work_ready: false,
                     checked_at: Utc::now(),
                     checks: vec![],
                     action_ids: vec![],
@@ -1048,12 +1139,14 @@ mod tests {
                 findings: vec![],
                 blocker: String::new(),
             }),
+            implementation_tree: None,
             snapshot: Some("snapshot".into()),
             verified_tree: Some("c".repeat(40)),
             preserved_tree: Some("c".repeat(40)),
             detail: None,
         });
         run.revision += 1;
+        run.handoff = Some(run.partial_completion());
         for (verified, preserved) in [
             (None, None),
             (Some("c".repeat(40)), None),
@@ -1063,6 +1156,7 @@ mod tests {
             let attempt = &mut incomplete.tasks[0].attempts[0];
             attempt.verified_tree = verified;
             attempt.preserved_tree = preserved;
+            incomplete.handoff = Some(incomplete.partial_completion());
             let error = store
                 .engineering_save(&incomplete, "completed", "reject missing/mismatched trees")
                 .await
@@ -1349,6 +1443,7 @@ mod tests {
                     reviewer: None,
                     reviews: vec![],
                     review: None,
+                    implementation_tree: None,
                     snapshot: None,
                     verified_tree: None,
                     preserved_tree: None,
@@ -1541,6 +1636,151 @@ mod tests {
         assert!(restored.delegation.is_none());
         assert_eq!(restored.specification, run.specification);
         let count: i64 = sqlx::query_scalar("SELECT count(*) FROM engineering_decisions")
+            .fetch_one(&upgraded.readers)
+            .await?;
+        assert_eq!(count, 0);
+        Ok(())
+    }
+
+    #[test]
+    fn legacy_artifacts_are_implemented_but_missing_tree_evidence_is_not_success() {
+        let mut run = fixture(std::path::Path::new("/disposable/legacy"));
+        run.status = EngineeringStatus::Completed;
+        run.tasks.push(EngineeringTask {
+            plan: plan().tasks.remove(0),
+            status: TaskStatus::Completed,
+            workspace: None,
+            attempts: vec![],
+            artifact_commit: Some("historical-artifact".into()),
+        });
+        let report = run.partial_completion();
+        assert_eq!(report.outcome, HandoffOutcome::EvidenceIncomplete);
+        assert_eq!(
+            report.tasks[0].delivery,
+            TaskDelivery::ImplementedNotFullyVerified
+        );
+        assert!(report.tasks[0].implementation_recorded);
+        assert!(!report.completion_requirements_satisfied && !report.combined_checks_passed);
+    }
+
+    #[tokio::test]
+    async fn prerequisite_evidence_and_handoff_are_atomic_immutable_and_migrate() -> Result<()> {
+        let dir = tempfile::tempdir()?;
+        let db = dir.path().join("db");
+        let store = Store::open(&db).await?;
+        let run = fixture(dir.path());
+        store.engineering_create(&run).await?;
+        let journal = Journal::new(store.clone(), run.clone());
+        let requirement = HumanRequirement {
+            kind: HumanActionType::Environment,
+            reason: "Required tool unavailable".into(),
+            requested_action: "Repair externally and refresh preflight".into(),
+            affected_tasks: vec![],
+            blocking: true,
+            evidence: "Deterministic fixture probe".into(),
+            confidence: 100,
+            permission: None,
+        };
+        journal
+            .change("prerequisite", "durable essential gate", |r| {
+                r.human_actions.push(super::super::preflight::action(
+                    requirement,
+                    "essential-tool",
+                    false,
+                    None,
+                ));
+                Ok(())
+            })
+            .await?;
+        let original = journal.read().await;
+        assert_eq!(
+            original.handoff.as_ref().context("handoff")?.outcome,
+            HandoffOutcome::InProgress
+        );
+        let count: i64 = sqlx::query_scalar("SELECT count(*) FROM engineering_prerequisite_events")
+            .fetch_one(&store.readers)
+            .await?;
+        assert_eq!(count, 1);
+        assert!(
+            journal
+                .change("forge", "cannot relabel permission", |r| {
+                    r.human_actions[0]
+                        .prerequisite
+                        .as_mut()
+                        .context("classification")?
+                        .category = PrerequisiteCategory::SafelyResolvableInternally;
+                    Ok(())
+                })
+                .await
+                .is_err()
+        );
+        assert!(
+            journal
+                .change("rollback", "no partial history on failed checkpoint", |r| {
+                    let a = &mut r.human_actions[0];
+                    a.audit.push(ActionAudit {
+                        at: Utc::now(),
+                        status: HumanActionStatus::Deferred,
+                        request: None,
+                    });
+                    r.base_commit = "different".into();
+                    Ok(())
+                })
+                .await
+                .is_err()
+        );
+        assert_eq!(journal.read().await.revision, original.revision);
+        for statement in [
+            "UPDATE engineering_prerequisite_events SET sequence=2",
+            "DELETE FROM engineering_prerequisite_events",
+        ] {
+            assert!(sqlx::query(statement).execute(&store.pool).await.is_err());
+        }
+        let mut forged = original.clone();
+        forged.revision += 1;
+        forged
+            .handoff
+            .as_mut()
+            .context("handoff")?
+            .completion_requirements_satisfied = true;
+        assert!(
+            store
+                .engineering_save(&forged, "forge", "no invented completion")
+                .await
+                .is_err()
+        );
+        store.pool.close().await;
+        store.readers.close().await;
+        let reopened = Store::open(&db).await?;
+        let saved = reopened.engineering_get(run.id).await?;
+        assert_eq!(saved.human_actions, original.human_actions);
+        assert_eq!(saved.handoff, original.handoff);
+        // Emulate a pre-A4 checkpoint and migration index. No legacy action is
+        // retrospectively granted a classification or automatic continuation.
+        let mut legacy = serde_json::to_value(&saved)?;
+        legacy.as_object_mut().context("run")?.remove("handoff");
+        legacy["human_actions"][0]
+            .as_object_mut()
+            .context("action")?
+            .remove("prerequisite");
+        sqlx::query("UPDATE engineering_runs SET document=? WHERE id=?")
+            .bind(serde_json::to_string(&legacy)?)
+            .bind(run.id.to_string())
+            .execute(&reopened.pool)
+            .await?;
+        sqlx::query("DROP TABLE engineering_prerequisite_events")
+            .execute(&reopened.pool)
+            .await?;
+        sqlx::query("DELETE FROM _sqlx_migrations WHERE version=8")
+            .execute(&reopened.pool)
+            .await?;
+        reopened.pool.close().await;
+        reopened.readers.close().await;
+        let upgraded = Store::open(&db).await?;
+        let saved = upgraded.engineering_get(run.id).await?;
+        assert!(saved.handoff.is_none() && saved.human_actions[0].prerequisite.is_none());
+        assert!(saved.action_blocks(&saved.human_actions[0]));
+        let count: i64 = sqlx::query_scalar("SELECT count(*) FROM engineering_prerequisite_events")
             .fetch_one(&upgraded.readers)
             .await?;
         assert_eq!(count, 0);
