@@ -279,6 +279,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "serde",
+ "serde_json",
  "uuid",
 ]
 

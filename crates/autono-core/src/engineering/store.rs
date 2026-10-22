@@ -245,6 +245,9 @@ impl Store {
                     .as_ref()
                     .context("completed task has no review")?;
                 review.validate(&task.plan)?;
+                if let Some(ids) = &last.decision_ids {
+                    review.validate_decisions(ids)?;
+                }
                 ensure!(
                     review.accepts() && last.snapshot.is_some(),
                     "completed task lacks acceptance evidence"
@@ -586,6 +589,73 @@ async fn save_decisions(
     old: &EngineeringRun,
     run: &EngineeringRun,
 ) -> Result<()> {
+    // Attempt bindings are part of the same transaction as immutable ledger
+    // events. Once admitted, neither context nor consumed revisions may change.
+    for task in &run.tasks {
+        let previous = old.tasks.iter().find(|t| t.plan.id == task.plan.id);
+        ensure!(
+            previous.is_none_or(|t| task.attempts.len() >= t.attempts.len()),
+            "attempt history removed"
+        );
+        for (index, attempt) in task.attempts.iter().enumerate() {
+            ensure!(attempt.number == index + 1, "invalid attempt order");
+            let prior = previous.and_then(|t| t.attempts.get(index));
+            if let Some(prior) = prior {
+                ensure!(
+                    prior.decision_context == attempt.decision_context
+                        && prior
+                            .decision_ids
+                            .as_ref()
+                            .is_none_or(|ids| Some(ids) == attempt.decision_ids.as_ref()),
+                    "attempt decision binding is immutable"
+                );
+            } else {
+                ensure!(
+                    attempt.decision_context == super::decisions::active_ids(old, &task.plan.id),
+                    "attempt context differs from admitted decision revisions"
+                );
+            }
+            if let Some(ids) = &attempt.decision_ids {
+                ensure!(
+                    run.delegation.is_some(),
+                    "supervised attempts cannot consume autonomous decisions"
+                );
+                if prior.is_none_or(|p| p.decision_ids.is_none()) {
+                    ensure!(
+                        run.decisions
+                            .iter()
+                            .filter(|d| ids.contains(&d.id))
+                            .all(|d| super::decisions::trusted_basis(run, d)),
+                        "attempt cannot consume historical unverified provenance"
+                    );
+                    ensure!(
+                        *ids == super::decisions::active_ids(run, &task.plan.id),
+                        "attempt did not consume active revisions"
+                    );
+                    ensure!(
+                        attempt.decision_context.iter().all(|id| ids.contains(id)
+                            || run.decisions.iter().any(|d| d.proposal.supersedes.as_ref()
+                                == Some(id)
+                                && d.task_id.as_ref() == Some(&task.plan.id)
+                                && d.attempt == Some(attempt.number)
+                                && ids.contains(&d.id)))
+                            && ids.iter().all(|id| attempt.decision_context.contains(id)
+                                || run.decisions.iter().any(|d| &d.id == id
+                                    && d.task_id.as_ref() == Some(&task.plan.id)
+                                    && d.attempt == Some(attempt.number))),
+                        "attempt consumed revisions outside its context and own proposals"
+                    );
+                    ensure!(
+                        ids.iter().all(|id| run.decisions.iter().any(|d| &d.id == id
+                            && d.audit.iter().any(|e| e.kind == DecisionEventKind::Consumed
+                                && e.task_id.as_ref() == Some(&task.plan.id)
+                                && e.attempt == Some(attempt.number)))),
+                        "attempt binding lacks immutable consumption evidence"
+                    );
+                }
+            }
+        }
+    }
     ensure!(
         run.decisions.len() >= old.decisions.len() && run.decisions.len() <= 128,
         "decision history removed or oversized"
@@ -621,6 +691,88 @@ async fn save_decisions(
         let prior_len = old.decisions.get(i).map_or(0, |d| d.audit.len());
         for (j, event) in d.audit.iter().enumerate().skip(prior_len) {
             ensure!(event.sequence == j + 1, "invalid decision event order");
+            if matches!(
+                event.kind,
+                DecisionEventKind::Consumed
+                    | DecisionEventKind::Implemented
+                    | DecisionEventKind::VerificationFailed
+                    | DecisionEventKind::ChecksPassed
+                    | DecisionEventKind::ReviewAccepted
+                    | DecisionEventKind::ReviewRejected
+                    | DecisionEventKind::TaskVerified
+            ) {
+                let task = run
+                    .tasks
+                    .iter()
+                    .find(|t| Some(&t.plan.id) == event.task_id.as_ref())
+                    .context("decision event lacks task")?;
+                let a = task
+                    .attempts
+                    .iter()
+                    .find(|a| Some(a.number) == event.attempt)
+                    .context("decision event lacks attempt")?;
+                ensure!(
+                    d.autonomous()
+                        && a.decision_ids
+                            .as_ref()
+                            .is_some_and(|ids| ids.contains(&d.id)),
+                    "decision event does not match the consumed revision"
+                );
+                let prior_event = |kind| {
+                    d.audit[..j].iter().rev().find(|e| {
+                        e.kind == kind && e.task_id == event.task_id && e.attempt == event.attempt
+                    })
+                };
+                if event.kind == DecisionEventKind::Consumed {
+                    ensure!(!d.superseded(), "cannot consume superseded decision");
+                } else {
+                    ensure!(
+                        prior_event(DecisionEventKind::Consumed).is_some(),
+                        "decision was never consumed"
+                    );
+                }
+                if matches!(
+                    event.kind,
+                    DecisionEventKind::ChecksPassed
+                        | DecisionEventKind::ReviewAccepted
+                        | DecisionEventKind::ReviewRejected
+                        | DecisionEventKind::TaskVerified
+                ) {
+                    ensure!(
+                        a.verified_tree.as_ref() == Some(&event.detail)
+                            && prior_event(DecisionEventKind::Implemented)
+                                .is_some_and(|e| e.detail == event.detail),
+                        "decision evidence has a different implementation tree"
+                    );
+                }
+                if matches!(
+                    event.kind,
+                    DecisionEventKind::ReviewAccepted
+                        | DecisionEventKind::ReviewRejected
+                        | DecisionEventKind::TaskVerified
+                ) {
+                    a.review
+                        .as_ref()
+                        .context("missing decision review")?
+                        .validate_decisions(a.decision_ids.as_deref().unwrap_or_default())?;
+                    ensure!(
+                        prior_event(DecisionEventKind::ChecksPassed)
+                            .is_some_and(|e| e.detail == event.detail)
+                            && a.review.as_ref().is_some_and(|r| r.accepts()
+                                == (event.kind != DecisionEventKind::ReviewRejected)),
+                        "decision event lacks corresponding independent review"
+                    );
+                }
+                if event.kind == DecisionEventKind::TaskVerified {
+                    ensure!(
+                        !d.superseded()
+                            && a.preserved_tree == a.verified_tree
+                            && prior_event(DecisionEventKind::ReviewAccepted)
+                                .is_some_and(|e| e.detail == event.detail),
+                        "decision verification lacks matching review/preservation evidence"
+                    );
+                }
+            }
             if event.kind == DecisionEventKind::TaskVerified {
                 ensure!(
                     event
@@ -863,6 +1015,8 @@ mod tests {
         task.artifact_commit = Some("b".repeat(40));
         task.attempts.push(TaskAttempt {
             number: 1,
+            decision_context: vec![],
+            decision_ids: None,
             coder: session(AgentRole::Coder),
             verification: run
                 .settings
@@ -883,6 +1037,7 @@ mod tests {
             reviews: vec![],
             reviewer: Some(session(AgentRole::Reviewer)),
             review: Some(ReviewResult {
+                decision_reviews: vec![],
                 accepted: true,
                 criteria: vec![CriterionReview {
                     criterion_id: String::new(),
@@ -932,6 +1087,7 @@ mod tests {
         Ok(())
     }
     fn with_delegation(mut run: EngineeringRun) -> EngineeringRun {
+        run.specification = "Use feature".into();
         let contract = DelegationContract {
             version: 1,
             request: DelegationProposalRequest {
@@ -972,7 +1128,7 @@ mod tests {
         run
     }
     fn decision() -> DecisionProposal {
-        serde_json::from_value(serde_json::json!({"key":"local-default","question":"Which local default?","chosen":"feature","alternatives":["alternate"],"rationale":"Keep the feature local.","kind":"default_value","evidence":[{"file":null,"excerpt":"A feature","supports":"feature"}],"requirements":["A feature"],"assumptions":[],"uncertainty":[],"affected_files":["source.txt"],"affected_tasks":["t"],"supersedes":null})).expect("decision")
+        serde_json::from_value(serde_json::json!({"key":"local-default","question":"Which local default?","chosen":"feature","alternatives":["alternate"],"rationale":"Keep the feature local.","kind":"default_value","evidence":[{"file":null,"excerpt":"Use feature","supports":"feature"}],"requirements":["Use feature"],"assumptions":[],"uncertainty":[],"affected_files":["source.txt"],"affected_tasks":["t"],"supersedes":null})).expect("decision")
     }
     #[tokio::test]
     async fn decisions_are_atomic_append_only_idempotent_and_survive_migration_and_reopen()
@@ -992,7 +1148,15 @@ mod tests {
             journal
                 .change("bad", "must roll back", |r| {
                     r.plan = Some(plan());
-                    super::super::decisions::record(r, &cwd, &[decision()], None, None, session)?;
+                    super::super::decisions::record(
+                        r,
+                        &cwd,
+                        &Default::default(),
+                        &[decision()],
+                        None,
+                        None,
+                        session,
+                    )?;
                     r.plan.as_mut().expect("plan").tasks.clear();
                     Ok(())
                 })
@@ -1018,15 +1182,39 @@ mod tests {
                     })
                     .collect();
                 r.plan = Some(p);
-                super::super::decisions::record(r, &cwd, &[decision()], None, None, session)
+                super::super::decisions::record(
+                    r,
+                    &cwd,
+                    &Default::default(),
+                    &[decision()],
+                    None,
+                    None,
+                    session,
+                )
             })
             .await?;
         let (a, b) = tokio::join!(
             journal.change("replay", "same proposal", |r| {
-                super::super::decisions::record(r, &cwd, &[decision()], None, None, session)
+                super::super::decisions::record(
+                    r,
+                    &cwd,
+                    &Default::default(),
+                    &[decision()],
+                    None,
+                    None,
+                    session,
+                )
             }),
             journal.change("replay", "same proposal", |r| {
-                super::super::decisions::record(r, &cwd, &[decision()], None, None, session)
+                super::super::decisions::record(
+                    r,
+                    &cwd,
+                    &Default::default(),
+                    &[decision()],
+                    None,
+                    None,
+                    session,
+                )
             })
         );
         a?;
@@ -1043,7 +1231,15 @@ mod tests {
                         let mut p = decision();
                         p.key = "different-key".into();
                         p.question = " WHICH   LOCAL DEFAULT? ".into();
-                        super::super::decisions::record(r, &cwd, &[p], None, None, session)
+                        super::super::decisions::record(
+                            r,
+                            &cwd,
+                            &Default::default(),
+                            &[p],
+                            None,
+                            None,
+                            session,
+                        )
                     }
                 )
                 .await
@@ -1055,6 +1251,7 @@ mod tests {
                     super::super::decisions::record(
                         r,
                         &cwd,
+                        &Default::default(),
                         &[decision()],
                         Some("other"),
                         Some(1),
@@ -1069,7 +1266,15 @@ mod tests {
                 .change("contradictory_replay", "must explicitly supersede", |r| {
                     let mut p = decision();
                     p.chosen = "changed".into();
-                    super::super::decisions::record(r, &cwd, &[p], None, None, session)
+                    super::super::decisions::record(
+                        r,
+                        &cwd,
+                        &Default::default(),
+                        &[p],
+                        None,
+                        None,
+                        session,
+                    )
                 })
                 .await
                 .is_err()
@@ -1095,13 +1300,14 @@ mod tests {
         assert!(
             journal
                 .change("forge", "forbidden", |r| {
-                    super::super::decisions::event(
-                        r,
-                        "t",
-                        1,
-                        DecisionEventKind::TaskVerified,
-                        "forged",
-                    );
+                    r.decisions[0].audit.push(DecisionEvent {
+                        sequence: 2,
+                        at: Utc::now(),
+                        kind: DecisionEventKind::TaskVerified,
+                        task_id: Some("t".into()),
+                        attempt: Some(1),
+                        detail: "forged".into(),
+                    });
                     Ok(())
                 })
                 .await
@@ -1121,6 +1327,162 @@ mod tests {
                     .is_err()
             );
         }
+        journal
+            .change("attempt_started", "freeze consumed revisions", |r| {
+                let decision_context = super::super::decisions::active_ids(r, "t");
+                r.tasks[0].attempts.push(TaskAttempt {
+                    number: 1,
+                    decision_context,
+                    decision_ids: None,
+                    coder: AgentSession {
+                        id: session,
+                        role: AgentRole::Coder,
+                        provider: Provider::Claude,
+                        provider_session_id: None,
+                        resumed_from: None,
+                        process_key: Uuid::new_v4(),
+                        process_run_id: None,
+                        outcome: None,
+                        result: None,
+                    },
+                    verification: vec![],
+                    reviewer: None,
+                    reviews: vec![],
+                    review: None,
+                    snapshot: None,
+                    verified_tree: None,
+                    preserved_tree: None,
+                    detail: None,
+                });
+                Ok(())
+            })
+            .await?;
+        journal
+            .change("consume", "bind before implementation", |r| {
+                super::super::decisions::consume(r, "t", 1)
+            })
+            .await?;
+        journal
+            .change("consume_replay", "idempotent", |r| {
+                super::super::decisions::consume(r, "t", 1)
+            })
+            .await?;
+        let bound = journal.read().await;
+        let mut historical = bound.decisions[0].clone();
+        historical.evidence[0].source = DecisionEvidenceSource::LegacyUnverified;
+        assert!(!super::super::decisions::trusted_basis(&bound, &historical));
+        assert!(bound.decisions[0].autonomous());
+        assert_eq!(
+            bound.tasks[0].attempts[0].decision_ids,
+            Some(vec![bound.decisions[0].id.clone()])
+        );
+        assert_eq!(
+            bound.decisions[0]
+                .audit
+                .iter()
+                .filter(|e| e.kind == DecisionEventKind::Consumed)
+                .count(),
+            1
+        );
+        journal
+            .change("revision", "preserve supersession", |r| {
+                let mut p = decision();
+                p.supersedes = Some(r.decisions[0].id.clone());
+                p.chosen = "alternate".into();
+                p.alternatives = vec!["feature".into()];
+                p.evidence.clear();
+                super::super::decisions::record(
+                    r,
+                    &cwd,
+                    &Default::default(),
+                    &[p],
+                    None,
+                    None,
+                    session,
+                )
+            })
+            .await?;
+        assert!(
+            journal
+                .change("stale_replay", "reject retired revision", |r| {
+                    super::super::decisions::record(
+                        r,
+                        &cwd,
+                        &Default::default(),
+                        &[decision()],
+                        None,
+                        None,
+                        session,
+                    )
+                })
+                .await
+                .is_err()
+        );
+        for context in [true, false] {
+            assert!(
+                journal
+                    .change("rebind", "cannot change consumed revision", |r| {
+                        let replacement = vec![r.decisions[1].id.clone()];
+                        if context {
+                            r.tasks[0].attempts[0].decision_context = replacement;
+                        } else {
+                            r.tasks[0].attempts[0].decision_ids = Some(replacement);
+                        }
+                        Ok(())
+                    })
+                    .await
+                    .is_err()
+            );
+        }
+        assert!(
+            journal
+                .change(
+                    "misattribute",
+                    "cannot append evidence to another revision",
+                    |r| {
+                        r.decisions[1].audit.push(DecisionEvent {
+                            sequence: 2,
+                            at: Utc::now(),
+                            kind: DecisionEventKind::Implemented,
+                            task_id: Some("t".into()),
+                            attempt: Some(1),
+                            detail: "tree".into(),
+                        });
+                        Ok(())
+                    }
+                )
+                .await
+                .is_err()
+        );
+        journal
+            .change(
+                "implementation",
+                "historical events retain exact binding",
+                |r| {
+                    super::super::decisions::event(
+                        r,
+                        "t",
+                        1,
+                        DecisionEventKind::Implemented,
+                        "tree",
+                    );
+                    Ok(())
+                },
+            )
+            .await?;
+        let saved = journal.read().await;
+        assert!(
+            saved.decisions[0]
+                .audit
+                .iter()
+                .any(|e| e.kind == DecisionEventKind::Implemented)
+        );
+        assert!(
+            !saved.decisions[1]
+                .audit
+                .iter()
+                .any(|e| e.kind == DecisionEventKind::Implemented)
+        );
         store.pool.close().await;
         store.readers.close().await;
         let reopened = Store::open(&db).await?;
@@ -1136,7 +1498,16 @@ mod tests {
         let events: i64 = sqlx::query_scalar("SELECT count(*) FROM engineering_decision_events")
             .fetch_one(&reopened.readers)
             .await?;
-        assert_eq!(events, 1);
+        assert_eq!(
+            events as usize,
+            saved.decisions.iter().map(|d| d.audit.len()).sum::<usize>()
+        );
+        assert_eq!(
+            serde_json::to_value(
+                reopened.engineering_get(run.id).await?.tasks[0].attempts[0].clone()
+            )?,
+            serde_json::to_value(&saved.tasks[0].attempts[0])?
+        );
         Ok(())
     }
     #[tokio::test]

@@ -1,5 +1,7 @@
 import type { DecisionRecord } from "../lib/types";
 
+import { decisionVerified } from "../lib/decision-state";
+
 export function Decisions({ ledger = [] }: { ledger?: DecisionRecord[] }) {
   if (!ledger.length) return null;
   return (
@@ -8,14 +10,7 @@ export function Decisions({ ledger = [] }: { ledger?: DecisionRecord[] }) {
       {ledger.map((d) => {
         const superseded = d.audit.some((e) => e.kind === "superseded");
         const accepted = d.audit[0]?.kind === "accepted";
-        const verified =
-          accepted &&
-          !superseded &&
-          d.proposal.affected_tasks.every(
-            (task) =>
-              d.audit.filter((e) => e.task_id === task).at(-1)?.kind ===
-              "task_verified",
-          );
+        const verified = decisionVerified(d);
         return (
           <details key={d.id} className="audit">
             <summary>
@@ -37,7 +32,12 @@ export function Decisions({ ledger = [] }: { ledger?: DecisionRecord[] }) {
             {d.evidence.map((e, i) => (
               <p key={i}>
                 Evidence: {e.file ?? "Original specification"} ·{" "}
-                <code>{e.content_sha256}</code>
+                {e.source === "frozen_base"
+                  ? `Frozen base ${e.base_commit}`
+                  : e.source === "specification"
+                    ? "Developer specification"
+                    : "Historical origin unverified"}{" "}
+                · <code>{e.content_sha256}</code>
                 <br />
                 {e.excerpt}
               </p>

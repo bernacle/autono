@@ -515,12 +515,38 @@ pub struct CriterionReview {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ReviewResult {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub decision_reviews: Vec<DecisionReview>,
     pub accepted: bool,
     pub criteria: Vec<CriterionReview>,
     pub findings: Vec<ReviewFinding>,
     pub blocker: String,
 }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DecisionReview {
+    pub decision_id: String,
+    pub implemented: bool,
+    pub evidence: String,
+}
 impl ReviewResult {
+    pub fn validate_decisions(&self, ids: &[String]) -> Result<()> {
+        let actual: BTreeSet<_> = self
+            .decision_reviews
+            .iter()
+            .map(|d| &d.decision_id)
+            .collect();
+        ensure!(
+            actual.len() == self.decision_reviews.len()
+                && actual == ids.iter().collect()
+                && self
+                    .decision_reviews
+                    .iter()
+                    .all(|d| !d.evidence.trim().is_empty() && d.evidence.len() <= 4000),
+            "review must independently account for the exact consumed decision revisions"
+        );
+        Ok(())
+    }
     pub fn validate(&self, task: &PlannedTask) -> Result<()> {
         ensure!(
             self.findings.len() <= 64 && self.criteria.len() == task.acceptance_criteria.len(),
@@ -561,6 +587,7 @@ impl ReviewResult {
     }
     pub fn accepts(&self) -> bool {
         self.accepted
+            && self.decision_reviews.iter().all(|d| d.implemented)
             && self.blocker.is_empty()
             && self.criteria.iter().all(|c| c.satisfied)
             && !self.findings.iter().any(ReviewFinding::blocking)
@@ -583,6 +610,13 @@ pub struct ReviewAttempt {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskAttempt {
     pub number: usize,
+    /// Active revisions supplied to this coder invocation. Frozen at attempt admission.
+    #[serde(default)]
+    pub decision_context: Vec<String>,
+    /// Revisions consumed after validating this response, before applying its edits.
+    /// None denotes an unadmitted response or a legacy attempt, never verified attribution.
+    #[serde(default)]
+    pub decision_ids: Option<Vec<String>>,
     pub coder: AgentSession,
     pub verification: Vec<VerificationResult>,
     pub reviewer: Option<AgentSession>,

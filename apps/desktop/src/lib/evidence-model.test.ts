@@ -77,6 +77,20 @@ describe("effective review evidence (Rust ReviewResult semantics)", () => {
     for (const blocker of ["Needs a decision", " ", "\n"])
       expect(reviewAccepts({ ...r, blocker })).toBe(false);
   });
+  it("requires the independent implementation verdict for every decision revision", () => {
+    const r = review();
+    r.decision_reviews = [
+      {
+        decision_id: "D-legacy",
+        implemented: false,
+        evidence:
+          "The candidate implements stable and does not implement legacy.",
+      },
+    ];
+    expect(reviewAccepts(r)).toBe(false);
+    r.decision_reviews[0].implemented = true;
+    expect(reviewAccepts(r)).toBe(true);
+  });
   it("retains null reviews, their original ordinals and session identity", () => {
     const a = (observable.run as unknown as Run).tasks.find(
         (t) => t.plan.id === "E",

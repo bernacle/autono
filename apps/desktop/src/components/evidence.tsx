@@ -83,6 +83,15 @@ export function TaskEvidence({
                             <p>{c.evidence}</p>
                           </details>
                         ))}
+                        {(review.decision_reviews ?? []).map((d) => (
+                          <details key={d.decision_id}>
+                            <summary>
+                              {d.implemented ? "✓" : "✕"} Decision{" "}
+                              {d.decision_id}
+                            </summary>
+                            <p>{d.evidence}</p>
+                          </details>
+                        ))}
                         {review.findings.map((finding, i) => (
                           <div className="finding" key={i}>
                             <strong>

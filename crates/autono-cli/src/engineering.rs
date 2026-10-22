@@ -244,8 +244,11 @@ pub async fn decisions(paths: &Paths, id: Uuid, json_output: bool) -> Result<()>
             );
             for e in &d.evidence {
                 println!(
-                    "Evidence: {} (SHA-256 {}): {}",
+                    "Evidence: {} (source={:?}, commit={:?}, blob={:?}, SHA-256 {}): {}",
                     e.file.as_deref().unwrap_or("original specification"),
+                    e.source,
+                    e.base_commit,
+                    e.blob_oid,
                     e.content_sha256,
                     e.excerpt
                 );

@@ -1,8 +1,12 @@
-//! Conservative, non-authorizing decision assessment. No provider calls or new reads.
+//! Conservative, non-authorizing assessment using exact immutable Git objects.
 use super::*;
 use anyhow::{Result, ensure};
 use chrono::Utc;
-use std::{collections::BTreeSet, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    path::Path,
+};
+use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
 fn invalid() -> anyhow::Error {
@@ -119,9 +123,128 @@ pub(super) fn parse(value: Option<&serde_json::Value>) -> Result<Vec<DecisionPro
     Ok(proposals)
 }
 
+pub(super) fn review_content(value: Option<&serde_json::Value>) -> Result<()> {
+    if let Some(value) = value {
+        ensure!(serde_json::to_vec(value)?.len() <= 32 * 1024, invalid());
+        let reviews: Vec<DecisionReview> =
+            serde_json::from_value(value.clone()).map_err(|_| invalid())?;
+        ensure!(reviews.len() <= 128, invalid());
+        for review in reviews {
+            safe(&review.decision_id)?;
+            safe(&review.evidence)?;
+        }
+    }
+    Ok(())
+}
+
+pub(super) struct FrozenSource {
+    content: String,
+    blob_oid: String,
+}
+
+/// Read only cited, exactly allowlisted paths from the original pinned base.
+/// Mutable workspaces (including failed attempts and dependency artifacts) are
+/// candidate material, never established project convention in this policy.
+pub(super) async fn sources(
+    run: &EngineeringRun,
+    runner: &process::ProcessRunner,
+    cwd: &Path,
+    proposals: &[DecisionProposal],
+    stop: &CancellationToken,
+) -> Result<BTreeMap<String, FrozenSource>> {
+    let mut sources = BTreeMap::new();
+    let Some(auth) = &run.delegation else {
+        return Ok(sources);
+    };
+    delegation::owns_cwd(&auth.contract, cwd)?;
+    let files: BTreeSet<_> = proposals
+        .iter()
+        .flat_map(|p| &p.evidence)
+        .filter_map(|e| e.file.as_ref())
+        .filter(|f| auth.contract.request.writable_files.contains(f))
+        .collect();
+    let mut total = 0;
+    for file in files {
+        let pathspec = format!(":(literal){file}");
+        let entry = runner
+            .git(
+                cwd,
+                &[
+                    "ls-tree",
+                    "-l",
+                    "-z",
+                    "--full-tree",
+                    &run.base_commit,
+                    "--",
+                    &pathspec,
+                ],
+                stop,
+            )
+            .await?;
+        let Some((metadata, path)) = entry.strip_suffix('\0').and_then(|s| s.split_once('\t'))
+        else {
+            continue;
+        };
+        let fields: Vec<_> = metadata.split_whitespace().collect();
+        if path != file
+            || fields.len() != 4
+            || !matches!(fields[0], "100644" | "100755")
+            || fields[1] != "blob"
+            || fields[3]
+                .parse::<usize>()
+                .ok()
+                .is_none_or(|s| s > 256 * 1024)
+        {
+            continue;
+        }
+        let content = runner
+            .git(cwd, &["cat-file", "blob", fields[2]], stop)
+            .await?;
+        total += content.len();
+        ensure!(total <= 1024 * 1024, invalid());
+        ensure!(content.len() == fields[3].parse::<usize>()?, invalid());
+        sources.insert(
+            file.clone(),
+            FrozenSource {
+                content,
+                blob_oid: fields[2].into(),
+            },
+        );
+    }
+    Ok(sources)
+}
+
+/// This is intentionally a small lexical gate, not semantic understanding.
+/// Any competing mention, quotation, negation, contrast or unfamiliar wording
+/// stays unresolved. A sole option mention needs a simple positive instruction.
+fn requirements_compatible(specification: &str, p: &DecisionProposal) -> bool {
+    let spec = specification.to_lowercase();
+    let chosen = p.chosen.to_lowercase();
+    if p.alternatives
+        .iter()
+        .any(|a| spec.contains(&a.to_lowercase()))
+    {
+        return false;
+    }
+    if !spec.contains(&chosen) {
+        return true;
+    }
+    let clauses: Vec<_> = spec
+        .split(['.', '\n', ';', '!', '?'])
+        .filter(|s| s.contains(&chosen))
+        .collect();
+    clauses.len() == 1 && {
+        let clause = clauses[0].trim();
+        clause == format!("use {chosen}")
+            || clause == format!("use {chosen} helper names")
+            || clause == format!("use {chosen} as the default export format")
+    }
+}
+
 pub(super) fn record(
     run: &mut EngineeringRun,
     cwd: &Path,
+    sources: &BTreeMap<String, FrozenSource>,
     proposals: &[DecisionProposal],
     task_id: Option<&str>,
     attempt: Option<usize>,
@@ -168,7 +291,7 @@ pub(super) fn record(
             review::digest(&serde_json::to_string(&(run.id, &p.key, &p.supersedes))?)
         );
         if let Some(existing) = run.decisions.iter().find(|d| d.id == id) {
-            ensure!(existing.proposal == *p, invalid());
+            ensure!(existing.proposal == *p && !existing.superseded(), invalid());
             continue;
         }
         ensure!(run.decisions.len() < 128, invalid());
@@ -221,33 +344,26 @@ pub(super) fn record(
             });
         let mut contradictory = false;
         for e in &p.evidence {
-            let content = if let Some(file) = &e.file {
-                // Do not even probe an unauthorized path.
-                if auth.contract.request.writable_files.contains(file) {
-                    scoped_files::read(cwd, file).ok().flatten()
-                } else {
-                    None
-                }
+            let frozen = e.file.as_ref().and_then(|f| sources.get(f));
+            let content = if e.file.is_none() {
+                Some(&run.specification)
             } else {
-                Some(run.specification.clone())
+                frozen.map(|s| &s.content)
             };
             if let Some(content) = content.filter(|content| content.contains(&e.excerpt)) {
                 evidence.push(DecisionProvenance {
+                    source: if e.file.is_none() {
+                        DecisionEvidenceSource::Specification
+                    } else {
+                        DecisionEvidenceSource::FrozenBase
+                    },
                     file: e.file.clone(),
-                    content_sha256: review::digest(&content),
+                    content_sha256: review::digest(content),
                     excerpt: e.excerpt.clone(),
                     supports: e.supports.clone(),
-                    base_commit: run.base_commit.clone(),
-                    workspace_id: if let Some(task) = task_id {
-                        run.tasks
-                            .iter()
-                            .find(|t| t.plan.id == task)
-                            .and_then(|t| t.workspace.as_ref())
-                            .map(|w| w.id)
-                            .ok_or_else(invalid)?
-                    } else {
-                        run.planning_workspace.id
-                    },
+                    base_commit: frozen.map(|_| run.base_commit.clone()),
+                    workspace_id: None,
+                    blob_oid: frozen.map(|s| s.blob_oid.clone()),
                 });
             } else {
                 reliable = false;
@@ -255,16 +371,7 @@ pub(super) fn record(
             contradictory |= e.supports != p.chosen;
         }
         let requirements_known = p.requirements.iter().all(|r| run.specification.contains(r));
-        // Deliberately conservative lexical conflict gate; semantic conflicts also
-        // require independent review against the complete original specification.
-        let explicit_alternative = p
-            .alternatives
-            .iter()
-            .any(|a| run.specification.to_lowercase().contains(&a.to_lowercase()))
-            && !run
-                .specification
-                .to_lowercase()
-                .contains(&p.chosen.to_lowercase());
+        let compatible = requirements_compatible(&run.specification, p);
         let human_gate = plan.human_requirements.iter().any(|h| {
             h.blocking
                 && (h.affected_tasks.is_empty()
@@ -277,7 +384,7 @@ pub(super) fn record(
                 || contradictory
                 || !requirements_known
                 || !p.uncertainty.is_empty()
-                || explicit_alternative
+                || !compatible
                 || human_gate
                 || busy)
         {
@@ -348,6 +455,91 @@ pub(super) fn record(
     Ok(())
 }
 
+pub(super) fn active_ids(run: &EngineeringRun, task: &str) -> Vec<String> {
+    run.decisions
+        .iter()
+        .filter(|d| {
+            d.autonomous() && !d.superseded() && d.proposal.affected_tasks.iter().any(|t| t == task)
+        })
+        .map(|d| d.id.clone())
+        .collect()
+}
+
+pub(super) fn trusted_basis(run: &EngineeringRun, d: &DecisionRecord) -> bool {
+    !d.evidence.is_empty()
+        && d.evidence.iter().all(|e| match e.source {
+            DecisionEvidenceSource::FrozenBase => {
+                e.base_commit.as_ref() == Some(&run.base_commit)
+                    && e.blob_oid.is_some()
+                    && e.file.is_some()
+            }
+            DecisionEvidenceSource::Specification => {
+                e.file.is_none() && e.content_sha256 == review::digest(&run.specification)
+            }
+            DecisionEvidenceSource::LegacyUnverified => false,
+        })
+}
+
+/// Freeze the revisions this response consumed before applying any edits. The
+/// only changes from the invocation's context may be its own admitted revisions.
+pub(super) fn consume(run: &mut EngineeringRun, task: &str, attempt: usize) -> Result<()> {
+    let ids = active_ids(run, task);
+    ensure!(
+        run.decisions
+            .iter()
+            .filter(|d| ids.contains(&d.id))
+            .all(|d| trusted_basis(run, d)),
+        invalid()
+    );
+    let a = run
+        .tasks
+        .iter()
+        .find(|t| t.plan.id == task)
+        .and_then(|t| t.attempts.iter().find(|a| a.number == attempt))
+        .ok_or_else(invalid)?;
+    if let Some(previous) = &a.decision_ids {
+        ensure!(previous == &ids, invalid());
+        return Ok(());
+    }
+    for id in &a.decision_context {
+        ensure!(
+            ids.contains(id)
+                || run
+                    .decisions
+                    .iter()
+                    .any(|d| d.proposal.supersedes.as_ref() == Some(id)
+                        && d.task_id.as_deref() == Some(task)
+                        && d.attempt == Some(attempt)
+                        && ids.contains(&d.id)),
+            invalid()
+        );
+    }
+    ensure!(
+        ids.iter().all(|id| a.decision_context.contains(id)
+            || run.decisions.iter().any(|d| &d.id == id
+                && d.task_id.as_deref() == Some(task)
+                && d.attempt == Some(attempt))),
+        invalid()
+    );
+    run.tasks
+        .iter_mut()
+        .find(|t| t.plan.id == task)
+        .ok_or_else(invalid)?
+        .attempts
+        .iter_mut()
+        .find(|a| a.number == attempt)
+        .ok_or_else(invalid)?
+        .decision_ids = Some(ids);
+    event(
+        run,
+        task,
+        attempt,
+        DecisionEventKind::Consumed,
+        "Admitted coder response; exact decision revisions frozen before file replacements",
+    );
+    Ok(())
+}
+
 pub(super) fn event(
     run: &mut EngineeringRun,
     task: &str,
@@ -355,9 +547,16 @@ pub(super) fn event(
     kind: DecisionEventKind,
     detail: &str,
 ) {
+    let ids = run
+        .tasks
+        .iter()
+        .find(|t| t.plan.id == task)
+        .and_then(|t| t.attempts.iter().find(|a| a.number == attempt))
+        .and_then(|a| a.decision_ids.as_ref())
+        .cloned()
+        .unwrap_or_default();
     for d in &mut run.decisions {
-        if d.autonomous() && !d.superseded() && d.proposal.affected_tasks.iter().any(|t| t == task)
-        {
+        if ids.contains(&d.id) {
             // Journal checkpoint retries/replay cannot duplicate an audit fact.
             if !d.audit.iter().any(|e| {
                 e.kind == kind && e.task_id.as_deref() == Some(task) && e.attempt == Some(attempt)
@@ -376,7 +575,7 @@ pub(super) fn event(
 }
 
 pub(super) fn instructions() -> &'static str {
-    "\nA3 decisions: propose a decisions array (empty when none) for genuine ambiguities. Minor local patterns, internal names, defaults and test structures may be resolved using exact excerpts from authorized files or the original specification. Include alternatives, concise rationale (never private reasoning), exact original requirement excerpts, assumptions, uncertainty and affected task/file IDs. Evidence supports names the supported option. file=null means original specification. Missing context, conflicting requirements, architecture/compatibility changes and unknown effects remain unresolved; report these honestly. kind is local_pattern, internal_name, default_value, test_structure, significant, authorization, unknown_effects or prerequisite. Never reclassify a permission, prerequisite, unknown effect or explicit human requirement as a preference. A decision grants no permissions, file access, commands or deadline extensions. Reuse the same key/payload on replay; corrections use supersedes with the previous decision ID. All choices remain subject to configured checks and independent review. Reviewers must independently challenge the choices and compare original requirements; do not emit new decisions.\n"
+    "\nA3 decisions: propose a decisions array (empty when none) for genuine ambiguities. Minor local patterns, internal names, defaults and test structures may be resolved using exact excerpts from the original frozen-base versions of authorized files or the original specification. Current workspace bytes, including failed or dependency artifacts, are candidate context and cannot establish project conventions. Explicit requirements override conventions; an option mentioned in a prohibition or example is not permission. Include alternatives, concise rationale (never private reasoning), exact original requirement excerpts, assumptions, uncertainty and affected task/file IDs. Evidence supports names the supported option. file=null means original specification. Missing context, conflicting requirements, architecture/compatibility changes and unknown effects remain unresolved; report these honestly. kind is local_pattern, internal_name, default_value, test_structure, significant, authorization, unknown_effects or prerequisite. Never reclassify a permission, prerequisite, unknown effect or explicit human requirement as a preference. A decision grants no permissions, file access, commands or deadline extensions. Reuse the same key/payload only while its revision is active; superseded replay is rejected. Corrections or reverting to a historical choice require a new revision with supersedes naming the current decision ID. All choices remain subject to configured checks and independent review. Reviewers must independently challenge the choices and compare original requirements; do not emit new decisions.\n"
 }
 pub(super) fn schema() -> serde_json::Value {
     use serde_json::json;
@@ -395,6 +594,37 @@ pub(super) fn schema() -> serde_json::Value {
 mod tests {
     use super::*;
     #[test]
+    fn requirement_mentions_are_not_permission_or_semantic_proof() {
+        let p: DecisionProposal = serde_json::from_value(serde_json::json!({"key":"name","question":"Which helper?","chosen":"stable","alternatives":["legacy"],"rationale":"Reuse naming","kind":"internal_name","evidence":[],"requirements":["Implement"],"assumptions":[],"uncertainty":[],"affected_files":["b.txt"],"affected_tasks":["b"],"supersedes":null})).expect("proposal");
+        for spec in [
+            "Use legacy helper names. Do not use stable helper names.",
+            "Do not use stable helper names.",
+            "Never use stable.",
+            "Avoid stable helper names.",
+            "Use no stable helper names.",
+            "Don't use stable helper names.",
+            "Example: 'Use stable helper names'.",
+            "Example: \"stable\".",
+            "Use legacy rather than stable.",
+            "Consider stable versus legacy.",
+            "Use stable helper names. Use legacy helper names.",
+            "Use stable helper names. Do not use stable helper names.",
+            "Use stable helper names unless compatibility requires otherwise.",
+        ] {
+            assert!(
+                !requirements_compatible(spec, &p),
+                "ambiguous/prohibited: {spec}"
+            );
+        }
+        for spec in [
+            "Implement safe feature",
+            "Implement safe feature. Use stable helper names.",
+            "Use stable.",
+        ] {
+            assert!(requirements_compatible(spec, &p), "unambiguous: {spec}");
+        }
+    }
+    #[test]
     fn decision_content_rejects_credentials_and_malformed_contracts_without_echoing() {
         for value in [
             "sk-fixture-1234567890",
@@ -409,6 +639,7 @@ mod tests {
         ] {
             assert!(safe(value).is_err(), "must reject credential-like input");
         }
+        assert!(review_content(Some(&serde_json::json!([{"decision_id":"D-fixture","implemented":true,"evidence":"api_key: canary-value"}]))).is_err());
         assert!(safe("task-export").is_ok());
         assert!(safe("src/mask-utils.rs").is_ok());
         assert!(safe("Use (sk-fixture-1234567890)").is_err());

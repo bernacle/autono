@@ -47,7 +47,12 @@ case "$label" in
     tests) case "$prompt" in *'test_export.sh'*'comma,name'*) : ;; *) exit 90;; esac ;;
     docs) case "$prompt" in *'export.txt'*'default to CSV'*) : ;; *) exit 89;; esac ;;
   esac
-  result="{\"accepted\":true,\"criteria\":[{\"criterion_id\":\"$id-C1\",\"criterion\":\"Works\",\"satisfied\":true,\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\"}],\"findings\":[],\"blocker\":\"\"}";;
+  decision_reviews='[]'
+  decision_id=$(printf '%s\n' "$prompt" | sed -n 's/^Consumed decision ID: //p')
+  if test -n "$decision_id"; then
+    decision_reviews="[{\"decision_id\":\"$decision_id\",\"implemented\":true,\"evidence\":\"The candidate implements the CSV revision in the affected task; full diff independently inspected.\"}]"
+  fi
+  result="{\"decision_reviews\":$decision_reviews,\"accepted\":true,\"criteria\":[{\"criterion_id\":\"$id-C1\",\"criterion\":\"Works\",\"satisfied\":true,\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\"}],\"findings\":[],\"blocker\":\"\"}";;
  *) exit 96;;
 esac
 uuid=$(if test -f /proc/sys/kernel/random/uuid; then cat /proc/sys/kernel/random/uuid; else /usr/bin/uuidgen; fi)
