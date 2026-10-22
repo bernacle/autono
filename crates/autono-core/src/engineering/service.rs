@@ -394,7 +394,13 @@ impl EngineeringService {
             action.status = match request.disposition { ResolutionDisposition::Resolve | ResolutionDisposition::Approve => HumanActionStatus::Resolved, ResolutionDisposition::Defer => HumanActionStatus::Deferred, ResolutionDisposition::Reject => HumanActionStatus::Rejected };
             action.resolution = Some(request.clone());
             action.updated_at = Utc::now();
-            action.audit.push(ActionAudit { at: action.updated_at, status: action.status, request: Some(request) });
+            let decision_evidence = action.requirement.evidence.clone();
+            action.audit.push(ActionAudit { at: action.updated_at, status: action.status, request: Some(request.clone()) });
+            for d in &mut r.decisions {
+                if decision_evidence == format!("Daemon decision assessment: {}", d.id) {
+                    d.audit.push(DecisionEvent { sequence: d.audit.len() + 1, at: Utc::now(), kind: DecisionEventKind::HumanFeedback, task_id: None, attempt: None, detail: format!("Resolution receipt {}: {:?}; see immutable human-action receipt. This does not accept a decision or grant authority.", request.request_id, request.disposition) });
+                }
+            }
             Ok(())
         }).await;
         if let Err(error) = committed {
@@ -612,13 +618,13 @@ impl EngineeringService {
             };
             runner = runner.with_deadline(auth.as_ref().map(|a| a.expires_at));
             if let Some(auth) = &auth {
-                let remaining = (auth.expires_at - Utc::now()).to_std().unwrap_or_default();
+                let deadline = auth.expires_at;
                 let token = workflow_stop.clone();
                 self.inner.jobs.spawn(async move {
                     tokio::select! {
                         biased;
                         _ = done.cancelled() => {},
-                        _ = tokio::time::sleep(remaining) => token.cancel(),
+                        _ = crate::supervisor::wait_for_deadline(deadline) => token.cancel(),
                     }
                 });
             }
@@ -745,6 +751,7 @@ impl EngineeringService {
                 let w = workspace::reference(&self.inner.home, submission.id, "planner", &base);
                 let now = Utc::now();
                 let run = EngineeringRun {
+                    decisions: vec![],
                     delegation,
                     id: submission.id,
                     revision: 0,

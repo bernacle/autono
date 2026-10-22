@@ -41,11 +41,50 @@ impl ExecutionAuthority {
     }
     pub(crate) async fn deadline_reached(&self) {
         match self.deadline {
-            Some(d) => {
-                tokio::time::sleep((d - chrono::Utc::now()).to_std().unwrap_or_default()).await
-            }
+            Some(d) => wait_for_deadline(d).await,
             None => std::future::pending().await,
         }
+    }
+}
+
+pub(crate) async fn wait_for_deadline(deadline: chrono::DateTime<chrono::Utc>) {
+    wait_for_deadline_with_clock(deadline, chrono::Utc::now).await;
+}
+
+async fn wait_for_deadline_with_clock(
+    deadline: chrono::DateTime<chrono::Utc>,
+    mut now: impl FnMut() -> chrono::DateTime<chrono::Utc>,
+) {
+    // A relative timer wake is only a hint about the absolute authority cutoff.
+    // Never translate an early wake / wall-clock adjustment into user cancellation.
+    while let Ok(remaining) = (deadline - now()).to_std() {
+        if remaining.is_zero() {
+            break;
+        }
+        tokio::time::sleep(remaining).await;
+    }
+}
+
+#[cfg(test)]
+mod deadline_tests {
+    use super::*;
+    #[tokio::test]
+    async fn an_early_relative_wake_does_not_signal_absolute_expiry() {
+        let deadline = chrono::Utc::now();
+        let mut reads = 0;
+        wait_for_deadline_with_clock(deadline, || {
+            reads += 1;
+            if reads < 3 {
+                deadline - chrono::Duration::milliseconds(1)
+            } else {
+                deadline
+            }
+        })
+        .await;
+        assert_eq!(
+            reads, 3,
+            "the absolute cutoff must be rechecked after every wake"
+        );
     }
 }
 

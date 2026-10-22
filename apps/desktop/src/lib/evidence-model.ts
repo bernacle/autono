@@ -5,6 +5,7 @@ export type Attempt = Task["attempts"][number];
 export function reviewAccepts(review: Review) {
   return (
     review.accepted &&
+    (review.decision_reviews ?? []).every((d) => d.implemented) &&
     review.blocker.length === 0 &&
     review.criteria.every((c) => c.satisfied) &&
     !review.findings.some((f) =>

@@ -270,3 +270,7 @@ See [desktop setup and architecture](apps/desktop/README.md) and
 [native acceptance evidence](docs/desktop-acceptance.md).
 
 Bounded autonomous runs and the existing Supervised workflow: [M5 delegation contract and acceptance](docs/m5-bounded-delegation.md).
+
+M5 A3 adds reversible autonomous choices and an append-only decision ledger. See
+[authority boundaries, architecture and deterministic acceptance](docs/m5-autonomous-decisions.md).
+Inspect a run with `autono decisions <run-id>` (or `--json`).

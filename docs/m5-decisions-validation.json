@@ -1,0 +1,81 @@
+{
+  "validated_at": "2026-10-22T14:25:45.464840+00:00",
+  "base_commit": "437acc4de38d3c1d4dbaa8d8425a2545ac70c4e2",
+  "platform": {
+    "system": "Darwin",
+    "machine": "arm64"
+  },
+  "paid_inference": false,
+  "workspace_tests": {
+    "command": "RUST_TEST_THREADS=2 cargo test --workspace --locked",
+    "passed": 132,
+    "failed": 0,
+    "ignored": 2
+  },
+  "final_targeted_tests": {
+    "core_unit": {
+      "passed": 19,
+      "ignored": 1
+    },
+    "autonomous_decisions_adversarial": {
+      "passed": 4
+    },
+    "real_daemon_csv_fixture": {
+      "passed": 1
+    }
+  },
+  "frontend": {
+    "tests_passed": 103,
+    "typescript": "passed",
+    "eslint_zero_warnings": "passed",
+    "production_build_and_startup_smoke": "passed"
+  },
+  "checks": {
+    "formatting": "passed",
+    "strict_workspace_clippy_all_targets": "passed",
+    "workspace_debug_build": "passed",
+    "workspace_release_build": "passed",
+    "rust_1_89_non_desktop_all_targets": "passed",
+    "workspace_rustdoc": "passed",
+    "native_tauri_bundle": "passed"
+  },
+  "native_smoke": {
+    "bundle": "target/release/bundle/macos/Autono.app",
+    "origin": "tauri://localhost",
+    "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+    "observed": [
+      "authenticated daemon connected",
+      "five tasks completed",
+      "decision independently verified",
+      "CSV choice and JSON alternative",
+      "original source excerpt and SHA-256",
+      "append-only audit history"
+    ],
+    "owned_app_and_daemon_stopped": true
+  },
+  "acceptance": {
+    "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+    "status": "COMPLETED",
+    "decision_id": "D-6362fb718c2a1bd35433a814f9123f24fa37cc56035e567bda4db3150c8f6680",
+    "chosen": "CSV",
+    "lifecycle_events": 212,
+    "decision_events": 17,
+    "human_actions": 0,
+    "integration_commit": "c4b680535950de9994adc92c597e47bf28356f87",
+    "main_unchanged": true,
+    "restart_replayed": false,
+    "interruption_preserved_decisions": true
+  },
+  "ci": {
+    "linux": "pending remote CI",
+    "macos": "pending remote CI",
+    "release_builds_enabled_both_platforms": true
+  },
+  "limitations": [
+    "Semantic interpretation still requires independent review.",
+    "Evidence is limited to the original specification and exact authorized files.",
+    "Decision verification is task-scoped; overall run/integration status remains authoritative.",
+    "Completed affected tasks are not reopened for automatic correction.",
+    "Linux execution is left to the configured GitHub Actions matrix."
+  ]
+}

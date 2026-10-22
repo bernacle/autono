@@ -1,0 +1,2580 @@
+{
+  "reviewed_head": "b10c9666fed45a77f5fa369c95cb1d2ddc0ba7db",
+  "platform": "macOS arm64",
+  "paid_inference": false,
+  "original_review_fixture_sha256": "355057d708f8decd8f8c05e515eee6d95399c6c0a29ac73bd057dec855b4920a",
+  "unchanged_before_reproduction_log_sha256": "e544da0e8bba39876c1f109d0f72c66fbbc43b524c2cd3a608f64dde6ccf8721",
+  "unchanged_before_reproduction_result": {
+    "passed": 3,
+    "failed": 0
+  },
+  "regression_command": "RUST_TEST_THREADS=2 AUTONO_DECISIONS_FIX_EVIDENCE_DIR=/tmp/autono-a3-fix-evidence-final cargo test -p autono-core --locked --test delegation review_regressions -- --nocapture",
+  "regressions": [
+    {
+      "fixture_case": "ReviewDecisionMismatch",
+      "full_snapshot_sha256": "53b4fd9291a30e510e24788eabb6898a79cb896d50196dcc83b290b60ccda220",
+      "snapshot_excerpt": {
+        "id": "c2d4a3cc-4912-4616-85f6-e3e4b129555d",
+        "status": "FAILED",
+        "specification": "Implement safe feature",
+        "base_commit": "c1c68e6c9d86f9f8f70be08be3fea2668572eee4",
+        "summary": "2 of 3 tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate.",
+        "delegation_request": {
+          "submission": {
+            "id": "c2d4a3cc-4912-4616-85f6-e3e4b129555d",
+            "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmplnlRvf/repo",
+            "base": "main",
+            "specification": "Implement safe feature"
+          },
+          "writable_files": [
+            "a.txt",
+            "b.txt",
+            "c.txt"
+          ],
+          "max_runtime_seconds": 120,
+          "local_integration": false
+        },
+        "authorized_at": "2026-10-22T17:54:14.666640Z",
+        "expires_at": "2026-10-22T17:56:14.666640Z",
+        "execution_limits": {
+          "max_parallel": 2,
+          "max_attempts": 3,
+          "max_review_cycles": 2
+        },
+        "delegation_contract_sha256": "85c1c65fbe2582da476f9d5e8b211c2590e10de5a939e14595db7ebc260fef62",
+        "decisions": [
+          {
+            "id": "D-24dd10a7a3cd16e2933d66e498fccc00f041a890991b0b24ee833d4955b297fc",
+            "run_id": "c2d4a3cc-4912-4616-85f6-e3e4b129555d",
+            "ordinal": 1,
+            "task_id": "b",
+            "attempt": 1,
+            "session_id": "80665099-01bb-49a7-8439-ee047f1c019f",
+            "created_at": "2026-10-22T17:54:16.045478Z",
+            "proposal": {
+              "key": "helper-name",
+              "question": "Which internal helper name?",
+              "chosen": "stable",
+              "alternatives": [
+                "legacy"
+              ],
+              "rationale": "Use the documented helper naming convention.",
+              "kind": "internal_name",
+              "evidence": [
+                {
+                  "file": "a.txt",
+                  "excerpt": "prefer stable helper names",
+                  "supports": "stable"
+                }
+              ],
+              "requirements": [
+                "Implement safe feature"
+              ],
+              "assumptions": [],
+              "uncertainty": [],
+              "affected_files": [
+                "b.txt"
+              ],
+              "affected_tasks": [
+                "b"
+              ],
+              "supersedes": null
+            },
+            "category": "reversible",
+            "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+            "evidence": [
+              {
+                "source": "frozen_base",
+                "file": "a.txt",
+                "content_sha256": "c54fb02aa029f6c24708ac0d1d28a5e0d97b6068f28bb8a27cf82808b0d44db5",
+                "excerpt": "prefer stable helper names",
+                "supports": "stable",
+                "base_commit": "c1c68e6c9d86f9f8f70be08be3fea2668572eee4",
+                "workspace_id": null,
+                "blob_oid": "2c20f97123253ab177bf8fbdfd6d9d3c71f774ab"
+              }
+            ],
+            "audit": [
+              {
+                "sequence": 1,
+                "at": "2026-10-22T17:54:16.045478Z",
+                "kind": "accepted",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required"
+              },
+              {
+                "sequence": 2,
+                "at": "2026-10-22T17:54:16.045486Z",
+                "kind": "consumed",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "Admitted coder response; exact decision revisions frozen before file replacements"
+              },
+              {
+                "sequence": 3,
+                "at": "2026-10-22T17:54:16.534342Z",
+                "kind": "implemented",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "bd56ef0efe657f8877378ab06c8267c1c3cb5a1a"
+              },
+              {
+                "sequence": 4,
+                "at": "2026-10-22T17:54:17.111168Z",
+                "kind": "verification_failed",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "Configured checks failed; see immutable attempt process receipts"
+              },
+              {
+                "sequence": 5,
+                "at": "2026-10-22T17:54:17.411494Z",
+                "kind": "superseded",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "D-cb5675a101d74bae3ae7dfbfaeb4a17bca420acc7bc216ffe48d891a6781078a"
+              }
+            ]
+          },
+          {
+            "id": "D-cb5675a101d74bae3ae7dfbfaeb4a17bca420acc7bc216ffe48d891a6781078a",
+            "run_id": "c2d4a3cc-4912-4616-85f6-e3e4b129555d",
+            "ordinal": 2,
+            "task_id": "b",
+            "attempt": 2,
+            "session_id": "7724dc40-387a-4c2d-ba2e-8d066d52c597",
+            "created_at": "2026-10-22T17:54:17.411494Z",
+            "proposal": {
+              "key": "helper-name",
+              "question": "Which internal helper name?",
+              "chosen": "legacy",
+              "alternatives": [
+                "stable"
+              ],
+              "rationale": "Use the documented helper naming convention.",
+              "kind": "internal_name",
+              "evidence": [
+                {
+                  "file": "a.txt",
+                  "excerpt": "legacy helper naming",
+                  "supports": "legacy"
+                }
+              ],
+              "requirements": [
+                "Implement safe feature"
+              ],
+              "assumptions": [],
+              "uncertainty": [],
+              "affected_files": [
+                "b.txt"
+              ],
+              "affected_tasks": [
+                "b"
+              ],
+              "supersedes": "D-24dd10a7a3cd16e2933d66e498fccc00f041a890991b0b24ee833d4955b297fc"
+            },
+            "category": "reversible",
+            "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+            "evidence": [
+              {
+                "source": "frozen_base",
+                "file": "a.txt",
+                "content_sha256": "c54fb02aa029f6c24708ac0d1d28a5e0d97b6068f28bb8a27cf82808b0d44db5",
+                "excerpt": "legacy helper naming",
+                "supports": "legacy",
+                "base_commit": "c1c68e6c9d86f9f8f70be08be3fea2668572eee4",
+                "workspace_id": null,
+                "blob_oid": "2c20f97123253ab177bf8fbdfd6d9d3c71f774ab"
+              }
+            ],
+            "audit": [
+              {
+                "sequence": 1,
+                "at": "2026-10-22T17:54:17.411494Z",
+                "kind": "accepted",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required"
+              },
+              {
+                "sequence": 2,
+                "at": "2026-10-22T17:54:17.411503Z",
+                "kind": "consumed",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "Admitted coder response; exact decision revisions frozen before file replacements"
+              },
+              {
+                "sequence": 3,
+                "at": "2026-10-22T17:54:18.045106Z",
+                "kind": "implemented",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "1c75d2f22fc8c3a79977d5b6019a908778fe3d31"
+              },
+              {
+                "sequence": 4,
+                "at": "2026-10-22T17:54:19.211650Z",
+                "kind": "verification_failed",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "Configured checks failed; see immutable attempt process receipts"
+              },
+              {
+                "sequence": 5,
+                "at": "2026-10-22T17:54:19.508169Z",
+                "kind": "consumed",
+                "task_id": "b",
+                "attempt": 3,
+                "detail": "Admitted coder response; exact decision revisions frozen before file replacements"
+              },
+              {
+                "sequence": 6,
+                "at": "2026-10-22T17:54:20.040306Z",
+                "kind": "implemented",
+                "task_id": "b",
+                "attempt": 3,
+                "detail": "b282ceda8d6f8cfee426102f6da3a8fc5a0fe930"
+              },
+              {
+                "sequence": 7,
+                "at": "2026-10-22T17:54:20.668063Z",
+                "kind": "checks_passed",
+                "task_id": "b",
+                "attempt": 3,
+                "detail": "b282ceda8d6f8cfee426102f6da3a8fc5a0fe930"
+              },
+              {
+                "sequence": 8,
+                "at": "2026-10-22T17:54:21.761342Z",
+                "kind": "review_rejected",
+                "task_id": "b",
+                "attempt": 3,
+                "detail": "b282ceda8d6f8cfee426102f6da3a8fc5a0fe930"
+              }
+            ]
+          }
+        ],
+        "tasks": [
+          {
+            "id": "a",
+            "dependencies": [],
+            "status": "COMPLETED",
+            "artifact_commit": "6d7bc1a2f4fcbed4dbb54fefdecad8399aad7e65",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "c56b8439-dbd4-44b0-996e-d3ab6430383d",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "2d93813a-4b27-4cd4-a3cf-659e628c8322",
+                  "resumed_from": null,
+                  "process_key": "9987ee0c-c2c1-4c05-b67e-42288f58866d",
+                  "process_run_id": "99ae50ff-85e9-4a77-a5ee-95b703950b55",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "4e71a077-bb51-4d88-9d7b-68d05cc8a78b",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "3b9edbf5-9470-4ef3-bc4e-8a2139b64d43",
+                  "resumed_from": null,
+                  "process_key": "f80e7dec-36d6-4cb2-a523-c370022b16a1",
+                  "process_run_id": "b8b5635f-e175-4129-accc-34f7d97064f9",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "7b2f4671-152a-4086-b214-ae807c11dd38",
+                    "process_run_id": "077fb235-f544-452b-b6d5-d1e5c0a0d976",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=077fb235-f544-452b-b6d5-d1e5c0a0d976 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "a-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "preserved_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "detail": null
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "dependencies": [],
+            "status": "FAILED",
+            "artifact_commit": null,
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [
+                  "D-24dd10a7a3cd16e2933d66e498fccc00f041a890991b0b24ee833d4955b297fc"
+                ],
+                "coder": {
+                  "id": "80665099-01bb-49a7-8439-ee047f1c019f",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "c1ceb666-e3b1-4071-bdc8-39bbb6993a66",
+                  "resumed_from": null,
+                  "process_key": "ec9e44c5-3f9d-4e61-b19c-ea5256198154",
+                  "process_run_id": "1cd0f58b-dcf9-4b0a-8c14-5031b8964ef3",
+                  "outcome": "succeeded"
+                },
+                "reviewer": null,
+                "verification": [
+                  {
+                    "process_key": "defd3e8f-03d3-4cbc-8470-e06a43940db2",
+                    "process_run_id": "656182dd-509f-41ed-a3a5-3a9b162d0bc9",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 1,
+                    "passed": false,
+                    "outcome": "test_failure",
+                    "output_complete": true,
+                    "summary": "process=656182dd-509f-41ed-a3a5-3a9b162d0bc9 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1"
+                  }
+                ],
+                "review": null,
+                "verified_tree": null,
+                "preserved_tree": null,
+                "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"defd3e8f-03d3-4cbc-8470-e06a43940db2\",\"process_run_id\":\"656182dd-509f-41ed-a3a5-3a9b162d0bc9\",\"command\":[\"/bin/sh\",\"-c\",\"for f in a.txt b.txt c.txt; do if test -f \\\"$f\\\"; then grep -qx good \\\"$f\\\" || exit 1; fi; done\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=656182dd-509f-41ed-a3a5-3a9b162d0bc9 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1\"}]"
+              },
+              {
+                "number": 2,
+                "decision_context": [
+                  "D-24dd10a7a3cd16e2933d66e498fccc00f041a890991b0b24ee833d4955b297fc"
+                ],
+                "decision_ids": [
+                  "D-cb5675a101d74bae3ae7dfbfaeb4a17bca420acc7bc216ffe48d891a6781078a"
+                ],
+                "coder": {
+                  "id": "7724dc40-387a-4c2d-ba2e-8d066d52c597",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "685fd71d-72b7-47ce-8c9e-77796161067d",
+                  "resumed_from": null,
+                  "process_key": "8d1bc750-2563-4240-b8b7-a0d9ae472c6e",
+                  "process_run_id": "3db41c5c-a875-44f1-9a19-9fa97b82107f",
+                  "outcome": "succeeded"
+                },
+                "reviewer": null,
+                "verification": [
+                  {
+                    "process_key": "e14532d2-b03d-462d-b2b9-5579c3318c22",
+                    "process_run_id": "62ca63ef-fe5e-4592-8add-31de9c1fbb48",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 1,
+                    "passed": false,
+                    "outcome": "test_failure",
+                    "output_complete": true,
+                    "summary": "process=62ca63ef-fe5e-4592-8add-31de9c1fbb48 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1"
+                  }
+                ],
+                "review": null,
+                "verified_tree": null,
+                "preserved_tree": null,
+                "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"e14532d2-b03d-462d-b2b9-5579c3318c22\",\"process_run_id\":\"62ca63ef-fe5e-4592-8add-31de9c1fbb48\",\"command\":[\"/bin/sh\",\"-c\",\"for f in a.txt b.txt c.txt; do if test -f \\\"$f\\\"; then grep -qx good \\\"$f\\\" || exit 1; fi; done\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=62ca63ef-fe5e-4592-8add-31de9c1fbb48 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1\"}]"
+              },
+              {
+                "number": 3,
+                "decision_context": [
+                  "D-cb5675a101d74bae3ae7dfbfaeb4a17bca420acc7bc216ffe48d891a6781078a"
+                ],
+                "decision_ids": [
+                  "D-cb5675a101d74bae3ae7dfbfaeb4a17bca420acc7bc216ffe48d891a6781078a"
+                ],
+                "coder": {
+                  "id": "6c24f93a-e79c-4e67-b5d3-3a88d2c429d4",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "cdc5568f-e5b7-4b9f-ad83-2992470fdb7b",
+                  "resumed_from": null,
+                  "process_key": "79980a97-6446-47f9-8fc0-0e7901f05d09",
+                  "process_run_id": "0632ed4a-70c4-40d8-8181-a1b19df2b5f7",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "6ab4cd93-5dfd-4a67-bad6-fd8c92869df8",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "809d8417-5463-4ba7-b1bd-560837029182",
+                  "resumed_from": null,
+                  "process_key": "a6fb6d4e-3282-45a8-9697-8c5ea8ca6ae4",
+                  "process_run_id": "b44de55d-c2e6-4a62-92d2-f62d8a244973",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "ddc1b089-5769-4123-a032-257d385cc0c0",
+                    "process_run_id": "0150729d-57da-4130-b9b2-eec8ce1dfb1d",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=0150729d-57da-4130-b9b2-eec8ce1dfb1d status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "decision_reviews": [
+                    {
+                      "decision_id": "D-cb5675a101d74bae3ae7dfbfaeb4a17bca420acc7bc216ffe48d891a6781078a",
+                      "implemented": false,
+                      "evidence": "The candidate implements helper_name=stable. It does not implement helper_name=legacy."
+                    }
+                  ],
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "b-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "The candidate implements helper_name=stable. It does not implement helper_name=legacy."
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "b282ceda8d6f8cfee426102f6da3a8fc5a0fe930",
+                "preserved_tree": null,
+                "detail": "coding attempt limit exhausted for b: {\n  \"decision_reviews\": [\n    {\n      \"decision_id\": \"D-cb5675a101d74bae3ae7dfbfaeb4a17bca420acc7bc216ffe48d891a6781078a\",\n      \"implemented\": false,\n      \"evidence\": \"The candidate implements helper_name=stable. It does not implement helper_name=legacy.\"\n    }\n  ],\n  \"accepted\": true,\n  \"criteria\": [\n    {\n      \"criterion_id\": \"b-C1\",\n      \"criterion\": \"Works\",\n      \"satisfied\": true,\n      \"evidence\": \"The candidate implements helper_name=stable. It does not implement helper_name=legacy.\"\n    }\n  ],\n  \"findings\": [],\n  \"blocker\": \"\"\n}"
+              }
+            ]
+          },
+          {
+            "id": "c",
+            "dependencies": [
+              "a"
+            ],
+            "status": "COMPLETED",
+            "artifact_commit": "85e90ab9d30ae8322529736ab42cf145f527f759",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "ba47cd48-8d03-4d1c-a90d-49cad00ff62e",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "bb65e5ff-db3f-4d69-9a45-b6d3698f4c1f",
+                  "resumed_from": null,
+                  "process_key": "864e4be2-cfcf-4d56-809a-1593146c6bb9",
+                  "process_run_id": "0849cc2e-d399-4276-81a8-291886c7b718",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "e6ad6878-6c18-41d4-aa42-7e78c34b1ecc",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "49892e56-7350-43c5-87b2-8da3c3fdbe6f",
+                  "resumed_from": null,
+                  "process_key": "3d715ccf-47dc-4790-bb4b-9d72eec47267",
+                  "process_run_id": "31fa99ea-f353-4a21-9786-f97707dc9836",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "858f1ffe-e62d-411b-aaea-9a2e1d9bec73",
+                    "process_run_id": "62ff57c6-f173-4fbb-918d-1254ec99485c",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=62ff57c6-f173-4fbb-918d-1254ec99485c status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "c-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "preserved_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "human_actions": []
+      }
+    },
+    {
+      "fixture_case": "ReviewExplicitBan",
+      "full_snapshot_sha256": "824217907684638dbaffd5b2df045fb3a7288e306cb4842f0c8c833cfc3b91b1",
+      "snapshot_excerpt": {
+        "id": "954fbef3-82cf-426b-ba50-d96bb491ce70",
+        "status": "BLOCKED",
+        "specification": "Implement safe feature. Use legacy helper names. Do not use stable helper names.",
+        "base_commit": "9121eae8cb462399f58cddd2b75c8209b9842a68",
+        "summary": "2 of 3 tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate.",
+        "delegation_request": {
+          "submission": {
+            "id": "954fbef3-82cf-426b-ba50-d96bb491ce70",
+            "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpCARrwF/repo",
+            "base": "main",
+            "specification": "Implement safe feature. Use legacy helper names. Do not use stable helper names."
+          },
+          "writable_files": [
+            "a.txt",
+            "b.txt",
+            "c.txt"
+          ],
+          "max_runtime_seconds": 120,
+          "local_integration": false
+        },
+        "authorized_at": "2026-10-22T17:54:06.512724Z",
+        "expires_at": "2026-10-22T17:56:06.512724Z",
+        "execution_limits": {
+          "max_parallel": 2,
+          "max_attempts": 3,
+          "max_review_cycles": 2
+        },
+        "delegation_contract_sha256": "c118921deec4d59ae1cd32cf4237f7b6db2198077e4ba2394a5f21200cfe1011",
+        "decisions": [
+          {
+            "id": "D-aaf51c974d6aeeb1bd3fa212998d31d5e06785f213778751513f46c3381e51a8",
+            "run_id": "954fbef3-82cf-426b-ba50-d96bb491ce70",
+            "ordinal": 1,
+            "task_id": null,
+            "attempt": null,
+            "session_id": "fc8c70bb-e220-4b92-9460-916149c7a4a8",
+            "created_at": "2026-10-22T17:54:07.423053Z",
+            "proposal": {
+              "key": "helper-name",
+              "question": "Which internal helper name?",
+              "chosen": "stable",
+              "alternatives": [
+                "legacy"
+              ],
+              "rationale": "Use the documented helper naming convention.",
+              "kind": "internal_name",
+              "evidence": [
+                {
+                  "file": "a.txt",
+                  "excerpt": "prefer stable helper names",
+                  "supports": "stable"
+                }
+              ],
+              "requirements": [
+                "Implement safe feature"
+              ],
+              "assumptions": [],
+              "uncertainty": [],
+              "affected_files": [
+                "b.txt"
+              ],
+              "affected_tasks": [
+                "b"
+              ],
+              "supersedes": null
+            },
+            "category": "significant",
+            "policy_basis": "Unresolved: missing/contradictory authorized evidence, uncertain context, requirement conflict, existing human gate or concurrent/completed work",
+            "evidence": [
+              {
+                "source": "frozen_base",
+                "file": "a.txt",
+                "content_sha256": "c54fb02aa029f6c24708ac0d1d28a5e0d97b6068f28bb8a27cf82808b0d44db5",
+                "excerpt": "prefer stable helper names",
+                "supports": "stable",
+                "base_commit": "9121eae8cb462399f58cddd2b75c8209b9842a68",
+                "workspace_id": null,
+                "blob_oid": "2c20f97123253ab177bf8fbdfd6d9d3c71f774ab"
+              }
+            ],
+            "audit": [
+              {
+                "sequence": 1,
+                "at": "2026-10-22T17:54:07.423053Z",
+                "kind": "unresolved",
+                "task_id": null,
+                "attempt": null,
+                "detail": "Unresolved: missing/contradictory authorized evidence, uncertain context, requirement conflict, existing human gate or concurrent/completed work"
+              }
+            ]
+          }
+        ],
+        "tasks": [
+          {
+            "id": "a",
+            "dependencies": [],
+            "status": "COMPLETED",
+            "artifact_commit": "6959de8c75b87ef7af44f64a911f49e34e9186ba",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "ed73d12e-e13a-4c5a-b9c9-2d3248e835a7",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "8afab29a-8231-4031-9938-f124f0e233f3",
+                  "resumed_from": null,
+                  "process_key": "3699cb52-c6b1-46ce-b82e-7b1fa90578b0",
+                  "process_run_id": "9688cd78-df9f-4631-923f-ffa8afd9e481",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "f5d0da9e-e794-4370-afa7-3939484387e0",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "6785c8d3-c9f9-4b80-ae0c-759063af5fd7",
+                  "resumed_from": null,
+                  "process_key": "1fe1404f-011a-4405-b26e-17d4a5098e0f",
+                  "process_run_id": "5222a2af-dfc0-460c-958a-654440e5b457",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "b6f21672-f085-488e-b2ec-bf2a82e1c692",
+                    "process_run_id": "d6523cd0-cd43-4da6-b6b9-713b82a2baad",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=d6523cd0-cd43-4da6-b6b9-713b82a2baad status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "a-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "preserved_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "detail": null
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "dependencies": [],
+            "status": "READY",
+            "artifact_commit": null,
+            "attempts": []
+          },
+          {
+            "id": "c",
+            "dependencies": [
+              "a"
+            ],
+            "status": "COMPLETED",
+            "artifact_commit": "3508faec4b78da13481a638c3b5589b85082ac5f",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "af64c330-b035-45c7-864c-c3c1495294ad",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "a1f54e7c-af96-4e61-b0a8-e193303cdb4c",
+                  "resumed_from": null,
+                  "process_key": "50a6ef13-de68-4d4d-bba2-c49e7ce8fe73",
+                  "process_run_id": "7f26b10a-d388-4f08-9f5c-5033928b9cb2",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "94b9325d-230d-4fa9-a6c9-194f36beb025",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "1e466c6b-b954-4003-8e76-81851eebb850",
+                  "resumed_from": null,
+                  "process_key": "ec01bdc5-5937-4c9f-83be-ff38748e6d35",
+                  "process_run_id": "5313cbda-4b54-40a2-8917-26c05f78e477",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "ef94b045-4db8-4edd-9f85-59d484194ab2",
+                    "process_run_id": "ea6495aa-bc23-48d4-a7cf-e86ade2adf44",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=ea6495aa-bc23-48d4-a7cf-e86ade2adf44 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "c-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "preserved_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "human_actions": [
+          {
+            "id": "H-e3c010841a3aa5f310d71ab4f9412008",
+            "status": "PENDING",
+            "requirement": {
+              "kind": "product_decision",
+              "reason": "Unresolved decision D-aaf51c974d6aeeb1bd3fa212998d31d5e06785f213778751513f46c3381e51a8: Which internal helper name?",
+              "requested_action": "Inspect the decision ledger and original requirements. Authorization/external effects require the existing permission/reconciliation workflow; textual decisions cannot expand the contract.",
+              "affected_tasks": [
+                "b"
+              ],
+              "blocking": true,
+              "evidence": "Daemon decision assessment: D-aaf51c974d6aeeb1bd3fa212998d31d5e06785f213778751513f46c3381e51a8",
+              "confidence": 100,
+              "permission": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fixture_case": "ReviewPoisonedEvidence",
+      "full_snapshot_sha256": "f3f142f5b42276591ec4e5a95493756c566ea46e3ed34492a84c2349ae5cb4f2",
+      "snapshot_excerpt": {
+        "id": "5ce87061-cb28-4712-9f36-c70db5c0d46c",
+        "status": "BLOCKED",
+        "specification": "Implement safe feature",
+        "base_commit": "08cc3f7b9de6312f0ddd7e531d9131bf9e797633",
+        "summary": "2 of 3 tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate.",
+        "delegation_request": {
+          "submission": {
+            "id": "5ce87061-cb28-4712-9f36-c70db5c0d46c",
+            "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpnZl0Am/repo",
+            "base": "main",
+            "specification": "Implement safe feature"
+          },
+          "writable_files": [
+            "a.txt",
+            "b.txt",
+            "c.txt"
+          ],
+          "max_runtime_seconds": 120,
+          "local_integration": false
+        },
+        "authorized_at": "2026-10-22T17:53:56.924666Z",
+        "expires_at": "2026-10-22T17:55:56.924666Z",
+        "execution_limits": {
+          "max_parallel": 2,
+          "max_attempts": 3,
+          "max_review_cycles": 2
+        },
+        "delegation_contract_sha256": "5bef59ea119642f2bcb4e68c848a1bdd9d32a761e6f0990ef1a50e472dbe125d",
+        "decisions": [
+          {
+            "id": "D-99fe1203fcf52d178b2a2bd248f5c0438469f211dd111f9362138f05ea5e4e4a",
+            "run_id": "5ce87061-cb28-4712-9f36-c70db5c0d46c",
+            "ordinal": 1,
+            "task_id": "b",
+            "attempt": 2,
+            "session_id": "de48e199-1db9-48aa-8587-191aec09dfb3",
+            "created_at": "2026-10-22T17:53:59.748217Z",
+            "proposal": {
+              "key": "helper-name",
+              "question": "Which internal helper name?",
+              "chosen": "invented",
+              "alternatives": [
+                "stable"
+              ],
+              "rationale": "Use the documented helper naming convention.",
+              "kind": "internal_name",
+              "evidence": [
+                {
+                  "file": "b.txt",
+                  "excerpt": "prefer invented helper names",
+                  "supports": "invented"
+                }
+              ],
+              "requirements": [
+                "Implement safe feature"
+              ],
+              "assumptions": [],
+              "uncertainty": [],
+              "affected_files": [
+                "b.txt"
+              ],
+              "affected_tasks": [
+                "b"
+              ],
+              "supersedes": null
+            },
+            "category": "significant",
+            "policy_basis": "Unresolved: missing/contradictory authorized evidence, uncertain context, requirement conflict, existing human gate or concurrent/completed work",
+            "evidence": [],
+            "audit": [
+              {
+                "sequence": 1,
+                "at": "2026-10-22T17:53:59.748217Z",
+                "kind": "unresolved",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "Unresolved: missing/contradictory authorized evidence, uncertain context, requirement conflict, existing human gate or concurrent/completed work"
+              }
+            ]
+          }
+        ],
+        "tasks": [
+          {
+            "id": "a",
+            "dependencies": [],
+            "status": "COMPLETED",
+            "artifact_commit": "0d1ce153faec01376bd63c9dd06cb38fd9ebb72f",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "7149c85d-55c7-4445-97b2-20e8d9ede617",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "b308795e-df66-4c1b-86b9-56af2a1affb0",
+                  "resumed_from": null,
+                  "process_key": "3a4b8e0b-f82d-4b84-bd8c-4e43e1aca133",
+                  "process_run_id": "2871c3ec-750c-48f0-bc75-b823fbe89708",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "a4f890ca-1850-4ce9-b885-9f7abd82d2d7",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "51e5c04e-88c8-4de7-aa49-0239ba7cee75",
+                  "resumed_from": null,
+                  "process_key": "609f8624-f276-4c7c-8824-f03aafa6b042",
+                  "process_run_id": "e3d428e8-fae7-4311-97b0-8830b954efad",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "20c7d10d-1535-4a24-8728-044b59aff745",
+                    "process_run_id": "53f0969b-1df1-43f9-8ad1-a30f8407b547",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=53f0969b-1df1-43f9-8ad1-a30f8407b547 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "a-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "preserved_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "detail": null
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "dependencies": [],
+            "status": "BLOCKED",
+            "artifact_commit": null,
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "781e649f-a2b2-44b7-b0bc-1bc6b6701cda",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "0232f8df-5660-4e3f-81e9-8be2187cdd7f",
+                  "resumed_from": null,
+                  "process_key": "46bb1199-4df3-431e-8102-56d142bea1af",
+                  "process_run_id": "114d13c1-0a8a-4bbf-8fff-a9d4a77e1df0",
+                  "outcome": "succeeded"
+                },
+                "reviewer": null,
+                "verification": [
+                  {
+                    "process_key": "7ac1211b-f2ea-4b47-a4cc-d596b22d465e",
+                    "process_run_id": "0755e6d9-914e-466d-854a-20b491cb7a54",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 1,
+                    "passed": false,
+                    "outcome": "test_failure",
+                    "output_complete": true,
+                    "summary": "process=0755e6d9-914e-466d-854a-20b491cb7a54 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1"
+                  }
+                ],
+                "review": null,
+                "verified_tree": null,
+                "preserved_tree": null,
+                "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"7ac1211b-f2ea-4b47-a4cc-d596b22d465e\",\"process_run_id\":\"0755e6d9-914e-466d-854a-20b491cb7a54\",\"command\":[\"/bin/sh\",\"-c\",\"for f in a.txt b.txt c.txt; do if test -f \\\"$f\\\"; then grep -qx good \\\"$f\\\" || exit 1; fi; done\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=0755e6d9-914e-466d-854a-20b491cb7a54 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1\"}]"
+              },
+              {
+                "number": 2,
+                "decision_context": [],
+                "decision_ids": null,
+                "coder": {
+                  "id": "de48e199-1db9-48aa-8587-191aec09dfb3",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "47c43e1b-67c2-4668-a7f2-184c97cb497d",
+                  "resumed_from": null,
+                  "process_key": "51ec3215-ef3e-469e-a2a7-ba14372e444d",
+                  "process_run_id": "3ccd00c0-47ad-4ecd-90bf-7a790e00e6d2",
+                  "outcome": "succeeded"
+                },
+                "reviewer": null,
+                "verification": [],
+                "review": null,
+                "verified_tree": null,
+                "preserved_tree": null,
+                "detail": "decision_unresolved: Decision remains unresolved; inspect the ledger and human actions. No proposed edits were applied."
+              }
+            ]
+          },
+          {
+            "id": "c",
+            "dependencies": [
+              "a"
+            ],
+            "status": "COMPLETED",
+            "artifact_commit": "296249eb3e537275a4ada42a0c1e0b7f88a0c8b6",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "d61b227c-74a4-4de6-8ec1-ce7739bc6b8c",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "bf4d0908-2433-48e0-ab97-45da11da4d7b",
+                  "resumed_from": null,
+                  "process_key": "54a4e2c7-9825-4a1a-b4ca-f2ef6e667622",
+                  "process_run_id": "400c4b86-e0be-4101-ac6a-caeae142d4e7",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "959fd4af-aa15-4e74-bad6-5a96a1d5c7ce",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "34b9d4b1-88ff-4b68-a2e3-981377560bfd",
+                  "resumed_from": null,
+                  "process_key": "306887be-25d0-4f5f-8e48-4d679f63f754",
+                  "process_run_id": "874cac2a-676d-49da-82fc-4a9eded6c8c6",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "c77cc14e-b249-4037-be07-359b7bace8d0",
+                    "process_run_id": "dafa3e24-c534-4425-9fe7-881b49729114",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=dafa3e24-c534-4425-9fe7-881b49729114 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "c-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "preserved_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "human_actions": [
+          {
+            "id": "H-8a33dfa851bdc9049f586d059ac0899b",
+            "status": "PENDING",
+            "requirement": {
+              "kind": "product_decision",
+              "reason": "Unresolved decision D-99fe1203fcf52d178b2a2bd248f5c0438469f211dd111f9362138f05ea5e4e4a: Which internal helper name?",
+              "requested_action": "Inspect the decision ledger and original requirements. Authorization/external effects require the existing permission/reconciliation workflow; textual decisions cannot expand the contract.",
+              "affected_tasks": [
+                "b"
+              ],
+              "blocking": true,
+              "evidence": "Daemon decision assessment: D-99fe1203fcf52d178b2a2bd248f5c0438469f211dd111f9362138f05ea5e4e4a",
+              "confidence": 100,
+              "permission": null
+            }
+          },
+          {
+            "id": "H-a3cacf04e0d0dfd691ed92f59cf1c4a1",
+            "status": "PENDING",
+            "requirement": {
+              "kind": "runtime",
+              "reason": "decision_unresolved: decision_unresolved: Decision remains unresolved; inspect the ledger and human actions. No proposed edits were applied.",
+              "requested_action": "Integrity/ownership failure: inspect retained artifacts and establish a new trusted base; this task cannot be continued",
+              "affected_tasks": [
+                "b"
+              ],
+              "blocking": true,
+              "evidence": "Task b; attempt 2; retained process evidence",
+              "confidence": 100,
+              "permission": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fixture_case": "ReviewRetiredReplay",
+      "full_snapshot_sha256": "aacd0b9438753b6d502b7039a800de28eef649bd3bdce84840e98bad8e6ec270",
+      "snapshot_excerpt": {
+        "id": "abc8eb16-21d3-478a-ba7a-78520b59be55",
+        "status": "BLOCKED",
+        "specification": "Implement safe feature",
+        "base_commit": "b7795ca271b3656b6b90610d502f767d731092ce",
+        "summary": "2 of 3 tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate.",
+        "delegation_request": {
+          "submission": {
+            "id": "abc8eb16-21d3-478a-ba7a-78520b59be55",
+            "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpn52Jqc/repo",
+            "base": "main",
+            "specification": "Implement safe feature"
+          },
+          "writable_files": [
+            "a.txt",
+            "b.txt",
+            "c.txt"
+          ],
+          "max_runtime_seconds": 120,
+          "local_integration": false
+        },
+        "authorized_at": "2026-10-22T17:53:48.353915Z",
+        "expires_at": "2026-10-22T17:55:48.353915Z",
+        "execution_limits": {
+          "max_parallel": 2,
+          "max_attempts": 3,
+          "max_review_cycles": 2
+        },
+        "delegation_contract_sha256": "00aa59ef01173c5f6b8a8deac900716f11eed4428198ea93c95045c6fb1fd23b",
+        "decisions": [
+          {
+            "id": "D-5af7159daef0bb1ae8978efe9c3e0bc6da8e8c4c33cc669009dd77a34d58c0ae",
+            "run_id": "abc8eb16-21d3-478a-ba7a-78520b59be55",
+            "ordinal": 1,
+            "task_id": "b",
+            "attempt": 1,
+            "session_id": "c8e8a8d5-6ff0-42ea-8274-5bb2e8db3576",
+            "created_at": "2026-10-22T17:53:49.784414Z",
+            "proposal": {
+              "key": "helper-name",
+              "question": "Which internal helper name?",
+              "chosen": "stable",
+              "alternatives": [
+                "legacy"
+              ],
+              "rationale": "Use the documented helper naming convention.",
+              "kind": "internal_name",
+              "evidence": [
+                {
+                  "file": "a.txt",
+                  "excerpt": "prefer stable helper names",
+                  "supports": "stable"
+                }
+              ],
+              "requirements": [
+                "Implement safe feature"
+              ],
+              "assumptions": [],
+              "uncertainty": [],
+              "affected_files": [
+                "b.txt"
+              ],
+              "affected_tasks": [
+                "b"
+              ],
+              "supersedes": null
+            },
+            "category": "reversible",
+            "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+            "evidence": [
+              {
+                "source": "frozen_base",
+                "file": "a.txt",
+                "content_sha256": "c54fb02aa029f6c24708ac0d1d28a5e0d97b6068f28bb8a27cf82808b0d44db5",
+                "excerpt": "prefer stable helper names",
+                "supports": "stable",
+                "base_commit": "b7795ca271b3656b6b90610d502f767d731092ce",
+                "workspace_id": null,
+                "blob_oid": "2c20f97123253ab177bf8fbdfd6d9d3c71f774ab"
+              }
+            ],
+            "audit": [
+              {
+                "sequence": 1,
+                "at": "2026-10-22T17:53:49.784414Z",
+                "kind": "accepted",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required"
+              },
+              {
+                "sequence": 2,
+                "at": "2026-10-22T17:53:49.784422Z",
+                "kind": "consumed",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "Admitted coder response; exact decision revisions frozen before file replacements"
+              },
+              {
+                "sequence": 3,
+                "at": "2026-10-22T17:53:50.416444Z",
+                "kind": "implemented",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "bd56ef0efe657f8877378ab06c8267c1c3cb5a1a"
+              },
+              {
+                "sequence": 4,
+                "at": "2026-10-22T17:53:50.970676Z",
+                "kind": "verification_failed",
+                "task_id": "b",
+                "attempt": 1,
+                "detail": "Configured checks failed; see immutable attempt process receipts"
+              },
+              {
+                "sequence": 5,
+                "at": "2026-10-22T17:53:51.325060Z",
+                "kind": "superseded",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "D-cdbb72ba3929ba423c5fab23b8b6bfd7c0bb9df39d2ced99319383adddeb20a0"
+              }
+            ]
+          },
+          {
+            "id": "D-cdbb72ba3929ba423c5fab23b8b6bfd7c0bb9df39d2ced99319383adddeb20a0",
+            "run_id": "abc8eb16-21d3-478a-ba7a-78520b59be55",
+            "ordinal": 2,
+            "task_id": "b",
+            "attempt": 2,
+            "session_id": "3d88ef4d-66c4-4b54-8c1f-ba745be8380e",
+            "created_at": "2026-10-22T17:53:51.325060Z",
+            "proposal": {
+              "key": "helper-name",
+              "question": "Which internal helper name?",
+              "chosen": "legacy",
+              "alternatives": [
+                "stable"
+              ],
+              "rationale": "Use the documented helper naming convention.",
+              "kind": "internal_name",
+              "evidence": [
+                {
+                  "file": "a.txt",
+                  "excerpt": "legacy helper naming",
+                  "supports": "legacy"
+                }
+              ],
+              "requirements": [
+                "Implement safe feature"
+              ],
+              "assumptions": [],
+              "uncertainty": [],
+              "affected_files": [
+                "b.txt"
+              ],
+              "affected_tasks": [
+                "b"
+              ],
+              "supersedes": "D-5af7159daef0bb1ae8978efe9c3e0bc6da8e8c4c33cc669009dd77a34d58c0ae"
+            },
+            "category": "reversible",
+            "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+            "evidence": [
+              {
+                "source": "frozen_base",
+                "file": "a.txt",
+                "content_sha256": "c54fb02aa029f6c24708ac0d1d28a5e0d97b6068f28bb8a27cf82808b0d44db5",
+                "excerpt": "legacy helper naming",
+                "supports": "legacy",
+                "base_commit": "b7795ca271b3656b6b90610d502f767d731092ce",
+                "workspace_id": null,
+                "blob_oid": "2c20f97123253ab177bf8fbdfd6d9d3c71f774ab"
+              }
+            ],
+            "audit": [
+              {
+                "sequence": 1,
+                "at": "2026-10-22T17:53:51.325060Z",
+                "kind": "accepted",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required"
+              },
+              {
+                "sequence": 2,
+                "at": "2026-10-22T17:53:51.325068Z",
+                "kind": "consumed",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "Admitted coder response; exact decision revisions frozen before file replacements"
+              },
+              {
+                "sequence": 3,
+                "at": "2026-10-22T17:53:51.870283Z",
+                "kind": "implemented",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "1c75d2f22fc8c3a79977d5b6019a908778fe3d31"
+              },
+              {
+                "sequence": 4,
+                "at": "2026-10-22T17:53:52.431989Z",
+                "kind": "verification_failed",
+                "task_id": "b",
+                "attempt": 2,
+                "detail": "Configured checks failed; see immutable attempt process receipts"
+              }
+            ]
+          }
+        ],
+        "tasks": [
+          {
+            "id": "a",
+            "dependencies": [],
+            "status": "COMPLETED",
+            "artifact_commit": "b908b8607e004dcceca0db4fb349afe0992a9696",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "e669ee64-922c-4213-83f8-943774c13eac",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "e01c075e-960f-4de3-9d03-4a78b07fdfc5",
+                  "resumed_from": null,
+                  "process_key": "06285476-fd8b-49ff-b664-868747d04292",
+                  "process_run_id": "a019e9fb-4261-480c-9338-e1cf2a5b0f5a",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "810a5590-cd35-44aa-ba1c-b6d3f159fe27",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "4e5fa6fe-3c43-45f3-94b2-1ac65d48f0fb",
+                  "resumed_from": null,
+                  "process_key": "f468c987-af2f-467b-ace5-29b4ff7ee3de",
+                  "process_run_id": "85444be1-cf33-4d82-bc2e-3d4226b71eea",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "951c8ac7-2914-4301-b07a-7cbdb8b00e2d",
+                    "process_run_id": "ec4cc75a-5466-416e-844c-af33e3e90e62",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=ec4cc75a-5466-416e-844c-af33e3e90e62 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "a-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "preserved_tree": "0b934eacac7f69ef70b45e8deea7ffd259a063c6",
+                "detail": null
+              }
+            ]
+          },
+          {
+            "id": "b",
+            "dependencies": [],
+            "status": "BLOCKED",
+            "artifact_commit": null,
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [
+                  "D-5af7159daef0bb1ae8978efe9c3e0bc6da8e8c4c33cc669009dd77a34d58c0ae"
+                ],
+                "coder": {
+                  "id": "c8e8a8d5-6ff0-42ea-8274-5bb2e8db3576",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "7c8c48ba-55a0-4972-b28a-f54e927aa8d4",
+                  "resumed_from": null,
+                  "process_key": "e2716c25-02ba-4cec-990e-5d79e84f7161",
+                  "process_run_id": "91cc8f75-4b9b-4782-bc39-c7685cc68f84",
+                  "outcome": "succeeded"
+                },
+                "reviewer": null,
+                "verification": [
+                  {
+                    "process_key": "04ad947f-bff3-4b16-a388-13c2f1534591",
+                    "process_run_id": "bd0eead0-99a7-4cf2-9be6-9708d988c663",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 1,
+                    "passed": false,
+                    "outcome": "test_failure",
+                    "output_complete": true,
+                    "summary": "process=bd0eead0-99a7-4cf2-9be6-9708d988c663 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1"
+                  }
+                ],
+                "review": null,
+                "verified_tree": null,
+                "preserved_tree": null,
+                "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"04ad947f-bff3-4b16-a388-13c2f1534591\",\"process_run_id\":\"bd0eead0-99a7-4cf2-9be6-9708d988c663\",\"command\":[\"/bin/sh\",\"-c\",\"for f in a.txt b.txt c.txt; do if test -f \\\"$f\\\"; then grep -qx good \\\"$f\\\" || exit 1; fi; done\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=bd0eead0-99a7-4cf2-9be6-9708d988c663 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1\"}]"
+              },
+              {
+                "number": 2,
+                "decision_context": [
+                  "D-5af7159daef0bb1ae8978efe9c3e0bc6da8e8c4c33cc669009dd77a34d58c0ae"
+                ],
+                "decision_ids": [
+                  "D-cdbb72ba3929ba423c5fab23b8b6bfd7c0bb9df39d2ced99319383adddeb20a0"
+                ],
+                "coder": {
+                  "id": "3d88ef4d-66c4-4b54-8c1f-ba745be8380e",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "56404ee6-e99d-4bae-b407-ee8f85e2a0b8",
+                  "resumed_from": null,
+                  "process_key": "a06f1e48-5e6c-4d5b-ae3a-bbed631672e9",
+                  "process_run_id": "12d452d5-2ccd-4431-8a5f-50d529266365",
+                  "outcome": "succeeded"
+                },
+                "reviewer": null,
+                "verification": [
+                  {
+                    "process_key": "6199d4eb-2c5d-4f79-b93d-33983c08a23f",
+                    "process_run_id": "e8e39a17-43fb-4cc8-8504-e2500647f378",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 1,
+                    "passed": false,
+                    "outcome": "test_failure",
+                    "output_complete": true,
+                    "summary": "process=e8e39a17-43fb-4cc8-8504-e2500647f378 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1"
+                  }
+                ],
+                "review": null,
+                "verified_tree": null,
+                "preserved_tree": null,
+                "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"6199d4eb-2c5d-4f79-b93d-33983c08a23f\",\"process_run_id\":\"e8e39a17-43fb-4cc8-8504-e2500647f378\",\"command\":[\"/bin/sh\",\"-c\",\"for f in a.txt b.txt c.txt; do if test -f \\\"$f\\\"; then grep -qx good \\\"$f\\\" || exit 1; fi; done\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=e8e39a17-43fb-4cc8-8504-e2500647f378 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1\"}]"
+              },
+              {
+                "number": 3,
+                "decision_context": [
+                  "D-cdbb72ba3929ba423c5fab23b8b6bfd7c0bb9df39d2ced99319383adddeb20a0"
+                ],
+                "decision_ids": null,
+                "coder": {
+                  "id": "ad421c4e-05d8-47a5-b708-b28f112e4b3f",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "4a05bc69-a9e5-4522-9add-10db1cdd5760",
+                  "resumed_from": null,
+                  "process_key": "eddc67be-22da-4361-9a4e-fdb52a4a4964",
+                  "process_run_id": "02493eaa-fd0e-4ce4-8734-560734389141",
+                  "outcome": "succeeded"
+                },
+                "reviewer": null,
+                "verification": [],
+                "review": null,
+                "verified_tree": null,
+                "preserved_tree": null,
+                "detail": "invalid_decision: Decision contract is malformed, oversized or contains credential-like material; inspect the task without expanding authority"
+              }
+            ]
+          },
+          {
+            "id": "c",
+            "dependencies": [
+              "a"
+            ],
+            "status": "COMPLETED",
+            "artifact_commit": "1733ed087344b668d14257694a9f737160a7d2d9",
+            "attempts": [
+              {
+                "number": 1,
+                "decision_context": [],
+                "decision_ids": [],
+                "coder": {
+                  "id": "2fd129de-e894-4da1-a153-6257ab05ab42",
+                  "role": "coder",
+                  "provider": "claude",
+                  "provider_session_id": "e863b35d-65dd-4666-b51d-c65cbf8d761d",
+                  "resumed_from": null,
+                  "process_key": "4df5c7d7-c732-4965-9b74-1352811aca5d",
+                  "process_run_id": "b4c4a535-7125-4b79-8fc5-560793f8a9b2",
+                  "outcome": "succeeded"
+                },
+                "reviewer": {
+                  "id": "8e7301ab-78e0-4582-8f88-7f0f8b1a4399",
+                  "role": "reviewer",
+                  "provider": "claude",
+                  "provider_session_id": "037a5c15-8834-401d-9f8e-2c4187fbcd28",
+                  "resumed_from": null,
+                  "process_key": "9c04330f-3bf1-4c04-8fe1-2f1b05aa3e62",
+                  "process_run_id": "dc287cbd-5151-4a96-8331-a2ee0181f822",
+                  "outcome": "succeeded"
+                },
+                "verification": [
+                  {
+                    "process_key": "b1984d47-c410-48e3-b6da-e7789825fc54",
+                    "process_run_id": "dc00ce51-9b21-49fb-934d-c104cddc3e32",
+                    "command": [
+                      "/bin/sh",
+                      "-c",
+                      "for f in a.txt b.txt c.txt; do if test -f \"$f\"; then grep -qx good \"$f\" || exit 1; fi; done"
+                    ],
+                    "exit_code": 0,
+                    "passed": true,
+                    "outcome": "passed",
+                    "output_complete": true,
+                    "summary": "process=dc00ce51-9b21-49fb-934d-c104cddc3e32 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                  }
+                ],
+                "review": {
+                  "accepted": true,
+                  "criteria": [
+                    {
+                      "criterion_id": "c-C1",
+                      "criterion": "Works",
+                      "satisfied": true,
+                      "evidence": "Independent inspection of full candidate diff and verification"
+                    }
+                  ],
+                  "findings": [],
+                  "blocker": ""
+                },
+                "verified_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "preserved_tree": "3ae058f47ddd3fb5cd57aac7d8abd13e42a60355",
+                "detail": null
+              }
+            ]
+          }
+        ],
+        "human_actions": [
+          {
+            "id": "H-f0a5a1a2ef99384ac4f3350495755aea",
+            "status": "PENDING",
+            "requirement": {
+              "kind": "runtime",
+              "reason": "invalid_decision: invalid_decision: Decision contract is malformed, oversized or contains credential-like material; inspect the task without expanding authority",
+              "requested_action": "Integrity/ownership failure: inspect retained artifacts and establish a new trusted base; this task cannot be continued",
+              "affected_tasks": [
+                "b"
+              ],
+              "blocking": true,
+              "evidence": "Task b; attempt 3; retained process evidence",
+              "confidence": 100,
+              "permission": null
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "csv_acceptance": {
+    "full_snapshot_sha256": "bc0f6256249a0390272e40037b3e7ad0ce5a7c108f8791e48614a353c45e793c",
+    "seed_commit": "f73a6d7959372f74c601a72148330e62c7474906",
+    "restart_replayed": false,
+    "provider_invocations": [
+      "planner",
+      "task-format",
+      "task-validate",
+      "review-format-1",
+      "review-validate-1",
+      "task-export",
+      "review-export-1",
+      "task-docs",
+      "task-tests",
+      "review-docs-1",
+      "review-tests-1"
+    ],
+    "journal_event_counts": {
+      "delegation_authorized": 1,
+      "created": 1,
+      "delegation_allowed": 67,
+      "planning_workspace_ready": 1,
+      "agent_started": 11,
+      "agent_process": 11,
+      "agent_finished": 11,
+      "plan_ready": 1,
+      "task_state": 18,
+      "preflight": 1,
+      "delegation_execution": 1,
+      "scheduler": 6,
+      "task_started": 5,
+      "workspace_reserved": 5,
+      "workspace_ready": 5,
+      "attempt_started": 5,
+      "decisions_assessed": 5,
+      "decision_implementation": 5,
+      "verification_started": 6,
+      "verification_process": 6,
+      "verification_finished": 6,
+      "verification_passed": 5,
+      "review_reserved": 5,
+      "review_workspace_ready": 5,
+      "review_finished": 5,
+      "task_completed": 5,
+      "execution_finished": 1,
+      "delegation_integration": 1,
+      "integration_workspace_ready": 1,
+      "integration_merge": 5,
+      "completed": 1
+    },
+    "snapshot_excerpt": {
+      "id": "2b934e3a-9558-4697-801e-8fe36455cc52",
+      "status": "COMPLETED",
+      "specification": "Implement report export with validation and tests.",
+      "base_commit": "f73a6d7959372f74c601a72148330e62c7474906",
+      "summary": "All 5 tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch autono/2b934e3a-9558-4697-801e-8fe36455cc52/integration at bf01b542c97157b4caa1d0af5a77adb2dfb50e48 (/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpj0aJYN/home/engineering/2b934e3a-9558-4697-801e-8fe36455cc52/integration). No merge to main was performed.",
+      "delegation_request": {
+        "local_integration": true,
+        "max_runtime_seconds": 120,
+        "submission": {
+          "base": "main",
+          "id": "2b934e3a-9558-4697-801e-8fe36455cc52",
+          "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpj0aJYN/repo",
+          "specification": "Implement report export with validation and tests."
+        },
+        "writable_files": [
+          "format.sh",
+          "validate.sh",
+          "export.sh",
+          "test_export.sh",
+          "export.txt"
+        ]
+      },
+      "authorized_at": "2026-10-22T17:50:49.678764Z",
+      "expires_at": "2026-10-22T17:52:49.678764Z",
+      "execution_limits": {
+        "max_attempts": 3,
+        "max_parallel": 2,
+        "max_review_cycles": 2
+      },
+      "delegation_contract_sha256": "28293b73226f2b3faa50e2b7eae66f4ca6e51db84b2f48326159c83b4bf74f57",
+      "decisions": [
+        {
+          "attempt": null,
+          "audit": [
+            {
+              "at": "2026-10-22T17:50:50.812754Z",
+              "attempt": null,
+              "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+              "kind": "accepted",
+              "sequence": 1,
+              "task_id": null
+            },
+            {
+              "at": "2026-10-22T17:50:51.450451Z",
+              "attempt": 1,
+              "detail": "Admitted coder response; exact decision revisions frozen before file replacements",
+              "kind": "consumed",
+              "sequence": 2,
+              "task_id": "format"
+            },
+            {
+              "at": "2026-10-22T17:50:51.933202Z",
+              "attempt": 1,
+              "detail": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+              "kind": "implemented",
+              "sequence": 3,
+              "task_id": "format"
+            },
+            {
+              "at": "2026-10-22T17:50:52.361457Z",
+              "attempt": 1,
+              "detail": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+              "kind": "checks_passed",
+              "sequence": 4,
+              "task_id": "format"
+            },
+            {
+              "at": "2026-10-22T17:50:53.200332Z",
+              "attempt": 1,
+              "detail": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+              "kind": "review_accepted",
+              "sequence": 5,
+              "task_id": "format"
+            },
+            {
+              "at": "2026-10-22T17:50:54.104673Z",
+              "attempt": 1,
+              "detail": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+              "kind": "task_verified",
+              "sequence": 6,
+              "task_id": "format"
+            },
+            {
+              "at": "2026-10-22T17:50:54.757116Z",
+              "attempt": 1,
+              "detail": "Admitted coder response; exact decision revisions frozen before file replacements",
+              "kind": "consumed",
+              "sequence": 7,
+              "task_id": "export"
+            },
+            {
+              "at": "2026-10-22T17:50:55.158563Z",
+              "attempt": 1,
+              "detail": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+              "kind": "implemented",
+              "sequence": 8,
+              "task_id": "export"
+            },
+            {
+              "at": "2026-10-22T17:50:55.565609Z",
+              "attempt": 1,
+              "detail": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+              "kind": "checks_passed",
+              "sequence": 9,
+              "task_id": "export"
+            },
+            {
+              "at": "2026-10-22T17:50:56.365453Z",
+              "attempt": 1,
+              "detail": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+              "kind": "review_accepted",
+              "sequence": 10,
+              "task_id": "export"
+            },
+            {
+              "at": "2026-10-22T17:50:57.257165Z",
+              "attempt": 1,
+              "detail": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+              "kind": "task_verified",
+              "sequence": 11,
+              "task_id": "export"
+            },
+            {
+              "at": "2026-10-22T17:50:57.995801Z",
+              "attempt": 1,
+              "detail": "Admitted coder response; exact decision revisions frozen before file replacements",
+              "kind": "consumed",
+              "sequence": 12,
+              "task_id": "docs"
+            },
+            {
+              "at": "2026-10-22T17:50:58.003406Z",
+              "attempt": 1,
+              "detail": "Admitted coder response; exact decision revisions frozen before file replacements",
+              "kind": "consumed",
+              "sequence": 13,
+              "task_id": "tests"
+            },
+            {
+              "at": "2026-10-22T17:50:58.455463Z",
+              "attempt": 1,
+              "detail": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+              "kind": "implemented",
+              "sequence": 14,
+              "task_id": "docs"
+            },
+            {
+              "at": "2026-10-22T17:50:58.471404Z",
+              "attempt": 1,
+              "detail": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+              "kind": "implemented",
+              "sequence": 15,
+              "task_id": "tests"
+            },
+            {
+              "at": "2026-10-22T17:50:58.957678Z",
+              "attempt": 1,
+              "detail": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+              "kind": "checks_passed",
+              "sequence": 16,
+              "task_id": "docs"
+            },
+            {
+              "at": "2026-10-22T17:50:59.006487Z",
+              "attempt": 1,
+              "detail": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+              "kind": "checks_passed",
+              "sequence": 17,
+              "task_id": "tests"
+            },
+            {
+              "at": "2026-10-22T17:51:00.313861Z",
+              "attempt": 1,
+              "detail": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+              "kind": "review_accepted",
+              "sequence": 18,
+              "task_id": "docs"
+            },
+            {
+              "at": "2026-10-22T17:51:00.357748Z",
+              "attempt": 1,
+              "detail": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+              "kind": "review_accepted",
+              "sequence": 19,
+              "task_id": "tests"
+            },
+            {
+              "at": "2026-10-22T17:51:01.334472Z",
+              "attempt": 1,
+              "detail": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+              "kind": "task_verified",
+              "sequence": 20,
+              "task_id": "docs"
+            },
+            {
+              "at": "2026-10-22T17:51:01.365036Z",
+              "attempt": 1,
+              "detail": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+              "kind": "task_verified",
+              "sequence": 21,
+              "task_id": "tests"
+            }
+          ],
+          "category": "reversible",
+          "created_at": "2026-10-22T17:50:50.812754Z",
+          "evidence": [
+            {
+              "base_commit": "f73a6d7959372f74c601a72148330e62c7474906",
+              "blob_oid": "110301af34c1457b47617ea108e97bff1fbdeeef",
+              "content_sha256": "70e0b10cf0b86c89c5b8089fd7998a6d4192ed3cf71cb77be13a1051e5ce2934",
+              "excerpt": "Default export format is CSV.",
+              "file": "format.sh",
+              "source": "frozen_base",
+              "supports": "CSV",
+              "workspace_id": null
+            }
+          ],
+          "id": "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215",
+          "ordinal": 1,
+          "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+          "proposal": {
+            "affected_files": [
+              "format.sh",
+              "export.sh",
+              "test_export.sh",
+              "export.txt"
+            ],
+            "affected_tasks": [
+              "format",
+              "export",
+              "tests",
+              "docs"
+            ],
+            "alternatives": [
+              "JSON"
+            ],
+            "assumptions": [
+              "The existing default applies to report exports."
+            ],
+            "chosen": "CSV",
+            "evidence": [
+              {
+                "excerpt": "Default export format is CSV.",
+                "file": "format.sh",
+                "supports": "CSV"
+              }
+            ],
+            "key": "export-format",
+            "kind": "default_value",
+            "question": "Which default report export format?",
+            "rationale": "The existing report formatter documents CSV as the default; reuse that local convention.",
+            "requirements": [
+              "Implement report export with validation and tests."
+            ],
+            "supersedes": null,
+            "uncertainty": []
+          },
+          "run_id": "2b934e3a-9558-4697-801e-8fe36455cc52",
+          "session_id": "4dbda7bc-9b90-4720-82ff-0a2719728d8c",
+          "task_id": null
+        }
+      ],
+      "tasks": [
+        {
+          "id": "format",
+          "dependencies": [],
+          "status": "COMPLETED",
+          "artifact_commit": "3e75bfad6a0a15b8c748062a42413421594cd760",
+          "attempts": [
+            {
+              "number": 1,
+              "decision_context": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "decision_ids": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "coder": {
+                "id": "ac8a7cb9-ab24-43d4-9590-891cf1156797",
+                "outcome": "succeeded",
+                "process_key": "cdb38ae2-b057-4ffe-b912-02322b7c27b6",
+                "process_run_id": "eebdcc01-0b06-4a56-97c4-11fec0cb0384",
+                "provider": "claude",
+                "provider_session_id": "55D2CB7B-EC42-4E0A-9025-EF239EB6A9D9",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "reviewer": {
+                "id": "287d69b9-660c-411e-a29f-27624c1b58fd",
+                "outcome": "succeeded",
+                "process_key": "86fd5ec5-7d94-4180-acb9-b0d5383af374",
+                "process_run_id": "45e5d843-707f-4140-8812-d29688c46f01",
+                "provider": "claude",
+                "provider_session_id": "E366E2A8-1A6B-4667-A623-9DEFEE3342EF",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "de164f43-8c98-4f44-be98-96e392ac640a",
+                  "process_run_id": "6a4e5c5b-4e40-403a-bace-cc4e447984c5",
+                  "summary": "process=6a4e5c5b-4e40-403a-bace-cc4e447984c5 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "format-C1",
+                    "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                    "satisfied": true
+                  }
+                ],
+                "decision_reviews": [
+                  {
+                    "decision_id": "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215",
+                    "evidence": "The candidate implements the CSV revision in the affected task; full diff independently inspected.",
+                    "implemented": true
+                  }
+                ],
+                "findings": []
+              },
+              "verified_tree": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+              "preserved_tree": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+              "detail": null
+            }
+          ]
+        },
+        {
+          "id": "validate",
+          "dependencies": [],
+          "status": "COMPLETED",
+          "artifact_commit": "91ed9ee627eadf7f5bc743da5a25d08b98f3c0c5",
+          "attempts": [
+            {
+              "number": 1,
+              "decision_context": [],
+              "decision_ids": [],
+              "coder": {
+                "id": "d879aa3f-a7b9-44b7-8d75-7f7fcd57762e",
+                "outcome": "succeeded",
+                "process_key": "93757729-b3d1-415e-8191-1093c6964ca3",
+                "process_run_id": "eda5aa8f-08d2-4f89-aef0-62f24ec43f76",
+                "provider": "claude",
+                "provider_session_id": "2BFA5A00-596A-4E91-ABFE-3FE02E3EECF5",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "reviewer": {
+                "id": "7c7cafcb-8415-4e01-bf25-63aa244e6ee3",
+                "outcome": "succeeded",
+                "process_key": "de1eaf27-44f2-485b-8519-9e1127aa2c8e",
+                "process_run_id": "e4e8ac1d-3ef4-4c49-9c53-582f2341feeb",
+                "provider": "claude",
+                "provider_session_id": "AA6A9B12-B1CC-4A98-B8B7-235340C8E260",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "cb2a1fd5-1791-4c25-b6a4-fcd4cae7531f",
+                  "process_run_id": "decdea50-a0b2-4f02-95bd-5ebd213a2e11",
+                  "summary": "process=decdea50-a0b2-4f02-95bd-5ebd213a2e11 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "validate-C1",
+                    "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                    "satisfied": true
+                  }
+                ],
+                "findings": []
+              },
+              "verified_tree": "2a08883e84bbbeed93acd86ea8747401bc33f194",
+              "preserved_tree": "2a08883e84bbbeed93acd86ea8747401bc33f194",
+              "detail": null
+            }
+          ]
+        },
+        {
+          "id": "export",
+          "dependencies": [
+            "format",
+            "validate"
+          ],
+          "status": "COMPLETED",
+          "artifact_commit": "c460835982bac36415fbf715d322903aa9851417",
+          "attempts": [
+            {
+              "number": 1,
+              "decision_context": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "decision_ids": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "coder": {
+                "id": "2ade6290-b736-4b2f-8e45-6c50d6f36612",
+                "outcome": "succeeded",
+                "process_key": "f73b2d32-5ef1-48ff-9dd7-a4165862dd8b",
+                "process_run_id": "d035f613-394b-4b47-bf02-34a3564db9ff",
+                "provider": "claude",
+                "provider_session_id": "210E9B14-4B76-4373-8A16-B4DD5DCCDCE9",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "reviewer": {
+                "id": "aa92f78d-7f4f-4fe8-91c4-5f729b2c1765",
+                "outcome": "succeeded",
+                "process_key": "a6d51a63-9c46-4bb3-b176-dce78b87bb61",
+                "process_run_id": "8ca87cbc-479f-4ce3-8c62-2e4229b0b9e5",
+                "provider": "claude",
+                "provider_session_id": "5CE24CD6-8A8C-4C7B-A3E7-660FAAE8252E",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "03b2697d-90d1-4dcf-8ba4-123caf0dffba",
+                  "process_run_id": "ffcb1c27-37b4-47ae-b666-99693a171eb2",
+                  "summary": "process=ffcb1c27-37b4-47ae-b666-99693a171eb2 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "export-C1",
+                    "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                    "satisfied": true
+                  }
+                ],
+                "decision_reviews": [
+                  {
+                    "decision_id": "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215",
+                    "evidence": "The candidate implements the CSV revision in the affected task; full diff independently inspected.",
+                    "implemented": true
+                  }
+                ],
+                "findings": []
+              },
+              "verified_tree": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+              "preserved_tree": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+              "detail": null
+            }
+          ]
+        },
+        {
+          "id": "tests",
+          "dependencies": [
+            "export"
+          ],
+          "status": "COMPLETED",
+          "artifact_commit": "e90a2b738e97975cd4f834eec5f93dab3ae938c7",
+          "attempts": [
+            {
+              "number": 1,
+              "decision_context": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "decision_ids": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "coder": {
+                "id": "b587d360-1d0d-4cd5-8b99-ee3c8afa21ca",
+                "outcome": "succeeded",
+                "process_key": "5c2f261b-2aab-42e9-be7b-ec6650e1a69e",
+                "process_run_id": "0df3aabe-bcc0-41d4-93c4-811ccac8c903",
+                "provider": "claude",
+                "provider_session_id": "3DEB075F-23FA-4199-92A6-0D35C11E2BD4",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "reviewer": {
+                "id": "29008062-d0a1-4ead-b973-c9df9ae25c61",
+                "outcome": "succeeded",
+                "process_key": "1b6979fc-9aed-433f-bf9f-fb11936cc4a9",
+                "process_run_id": "b3342e6d-dfd8-4ef0-853d-f7b73c3092dc",
+                "provider": "claude",
+                "provider_session_id": "A25CCC02-ED8A-4B3F-9BF8-F7E877CD09D4",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "ddb6999e-62d1-4922-857b-70cff5e807a7",
+                  "process_run_id": "6175d2e8-aa93-4e72-b812-4e338a7320c9",
+                  "summary": "process=6175d2e8-aa93-4e72-b812-4e338a7320c9 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "tests-C1",
+                    "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                    "satisfied": true
+                  }
+                ],
+                "decision_reviews": [
+                  {
+                    "decision_id": "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215",
+                    "evidence": "The candidate implements the CSV revision in the affected task; full diff independently inspected.",
+                    "implemented": true
+                  }
+                ],
+                "findings": []
+              },
+              "verified_tree": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+              "preserved_tree": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+              "detail": null
+            }
+          ]
+        },
+        {
+          "id": "docs",
+          "dependencies": [
+            "export"
+          ],
+          "status": "COMPLETED",
+          "artifact_commit": "0ee44648e06e4b029696df2286ff8264a4d77b76",
+          "attempts": [
+            {
+              "number": 1,
+              "decision_context": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "decision_ids": [
+                "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215"
+              ],
+              "coder": {
+                "id": "059e3f5a-405a-4a50-afd4-3d2a70c5a4ed",
+                "outcome": "succeeded",
+                "process_key": "7fcb3df0-1ab0-4295-b480-8a287473b0f1",
+                "process_run_id": "de0b7fcb-942a-4045-ba1d-3bf2b26da6fa",
+                "provider": "claude",
+                "provider_session_id": "3D4DC7F6-A779-4C03-BD63-ABEB80FAA91D",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "reviewer": {
+                "id": "4e1a6c6d-6f41-4962-a228-b30fc5e1f668",
+                "outcome": "succeeded",
+                "process_key": "74081141-4f1b-475f-a34a-294a20981910",
+                "process_run_id": "4b7a42f6-2b31-4bf7-9e19-8cda80aad42f",
+                "provider": "claude",
+                "provider_session_id": "C3B0C330-F54C-477A-9E5F-45CEC8976FAF",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "79e53b51-e34e-4c55-a90c-ea9f9a6adc79",
+                  "process_run_id": "f42cad25-91e1-40e9-ae60-992c95a97a54",
+                  "summary": "process=f42cad25-91e1-40e9-ae60-992c95a97a54 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "docs-C1",
+                    "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                    "satisfied": true
+                  }
+                ],
+                "decision_reviews": [
+                  {
+                    "decision_id": "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215",
+                    "evidence": "The candidate implements the CSV revision in the affected task; full diff independently inspected.",
+                    "implemented": true
+                  }
+                ],
+                "findings": []
+              },
+              "verified_tree": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+              "preserved_tree": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+              "detail": null
+            }
+          ]
+        }
+      ],
+      "human_actions": []
+    },
+    "interrupted_snapshot_excerpt": {
+      "id": "3460a385-b39f-46fd-be1c-9f5bb1bf16eb",
+      "status": "INTERRUPTED",
+      "specification": "Implement report export with validation and tests.",
+      "base_commit": "f73a6d7959372f74c601a72148330e62c7474906",
+      "summary": "Daemon restarted; workflow ownership lost. Workspaces retained. Inspect surviving processes before starting a new run.",
+      "delegation_request": {
+        "local_integration": true,
+        "max_runtime_seconds": 120,
+        "submission": {
+          "base": "main",
+          "id": "3460a385-b39f-46fd-be1c-9f5bb1bf16eb",
+          "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpj0aJYN/repo",
+          "specification": "Implement report export with validation and tests."
+        },
+        "writable_files": [
+          "format.sh",
+          "validate.sh",
+          "export.sh",
+          "test_export.sh",
+          "export.txt"
+        ]
+      },
+      "authorized_at": "2026-10-22T17:51:04.371796Z",
+      "expires_at": "2026-10-22T17:53:04.371796Z",
+      "execution_limits": {
+        "max_attempts": 3,
+        "max_parallel": 2,
+        "max_review_cycles": 2
+      },
+      "delegation_contract_sha256": "1b8cef345d84989d68cc496b2f8dcbbbc0f35d72afcf2ec3189b69d8e80e53eb",
+      "decisions": [
+        {
+          "attempt": null,
+          "audit": [
+            {
+              "at": "2026-10-22T17:51:05.056766Z",
+              "attempt": null,
+              "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+              "kind": "accepted",
+              "sequence": 1,
+              "task_id": null
+            }
+          ],
+          "category": "reversible",
+          "created_at": "2026-10-22T17:51:05.056766Z",
+          "evidence": [
+            {
+              "base_commit": "f73a6d7959372f74c601a72148330e62c7474906",
+              "blob_oid": "110301af34c1457b47617ea108e97bff1fbdeeef",
+              "content_sha256": "70e0b10cf0b86c89c5b8089fd7998a6d4192ed3cf71cb77be13a1051e5ce2934",
+              "excerpt": "Default export format is CSV.",
+              "file": "format.sh",
+              "source": "frozen_base",
+              "supports": "CSV",
+              "workspace_id": null
+            }
+          ],
+          "id": "D-7fff09af09cc2ba1a07a1852853196af84353e0521e869065aa20fd5fab9c553",
+          "ordinal": 1,
+          "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+          "proposal": {
+            "affected_files": [
+              "format.sh",
+              "export.sh",
+              "test_export.sh",
+              "export.txt"
+            ],
+            "affected_tasks": [
+              "format",
+              "export",
+              "tests",
+              "docs"
+            ],
+            "alternatives": [
+              "JSON"
+            ],
+            "assumptions": [
+              "The existing default applies to report exports."
+            ],
+            "chosen": "CSV",
+            "evidence": [
+              {
+                "excerpt": "Default export format is CSV.",
+                "file": "format.sh",
+                "supports": "CSV"
+              }
+            ],
+            "key": "export-format",
+            "kind": "default_value",
+            "question": "Which default report export format?",
+            "rationale": "The existing report formatter documents CSV as the default; reuse that local convention.",
+            "requirements": [
+              "Implement report export with validation and tests."
+            ],
+            "supersedes": null,
+            "uncertainty": []
+          },
+          "run_id": "3460a385-b39f-46fd-be1c-9f5bb1bf16eb",
+          "session_id": "714f4362-e50c-4db3-b684-7f8c37f5e368",
+          "task_id": null
+        }
+      ],
+      "tasks": [
+        {
+          "id": "format",
+          "dependencies": [],
+          "status": "INTERRUPTED",
+          "artifact_commit": null,
+          "attempts": [
+            {
+              "number": 1,
+              "decision_context": [
+                "D-7fff09af09cc2ba1a07a1852853196af84353e0521e869065aa20fd5fab9c553"
+              ],
+              "decision_ids": null,
+              "coder": {
+                "id": "1b8c782f-dce7-43dd-a5e8-085f079b3599",
+                "outcome": null,
+                "process_key": "fb7e2bdd-e79e-4c0f-b953-2c8e25ee5820",
+                "process_run_id": "7a778b9b-3e11-4141-b848-74f3d9db5a9a",
+                "provider": "claude",
+                "provider_session_id": null,
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "reviewer": null,
+              "verification": [],
+              "review": null,
+              "verified_tree": null,
+              "preserved_tree": null,
+              "detail": null
+            }
+          ]
+        },
+        {
+          "id": "validate",
+          "dependencies": [],
+          "status": "INTERRUPTED",
+          "artifact_commit": null,
+          "attempts": [
+            {
+              "number": 1,
+              "decision_context": [],
+              "decision_ids": null,
+              "coder": {
+                "id": "17aa0449-c120-4193-912a-c8926b52eccd",
+                "outcome": null,
+                "process_key": "640d795b-3bf0-4791-a41a-d7ecd78db5ee",
+                "process_run_id": "497e8a43-337a-492d-b1e2-523f2e5ed540",
+                "provider": "claude",
+                "provider_session_id": null,
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "reviewer": null,
+              "verification": [],
+              "review": null,
+              "verified_tree": null,
+              "preserved_tree": null,
+              "detail": null
+            }
+          ]
+        },
+        {
+          "id": "export",
+          "dependencies": [
+            "format",
+            "validate"
+          ],
+          "status": "INTERRUPTED",
+          "artifact_commit": null,
+          "attempts": []
+        },
+        {
+          "id": "tests",
+          "dependencies": [
+            "export"
+          ],
+          "status": "INTERRUPTED",
+          "artifact_commit": null,
+          "attempts": []
+        },
+        {
+          "id": "docs",
+          "dependencies": [
+            "export"
+          ],
+          "status": "INTERRUPTED",
+          "artifact_commit": null,
+          "attempts": []
+        }
+      ],
+      "human_actions": []
+    }
+  },
+  "separate_a2_expiry": [
+    {
+      "cancel": true,
+      "case": "PauseVerification",
+      "cutoff": "2026-10-22T17:54:32.492866Z",
+      "expiry": "2026-10-22T17:56:30.034584Z",
+      "run_status": "CANCELLED",
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-22T17:54:32.459930Z",
+        "detail": "cancelled by user",
+        "exit_code": null,
+        "finished_at": "2026-10-22T17:54:32.492895Z",
+        "id": "72529fce-ce84-4fac-8bda-ed1be6de86ec",
+        "output_complete": true,
+        "pid": 21546,
+        "started_at": "2026-10-22T17:54:32.460507Z",
+        "status": "CANCELLED",
+        "submission_key": "a9d9c907-9758-4cf0-8d5d-fe79df159156",
+        "updated_at": "2026-10-22T17:54:32.494792Z"
+      }
+    },
+    {
+      "cancel": false,
+      "case": "PauseVerification",
+      "cutoff": "2026-10-22T17:54:42.642034Z",
+      "expiry": "2026-10-22T17:54:42.642034Z",
+      "run_status": "BLOCKED",
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-22T17:54:34.836554Z",
+        "detail": "authorization deadline exceeded",
+        "exit_code": null,
+        "finished_at": "2026-10-22T17:54:42.645334Z",
+        "id": "fa0ee785-3e84-432f-89b2-4ddef7c9bb66",
+        "output_complete": true,
+        "pid": 25992,
+        "started_at": "2026-10-22T17:54:34.837035Z",
+        "status": "FAILED",
+        "submission_key": "1768c887-f6d5-42a4-879f-bc16f8688254",
+        "updated_at": "2026-10-22T17:54:42.646878Z"
+      }
+    },
+    {
+      "cancel": true,
+      "case": "PauseIntegration",
+      "cutoff": "2026-10-22T17:54:58.685796Z",
+      "expiry": "2026-10-22T17:56:42.828725Z",
+      "run_status": "CANCELLED",
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-22T17:54:58.591228Z",
+        "detail": "cancelled by user",
+        "exit_code": null,
+        "finished_at": "2026-10-22T17:54:58.685855Z",
+        "id": "9cbd19f7-296b-4379-8b76-0f853caba23e",
+        "output_complete": true,
+        "pid": 40098,
+        "started_at": "2026-10-22T17:54:58.591745Z",
+        "status": "CANCELLED",
+        "submission_key": "abeea305-1da2-44b2-b388-2d7d10142b57",
+        "updated_at": "2026-10-22T17:54:58.687218Z"
+      }
+    },
+    {
+      "cancel": false,
+      "case": "PauseIntegration",
+      "cutoff": "2026-10-22T17:55:59.035956Z",
+      "expiry": "2026-10-22T17:55:59.035956Z",
+      "run_status": "BLOCKED",
+      "receipt": {
+        "cleanup_warnings": [],
+        "created_at": "2026-10-22T17:55:13.993953Z",
+        "detail": "authorization deadline exceeded",
+        "exit_code": null,
+        "finished_at": "2026-10-22T17:55:59.041724Z",
+        "id": "dac6f013-92cc-4ecc-8867-69abe0c5df87",
+        "output_complete": true,
+        "pid": 51662,
+        "started_at": "2026-10-22T17:55:13.994407Z",
+        "status": "FAILED",
+        "submission_key": "452afa38-ed44-4c18-b0c7-a286868a0170",
+        "updated_at": "2026-10-22T17:55:59.043642Z"
+      }
+    }
+  ]
+}

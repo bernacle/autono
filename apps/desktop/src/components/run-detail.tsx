@@ -1,3 +1,4 @@
+import { Decisions } from "./decisions";
 import { useCallback, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -321,6 +322,7 @@ export function RunDetail({
           />
         </Tabs.Content>
         <Tabs.Content value="verification" className="tab-content">
+          <Decisions ledger={run.decisions} />
           <VerificationLedger
             run={run}
             onTask={(task) => {

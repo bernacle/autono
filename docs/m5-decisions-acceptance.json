@@ -1,0 +1,3676 @@
+{
+  "events": [
+    {
+      "detail": "Developer consented to the exact immutable bounded contract; no monetary accounting is available",
+      "kind": "delegation_authorized",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 1,
+      "timestamp": "2026-10-22T13:57:54.101469Z"
+    },
+    {
+      "detail": "Feature specification and configuration preserved; planning requested",
+      "kind": "created",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 2,
+      "timestamp": "2026-10-22T13:57:54.101728Z"
+    },
+    {
+      "detail": "Allowed planning and owned worktree creation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 3,
+      "timestamp": "2026-10-22T13:57:54.150446Z"
+    },
+    {
+      "detail": "Pinned Git ownership",
+      "kind": "planning_workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 4,
+      "timestamp": "2026-10-22T13:57:54.235573Z"
+    },
+    {
+      "detail": "Allowed Planner invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 5,
+      "timestamp": "2026-10-22T13:57:54.567279Z"
+    },
+    {
+      "detail": "Planner Claude; session=adfbc6de-0b60-40ee-8ba8-efcaeda91a1c process_key=edf22279-e5dd-43b5-9872-40c48f536415",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 6,
+      "timestamp": "2026-10-22T13:57:54.568624Z"
+    },
+    {
+      "detail": "Allowed Planner process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 7,
+      "timestamp": "2026-10-22T13:57:55.030505Z"
+    },
+    {
+      "detail": "Planner process=c963e9ee-839a-4cda-84c6-7fd0031ddf06",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 8,
+      "timestamp": "2026-10-22T13:57:55.034255Z"
+    },
+    {
+      "detail": "Planner session=adfbc6de-0b60-40ee-8ba8-efcaeda91a1c outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 9,
+      "timestamp": "2026-10-22T13:57:55.071843Z"
+    },
+    {
+      "detail": "Validated plan and decision assessments persisted",
+      "kind": "plan_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 10,
+      "timestamp": "2026-10-22T13:57:55.320099Z"
+    },
+    {
+      "detail": "format: None -> Ready",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 11,
+      "timestamp": "2026-10-22T13:57:55.320174Z"
+    },
+    {
+      "detail": "validate: None -> Ready",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 12,
+      "timestamp": "2026-10-22T13:57:55.320220Z"
+    },
+    {
+      "detail": "export: None -> Waiting",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 13,
+      "timestamp": "2026-10-22T13:57:55.320246Z"
+    },
+    {
+      "detail": "tests: None -> Waiting",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 14,
+      "timestamp": "2026-10-22T13:57:55.320297Z"
+    },
+    {
+      "detail": "docs: None -> Waiting",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 15,
+      "timestamp": "2026-10-22T13:57:55.320337Z"
+    },
+    {
+      "detail": "Preflight checks and human checklist refreshed (no credential values)",
+      "kind": "preflight",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 16,
+      "timestamp": "2026-10-22T13:57:55.497551Z"
+    },
+    {
+      "detail": "Allowed execution admission: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 17,
+      "timestamp": "2026-10-22T13:57:55.570951Z"
+    },
+    {
+      "detail": "Original delegation admits the immutable plan and configured checks",
+      "kind": "delegation_execution",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 18,
+      "timestamp": "2026-10-22T13:57:55.574409Z"
+    },
+    {
+      "detail": "Dependency states evaluated",
+      "kind": "scheduler",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 19,
+      "timestamp": "2026-10-22T13:57:55.578786Z"
+    },
+    {
+      "detail": "format",
+      "kind": "task_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 20,
+      "timestamp": "2026-10-22T13:57:55.585143Z"
+    },
+    {
+      "detail": "format: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-format (autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-format)",
+      "kind": "workspace_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 21,
+      "timestamp": "2026-10-22T13:57:55.622270Z"
+    },
+    {
+      "detail": "format: Some(Ready) -> Running",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 22,
+      "timestamp": "2026-10-22T13:57:55.622407Z"
+    },
+    {
+      "detail": "validate",
+      "kind": "task_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 23,
+      "timestamp": "2026-10-22T13:57:55.625575Z"
+    },
+    {
+      "detail": "validate: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-validate (autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-validate)",
+      "kind": "workspace_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 24,
+      "timestamp": "2026-10-22T13:57:55.628646Z"
+    },
+    {
+      "detail": "validate: Some(Ready) -> Running",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 25,
+      "timestamp": "2026-10-22T13:57:55.628695Z"
+    },
+    {
+      "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 26,
+      "timestamp": "2026-10-22T13:57:55.705649Z"
+    },
+    {
+      "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 27,
+      "timestamp": "2026-10-22T13:57:55.707853Z"
+    },
+    {
+      "detail": "validate",
+      "kind": "workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 28,
+      "timestamp": "2026-10-22T13:57:56.043548Z"
+    },
+    {
+      "detail": "format",
+      "kind": "workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 29,
+      "timestamp": "2026-10-22T13:57:56.048712Z"
+    },
+    {
+      "detail": "validate: attempt 1",
+      "kind": "attempt_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 30,
+      "timestamp": "2026-10-22T13:57:56.068814Z"
+    },
+    {
+      "detail": "format: attempt 1",
+      "kind": "attempt_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 31,
+      "timestamp": "2026-10-22T13:57:56.073811Z"
+    },
+    {
+      "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 32,
+      "timestamp": "2026-10-22T13:57:56.787158Z"
+    },
+    {
+      "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 33,
+      "timestamp": "2026-10-22T13:57:56.791593Z"
+    },
+    {
+      "detail": "Coder Claude; session=b63ffe04-299a-47bd-9791-14559d8627a2 process_key=2476a3cc-b24e-445e-8b20-46d3df6590b6",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 34,
+      "timestamp": "2026-10-22T13:57:56.799180Z"
+    },
+    {
+      "detail": "Coder Claude; session=916680dd-bde1-45c2-8776-25beccf18df6 process_key=fb99db1b-efa3-45d9-947e-5d610310c8ea",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 35,
+      "timestamp": "2026-10-22T13:57:56.805293Z"
+    },
+    {
+      "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 36,
+      "timestamp": "2026-10-22T13:57:57.711102Z"
+    },
+    {
+      "detail": "Coder process=d57a1efe-3957-4eed-a21c-463a14866f8c",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 37,
+      "timestamp": "2026-10-22T13:57:57.974399Z"
+    },
+    {
+      "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 38,
+      "timestamp": "2026-10-22T13:57:58.284470Z"
+    },
+    {
+      "detail": "Coder process=28729005-19f2-4104-a677-cf38be64067e",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 39,
+      "timestamp": "2026-10-22T13:57:58.488949Z"
+    },
+    {
+      "detail": "Coder session=b63ffe04-299a-47bd-9791-14559d8627a2 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 40,
+      "timestamp": "2026-10-22T13:57:58.649369Z"
+    },
+    {
+      "detail": "Coder session=916680dd-bde1-45c2-8776-25beccf18df6 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 41,
+      "timestamp": "2026-10-22T13:57:58.671751Z"
+    },
+    {
+      "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 42,
+      "timestamp": "2026-10-22T13:57:58.906187Z"
+    },
+    {
+      "detail": "validate",
+      "kind": "decisions_assessed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 43,
+      "timestamp": "2026-10-22T13:57:58.927068Z"
+    },
+    {
+      "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 44,
+      "timestamp": "2026-10-22T13:57:58.990182Z"
+    },
+    {
+      "detail": "format",
+      "kind": "decisions_assessed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 45,
+      "timestamp": "2026-10-22T13:57:58.996520Z"
+    },
+    {
+      "detail": "validate",
+      "kind": "decision_implementation",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 46,
+      "timestamp": "2026-10-22T13:57:59.631594Z"
+    },
+    {
+      "detail": "format",
+      "kind": "decision_implementation",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 47,
+      "timestamp": "2026-10-22T13:57:59.659126Z"
+    },
+    {
+      "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 48,
+      "timestamp": "2026-10-22T13:57:59.684023Z"
+    },
+    {
+      "detail": "target=Some((\"validate\", 1)) process_key=e0bb541c-3d83-4968-9bb7-6e0261226420 command=[\"/bin/sh\",\"-c\",\"for f in format.sh validate.sh export.sh test_export.sh; do if test -f \\\"$f\\\"; then /bin/sh -n \\\"$f\\\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \\\"${PWD##*/}\\\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi\"]",
+      "kind": "verification_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 49,
+      "timestamp": "2026-10-22T13:57:59.686982Z"
+    },
+    {
+      "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 50,
+      "timestamp": "2026-10-22T13:57:59.710074Z"
+    },
+    {
+      "detail": "target=Some((\"format\", 1)) process_key=83d7336c-6f49-4579-8292-be3e241e3b16 command=[\"/bin/sh\",\"-c\",\"for f in format.sh validate.sh export.sh test_export.sh; do if test -f \\\"$f\\\"; then /bin/sh -n \\\"$f\\\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \\\"${PWD##*/}\\\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi\"]",
+      "kind": "verification_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 51,
+      "timestamp": "2026-10-22T13:57:59.713173Z"
+    },
+    {
+      "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 52,
+      "timestamp": "2026-10-22T13:57:59.744004Z"
+    },
+    {
+      "detail": "target=Some((\"validate\", 1)) process=806c9af9-eacb-4b57-9aff-cbf4ac38c67c",
+      "kind": "verification_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 53,
+      "timestamp": "2026-10-22T13:57:59.749809Z"
+    },
+    {
+      "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 54,
+      "timestamp": "2026-10-22T13:57:59.812276Z"
+    },
+    {
+      "detail": "target=Some((\"validate\", 1)) process=806c9af9-eacb-4b57-9aff-cbf4ac38c67c passed=true",
+      "kind": "verification_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 55,
+      "timestamp": "2026-10-22T13:57:59.822216Z"
+    },
+    {
+      "detail": "target=Some((\"format\", 1)) process=fd7fee17-0140-456a-9892-d00acbca9cac",
+      "kind": "verification_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 56,
+      "timestamp": "2026-10-22T13:57:59.831864Z"
+    },
+    {
+      "detail": "target=Some((\"format\", 1)) process=fd7fee17-0140-456a-9892-d00acbca9cac passed=true",
+      "kind": "verification_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 57,
+      "timestamp": "2026-10-22T13:58:00.553767Z"
+    },
+    {
+      "detail": "validate",
+      "kind": "verification_passed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 58,
+      "timestamp": "2026-10-22T13:58:03.763137Z"
+    },
+    {
+      "detail": "format",
+      "kind": "verification_passed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 59,
+      "timestamp": "2026-10-22T13:58:03.857474Z"
+    },
+    {
+      "detail": "validate: review 1",
+      "kind": "review_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 60,
+      "timestamp": "2026-10-22T13:58:04.267417Z"
+    },
+    {
+      "detail": "format: review 1",
+      "kind": "review_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 61,
+      "timestamp": "2026-10-22T13:58:04.316058Z"
+    },
+    {
+      "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 62,
+      "timestamp": "2026-10-22T13:58:04.385771Z"
+    },
+    {
+      "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 63,
+      "timestamp": "2026-10-22T13:58:04.421099Z"
+    },
+    {
+      "detail": "validate",
+      "kind": "review_workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 64,
+      "timestamp": "2026-10-22T13:58:04.658723Z"
+    },
+    {
+      "detail": "format",
+      "kind": "review_workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 65,
+      "timestamp": "2026-10-22T13:58:04.691421Z"
+    },
+    {
+      "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 66,
+      "timestamp": "2026-10-22T13:58:05.034065Z"
+    },
+    {
+      "detail": "Reviewer Claude; session=25af4e6c-c86d-4f33-a076-3af4c5276a56 process_key=c0838662-8e0d-419d-93b6-fb6d42aa3a81",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 67,
+      "timestamp": "2026-10-22T13:58:05.041627Z"
+    },
+    {
+      "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 68,
+      "timestamp": "2026-10-22T13:58:05.376137Z"
+    },
+    {
+      "detail": "Reviewer Claude; session=3ed8797f-fca4-4f78-bed2-5aa2412164f7 process_key=d6f0ea62-f807-442e-bc68-961fc7be6607",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 69,
+      "timestamp": "2026-10-22T13:58:05.402863Z"
+    },
+    {
+      "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 70,
+      "timestamp": "2026-10-22T13:58:05.625421Z"
+    },
+    {
+      "detail": "Reviewer process=138f9477-9ff1-41e1-89ca-e518a2e84cf0",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 71,
+      "timestamp": "2026-10-22T13:58:05.638974Z"
+    },
+    {
+      "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 72,
+      "timestamp": "2026-10-22T13:58:05.834687Z"
+    },
+    {
+      "detail": "Reviewer session=25af4e6c-c86d-4f33-a076-3af4c5276a56 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 73,
+      "timestamp": "2026-10-22T13:58:05.898438Z"
+    },
+    {
+      "detail": "Reviewer process=8d8d8003-c7de-45e5-8632-34d05bb7cc23",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 74,
+      "timestamp": "2026-10-22T13:58:06.000877Z"
+    },
+    {
+      "detail": "Reviewer session=3ed8797f-fca4-4f78-bed2-5aa2412164f7 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 75,
+      "timestamp": "2026-10-22T13:58:06.028867Z"
+    },
+    {
+      "detail": "validate: accepted=true findings=0",
+      "kind": "review_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 76,
+      "timestamp": "2026-10-22T13:58:06.625562Z"
+    },
+    {
+      "detail": "format: accepted=true findings=0",
+      "kind": "review_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 77,
+      "timestamp": "2026-10-22T13:58:06.645208Z"
+    },
+    {
+      "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 78,
+      "timestamp": "2026-10-22T13:58:06.725766Z"
+    },
+    {
+      "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 79,
+      "timestamp": "2026-10-22T13:58:06.754298Z"
+    },
+    {
+      "detail": "validate: 188f68d6b59f6d737f9f715c8bca17f34d41dbcc",
+      "kind": "task_completed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 80,
+      "timestamp": "2026-10-22T13:58:08.060327Z"
+    },
+    {
+      "detail": "validate: Some(Running) -> Completed",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 81,
+      "timestamp": "2026-10-22T13:58:08.060367Z"
+    },
+    {
+      "detail": "Dependency states evaluated",
+      "kind": "scheduler",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 82,
+      "timestamp": "2026-10-22T13:58:08.065532Z"
+    },
+    {
+      "detail": "format: 83a36a3ff810c16cd470ced81e1605ef4dd04b98",
+      "kind": "task_completed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 83,
+      "timestamp": "2026-10-22T13:58:08.105635Z"
+    },
+    {
+      "detail": "format: Some(Running) -> Completed",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 84,
+      "timestamp": "2026-10-22T13:58:08.105675Z"
+    },
+    {
+      "detail": "Dependency states evaluated",
+      "kind": "scheduler",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 85,
+      "timestamp": "2026-10-22T13:58:08.111287Z"
+    },
+    {
+      "detail": "export",
+      "kind": "task_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 86,
+      "timestamp": "2026-10-22T13:58:08.116228Z"
+    },
+    {
+      "detail": "export: Some(Waiting) -> Ready",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 87,
+      "timestamp": "2026-10-22T13:58:08.116265Z"
+    },
+    {
+      "detail": "export: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-export (autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-export)",
+      "kind": "workspace_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 88,
+      "timestamp": "2026-10-22T13:58:08.121907Z"
+    },
+    {
+      "detail": "export: Some(Ready) -> Running",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 89,
+      "timestamp": "2026-10-22T13:58:08.121991Z"
+    },
+    {
+      "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 90,
+      "timestamp": "2026-10-22T13:58:08.185781Z"
+    },
+    {
+      "detail": "Allowed dependency merge: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 91,
+      "timestamp": "2026-10-22T13:58:08.354738Z"
+    },
+    {
+      "detail": "Allowed dependency merge: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 92,
+      "timestamp": "2026-10-22T13:58:08.447672Z"
+    },
+    {
+      "detail": "export",
+      "kind": "workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 93,
+      "timestamp": "2026-10-22T13:58:08.565850Z"
+    },
+    {
+      "detail": "export: attempt 1",
+      "kind": "attempt_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 94,
+      "timestamp": "2026-10-22T13:58:08.571415Z"
+    },
+    {
+      "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 95,
+      "timestamp": "2026-10-22T13:58:08.665755Z"
+    },
+    {
+      "detail": "Coder Claude; session=db144137-a1b3-4a00-b2e4-0303cf1b11a3 process_key=b5a607d6-c603-471d-a715-217536f9a2c7",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 96,
+      "timestamp": "2026-10-22T13:58:08.674992Z"
+    },
+    {
+      "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 97,
+      "timestamp": "2026-10-22T13:58:08.776095Z"
+    },
+    {
+      "detail": "Coder process=68d6a084-82ff-461c-8aca-8f042907347e",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 98,
+      "timestamp": "2026-10-22T13:58:08.783028Z"
+    },
+    {
+      "detail": "Coder session=db144137-a1b3-4a00-b2e4-0303cf1b11a3 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 99,
+      "timestamp": "2026-10-22T13:58:08.816070Z"
+    },
+    {
+      "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 100,
+      "timestamp": "2026-10-22T13:58:08.865731Z"
+    },
+    {
+      "detail": "export",
+      "kind": "decisions_assessed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 101,
+      "timestamp": "2026-10-22T13:58:08.870905Z"
+    },
+    {
+      "detail": "export",
+      "kind": "decision_implementation",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 102,
+      "timestamp": "2026-10-22T13:58:09.436441Z"
+    },
+    {
+      "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 103,
+      "timestamp": "2026-10-22T13:58:09.498796Z"
+    },
+    {
+      "detail": "target=Some((\"export\", 1)) process_key=55da2207-cf40-4743-a685-e25b5a2d1265 command=[\"/bin/sh\",\"-c\",\"for f in format.sh validate.sh export.sh test_export.sh; do if test -f \\\"$f\\\"; then /bin/sh -n \\\"$f\\\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \\\"${PWD##*/}\\\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi\"]",
+      "kind": "verification_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 104,
+      "timestamp": "2026-10-22T13:58:09.504350Z"
+    },
+    {
+      "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 105,
+      "timestamp": "2026-10-22T13:58:09.557217Z"
+    },
+    {
+      "detail": "target=Some((\"export\", 1)) process=6c9ae2b8-2877-47a5-874b-a788fc58050b",
+      "kind": "verification_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 106,
+      "timestamp": "2026-10-22T13:58:09.563573Z"
+    },
+    {
+      "detail": "target=Some((\"export\", 1)) process=6c9ae2b8-2877-47a5-874b-a788fc58050b passed=true",
+      "kind": "verification_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 107,
+      "timestamp": "2026-10-22T13:58:09.633017Z"
+    },
+    {
+      "detail": "export",
+      "kind": "verification_passed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 108,
+      "timestamp": "2026-10-22T13:58:10.002706Z"
+    },
+    {
+      "detail": "export: review 1",
+      "kind": "review_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 109,
+      "timestamp": "2026-10-22T13:58:10.362248Z"
+    },
+    {
+      "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 110,
+      "timestamp": "2026-10-22T13:58:10.437398Z"
+    },
+    {
+      "detail": "export",
+      "kind": "review_workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 111,
+      "timestamp": "2026-10-22T13:58:10.564322Z"
+    },
+    {
+      "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 112,
+      "timestamp": "2026-10-22T13:58:10.763838Z"
+    },
+    {
+      "detail": "Reviewer Claude; session=36ffbbfa-135a-4b41-bf57-5c6cb7ec1eac process_key=5e7888de-a523-4e8a-a561-c635d15528ac",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 113,
+      "timestamp": "2026-10-22T13:58:10.782595Z"
+    },
+    {
+      "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 114,
+      "timestamp": "2026-10-22T13:58:10.870108Z"
+    },
+    {
+      "detail": "Reviewer process=57dc3844-cd68-4ee3-b95c-da0080755939",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 115,
+      "timestamp": "2026-10-22T13:58:10.876825Z"
+    },
+    {
+      "detail": "Reviewer session=36ffbbfa-135a-4b41-bf57-5c6cb7ec1eac outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 116,
+      "timestamp": "2026-10-22T13:58:10.903140Z"
+    },
+    {
+      "detail": "export: accepted=true findings=0",
+      "kind": "review_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 117,
+      "timestamp": "2026-10-22T13:58:11.197873Z"
+    },
+    {
+      "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 118,
+      "timestamp": "2026-10-22T13:58:11.298772Z"
+    },
+    {
+      "detail": "export: accda7af804bb83c098db8202a9e4d2abe454b24",
+      "kind": "task_completed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 119,
+      "timestamp": "2026-10-22T13:58:12.492699Z"
+    },
+    {
+      "detail": "export: Some(Running) -> Completed",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 120,
+      "timestamp": "2026-10-22T13:58:12.492779Z"
+    },
+    {
+      "detail": "Dependency states evaluated",
+      "kind": "scheduler",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 121,
+      "timestamp": "2026-10-22T13:58:12.500734Z"
+    },
+    {
+      "detail": "tests",
+      "kind": "task_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 122,
+      "timestamp": "2026-10-22T13:58:12.507989Z"
+    },
+    {
+      "detail": "tests: Some(Waiting) -> Ready",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 123,
+      "timestamp": "2026-10-22T13:58:12.508078Z"
+    },
+    {
+      "detail": "tests: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-tests (autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-tests)",
+      "kind": "workspace_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 124,
+      "timestamp": "2026-10-22T13:58:12.516428Z"
+    },
+    {
+      "detail": "tests: Some(Ready) -> Running",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 125,
+      "timestamp": "2026-10-22T13:58:12.516483Z"
+    },
+    {
+      "detail": "docs",
+      "kind": "task_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 126,
+      "timestamp": "2026-10-22T13:58:12.523319Z"
+    },
+    {
+      "detail": "docs: Some(Waiting) -> Ready",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 127,
+      "timestamp": "2026-10-22T13:58:12.523354Z"
+    },
+    {
+      "detail": "docs: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-docs (autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-docs)",
+      "kind": "workspace_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 128,
+      "timestamp": "2026-10-22T13:58:12.530338Z"
+    },
+    {
+      "detail": "docs: Some(Ready) -> Running",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 129,
+      "timestamp": "2026-10-22T13:58:12.530371Z"
+    },
+    {
+      "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 130,
+      "timestamp": "2026-10-22T13:58:12.580314Z"
+    },
+    {
+      "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 131,
+      "timestamp": "2026-10-22T13:58:12.586933Z"
+    },
+    {
+      "detail": "Allowed dependency merge: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 132,
+      "timestamp": "2026-10-22T13:58:12.780068Z"
+    },
+    {
+      "detail": "Allowed dependency merge: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 133,
+      "timestamp": "2026-10-22T13:58:12.788596Z"
+    },
+    {
+      "detail": "tests",
+      "kind": "workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 134,
+      "timestamp": "2026-10-22T13:58:12.909079Z"
+    },
+    {
+      "detail": "tests: attempt 1",
+      "kind": "attempt_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 135,
+      "timestamp": "2026-10-22T13:58:12.916387Z"
+    },
+    {
+      "detail": "docs",
+      "kind": "workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 136,
+      "timestamp": "2026-10-22T13:58:12.924867Z"
+    },
+    {
+      "detail": "docs: attempt 1",
+      "kind": "attempt_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 137,
+      "timestamp": "2026-10-22T13:58:12.932302Z"
+    },
+    {
+      "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 138,
+      "timestamp": "2026-10-22T13:58:13.003820Z"
+    },
+    {
+      "detail": "Coder Claude; session=13ec8b87-be7a-4f89-8840-65d47f7ae3f6 process_key=b1753d48-098f-4784-9e7c-8c80449874af",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 139,
+      "timestamp": "2026-10-22T13:58:13.016355Z"
+    },
+    {
+      "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 140,
+      "timestamp": "2026-10-22T13:58:13.038951Z"
+    },
+    {
+      "detail": "Coder Claude; session=b6c915fb-1104-49c1-a16a-ae753eb50545 process_key=7ff8cc14-3e02-494b-8143-f20586b2df13",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 141,
+      "timestamp": "2026-10-22T13:58:13.051469Z"
+    },
+    {
+      "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 142,
+      "timestamp": "2026-10-22T13:58:13.122951Z"
+    },
+    {
+      "detail": "Coder process=279e4500-7430-47f5-b932-e5c2fa993042",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 143,
+      "timestamp": "2026-10-22T13:58:13.131601Z"
+    },
+    {
+      "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 144,
+      "timestamp": "2026-10-22T13:58:13.140409Z"
+    },
+    {
+      "detail": "Coder process=ddfb31ca-9a00-4753-b7f6-339bd3921874",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 145,
+      "timestamp": "2026-10-22T13:58:13.149340Z"
+    },
+    {
+      "detail": "Coder session=13ec8b87-be7a-4f89-8840-65d47f7ae3f6 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 146,
+      "timestamp": "2026-10-22T13:58:13.165001Z"
+    },
+    {
+      "detail": "Coder session=b6c915fb-1104-49c1-a16a-ae753eb50545 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 147,
+      "timestamp": "2026-10-22T13:58:13.180468Z"
+    },
+    {
+      "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 148,
+      "timestamp": "2026-10-22T13:58:13.214025Z"
+    },
+    {
+      "detail": "tests",
+      "kind": "decisions_assessed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 149,
+      "timestamp": "2026-10-22T13:58:13.222016Z"
+    },
+    {
+      "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 150,
+      "timestamp": "2026-10-22T13:58:13.249578Z"
+    },
+    {
+      "detail": "docs",
+      "kind": "decisions_assessed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 151,
+      "timestamp": "2026-10-22T13:58:13.257675Z"
+    },
+    {
+      "detail": "tests",
+      "kind": "decision_implementation",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 152,
+      "timestamp": "2026-10-22T13:58:14.007597Z"
+    },
+    {
+      "detail": "docs",
+      "kind": "decision_implementation",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 153,
+      "timestamp": "2026-10-22T13:58:14.069661Z"
+    },
+    {
+      "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 154,
+      "timestamp": "2026-10-22T13:58:14.087955Z"
+    },
+    {
+      "detail": "target=Some((\"tests\", 1)) process_key=1b4d4606-295e-4a60-89b6-35eafdfb8010 command=[\"/bin/sh\",\"-c\",\"for f in format.sh validate.sh export.sh test_export.sh; do if test -f \\\"$f\\\"; then /bin/sh -n \\\"$f\\\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \\\"${PWD##*/}\\\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi\"]",
+      "kind": "verification_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 155,
+      "timestamp": "2026-10-22T13:58:14.095461Z"
+    },
+    {
+      "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 156,
+      "timestamp": "2026-10-22T13:58:14.142786Z"
+    },
+    {
+      "detail": "target=Some((\"docs\", 1)) process_key=ab763799-3ac4-4e8d-aa32-402b50a17d3b command=[\"/bin/sh\",\"-c\",\"for f in format.sh validate.sh export.sh test_export.sh; do if test -f \\\"$f\\\"; then /bin/sh -n \\\"$f\\\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \\\"${PWD##*/}\\\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi\"]",
+      "kind": "verification_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 157,
+      "timestamp": "2026-10-22T13:58:14.162203Z"
+    },
+    {
+      "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 158,
+      "timestamp": "2026-10-22T13:58:14.216921Z"
+    },
+    {
+      "detail": "target=Some((\"tests\", 1)) process=07da079b-68a5-4fa5-9905-bd013ade48d4",
+      "kind": "verification_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 159,
+      "timestamp": "2026-10-22T13:58:14.247677Z"
+    },
+    {
+      "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 160,
+      "timestamp": "2026-10-22T13:58:14.384036Z"
+    },
+    {
+      "detail": "target=Some((\"docs\", 1)) process=100e8065-e86e-4f1c-9234-e7ee53d9a747",
+      "kind": "verification_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 161,
+      "timestamp": "2026-10-22T13:58:14.442153Z"
+    },
+    {
+      "detail": "target=Some((\"tests\", 1)) process=07da079b-68a5-4fa5-9905-bd013ade48d4 passed=true",
+      "kind": "verification_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 162,
+      "timestamp": "2026-10-22T13:58:14.453926Z"
+    },
+    {
+      "detail": "target=Some((\"docs\", 1)) process=100e8065-e86e-4f1c-9234-e7ee53d9a747 passed=true",
+      "kind": "verification_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 163,
+      "timestamp": "2026-10-22T13:58:14.478181Z"
+    },
+    {
+      "detail": "tests",
+      "kind": "verification_passed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 164,
+      "timestamp": "2026-10-22T13:58:14.899001Z"
+    },
+    {
+      "detail": "docs",
+      "kind": "verification_passed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 165,
+      "timestamp": "2026-10-22T13:58:14.939518Z"
+    },
+    {
+      "detail": "tests: review 1",
+      "kind": "review_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 166,
+      "timestamp": "2026-10-22T13:58:15.440489Z"
+    },
+    {
+      "detail": "docs: review 1",
+      "kind": "review_reserved",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 167,
+      "timestamp": "2026-10-22T13:58:15.534761Z"
+    },
+    {
+      "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 168,
+      "timestamp": "2026-10-22T13:58:15.675261Z"
+    },
+    {
+      "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 169,
+      "timestamp": "2026-10-22T13:58:15.914065Z"
+    },
+    {
+      "detail": "tests",
+      "kind": "review_workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 170,
+      "timestamp": "2026-10-22T13:58:16.088500Z"
+    },
+    {
+      "detail": "docs",
+      "kind": "review_workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 171,
+      "timestamp": "2026-10-22T13:58:16.107023Z"
+    },
+    {
+      "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 172,
+      "timestamp": "2026-10-22T13:58:16.495615Z"
+    },
+    {
+      "detail": "Reviewer Claude; session=8a3432a4-b4b2-4156-b1fb-b248512118f8 process_key=27563db0-0e71-46ed-9da2-229305619437",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 173,
+      "timestamp": "2026-10-22T13:58:16.510590Z"
+    },
+    {
+      "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 174,
+      "timestamp": "2026-10-22T13:58:16.518823Z"
+    },
+    {
+      "detail": "Reviewer Claude; session=f1fa9758-8441-43f6-8a51-a05890e19089 process_key=6826841d-734a-4a65-93de-f657f57ceaa4",
+      "kind": "agent_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 175,
+      "timestamp": "2026-10-22T13:58:16.564471Z"
+    },
+    {
+      "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 176,
+      "timestamp": "2026-10-22T13:58:16.651251Z"
+    },
+    {
+      "detail": "Reviewer process=6bd594ec-1a6f-4d33-acbc-11b76dc0b908",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 177,
+      "timestamp": "2026-10-22T13:58:16.662365Z"
+    },
+    {
+      "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 178,
+      "timestamp": "2026-10-22T13:58:16.678314Z"
+    },
+    {
+      "detail": "Reviewer process=d1477cf6-0e47-4db7-b893-fd343dc4f589",
+      "kind": "agent_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 179,
+      "timestamp": "2026-10-22T13:58:16.687699Z"
+    },
+    {
+      "detail": "Reviewer session=8a3432a4-b4b2-4156-b1fb-b248512118f8 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 180,
+      "timestamp": "2026-10-22T13:58:16.739754Z"
+    },
+    {
+      "detail": "Reviewer session=f1fa9758-8441-43f6-8a51-a05890e19089 outcome=succeeded",
+      "kind": "agent_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 181,
+      "timestamp": "2026-10-22T13:58:16.749317Z"
+    },
+    {
+      "detail": "docs: accepted=true findings=0",
+      "kind": "review_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 182,
+      "timestamp": "2026-10-22T13:58:17.111802Z"
+    },
+    {
+      "detail": "tests: accepted=true findings=0",
+      "kind": "review_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 183,
+      "timestamp": "2026-10-22T13:58:17.129444Z"
+    },
+    {
+      "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 184,
+      "timestamp": "2026-10-22T13:58:17.253044Z"
+    },
+    {
+      "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 185,
+      "timestamp": "2026-10-22T13:58:17.262346Z"
+    },
+    {
+      "detail": "docs: 5d6242f8d57b09d1cc43df7474ad46d14641f16e",
+      "kind": "task_completed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 186,
+      "timestamp": "2026-10-22T13:58:18.414986Z"
+    },
+    {
+      "detail": "docs: Some(Running) -> Completed",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 187,
+      "timestamp": "2026-10-22T13:58:18.415247Z"
+    },
+    {
+      "detail": "Dependency states evaluated",
+      "kind": "scheduler",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 188,
+      "timestamp": "2026-10-22T13:58:18.432878Z"
+    },
+    {
+      "detail": "tests: c93c7c6f5b954e49a6120372c33015457a5dacf5",
+      "kind": "task_completed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 189,
+      "timestamp": "2026-10-22T13:58:18.608642Z"
+    },
+    {
+      "detail": "tests: Some(Running) -> Completed",
+      "kind": "task_state",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 190,
+      "timestamp": "2026-10-22T13:58:18.608797Z"
+    },
+    {
+      "detail": "Dependency states evaluated",
+      "kind": "scheduler",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 191,
+      "timestamp": "2026-10-22T13:58:18.621683Z"
+    },
+    {
+      "detail": "All currently runnable tasks finished",
+      "kind": "execution_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 192,
+      "timestamp": "2026-10-22T13:58:18.633818Z"
+    },
+    {
+      "detail": "Allowed local integration admission: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 193,
+      "timestamp": "2026-10-22T13:58:18.699313Z"
+    },
+    {
+      "detail": "Original delegation admits isolated local integration and combined checks",
+      "kind": "delegation_integration",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 194,
+      "timestamp": "2026-10-22T13:58:18.710133Z"
+    },
+    {
+      "detail": "Allowed integration worktree creation: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 195,
+      "timestamp": "2026-10-22T13:58:18.786388Z"
+    },
+    {
+      "detail": "Pinned Git ownership",
+      "kind": "integration_workspace_ready",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 196,
+      "timestamp": "2026-10-22T13:58:18.884802Z"
+    },
+    {
+      "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 197,
+      "timestamp": "2026-10-22T13:58:18.935923Z"
+    },
+    {
+      "detail": "format: 83a36a3ff810c16cd470ced81e1605ef4dd04b98",
+      "kind": "integration_merge",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 198,
+      "timestamp": "2026-10-22T13:58:19.454410Z"
+    },
+    {
+      "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 199,
+      "timestamp": "2026-10-22T13:58:19.516395Z"
+    },
+    {
+      "detail": "validate: 188f68d6b59f6d737f9f715c8bca17f34d41dbcc",
+      "kind": "integration_merge",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 200,
+      "timestamp": "2026-10-22T13:58:19.839774Z"
+    },
+    {
+      "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 201,
+      "timestamp": "2026-10-22T13:58:19.891737Z"
+    },
+    {
+      "detail": "export: accda7af804bb83c098db8202a9e4d2abe454b24",
+      "kind": "integration_merge",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 202,
+      "timestamp": "2026-10-22T13:58:20.391752Z"
+    },
+    {
+      "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 203,
+      "timestamp": "2026-10-22T13:58:20.446703Z"
+    },
+    {
+      "detail": "docs: 5d6242f8d57b09d1cc43df7474ad46d14641f16e",
+      "kind": "integration_merge",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 204,
+      "timestamp": "2026-10-22T13:58:21.066272Z"
+    },
+    {
+      "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 205,
+      "timestamp": "2026-10-22T13:58:21.153388Z"
+    },
+    {
+      "detail": "tests: c93c7c6f5b954e49a6120372c33015457a5dacf5",
+      "kind": "integration_merge",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 206,
+      "timestamp": "2026-10-22T13:58:21.771548Z"
+    },
+    {
+      "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 207,
+      "timestamp": "2026-10-22T13:58:22.347047Z"
+    },
+    {
+      "detail": "target=None process_key=f7c683d2-c515-4e3b-a3f1-4d5b21e94c6c command=[\"/bin/sh\",\"-c\",\"for f in format.sh validate.sh export.sh test_export.sh; do if test -f \\\"$f\\\"; then /bin/sh -n \\\"$f\\\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \\\"${PWD##*/}\\\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi\"]",
+      "kind": "verification_started",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 208,
+      "timestamp": "2026-10-22T13:58:22.356924Z"
+    },
+    {
+      "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+      "kind": "delegation_allowed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 209,
+      "timestamp": "2026-10-22T13:58:22.409450Z"
+    },
+    {
+      "detail": "target=None process=cc70aa7c-dece-4491-88e8-d1d93180bb25",
+      "kind": "verification_process",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 210,
+      "timestamp": "2026-10-22T13:58:22.420945Z"
+    },
+    {
+      "detail": "target=None process=cc70aa7c-dece-4491-88e8-d1d93180bb25 passed=true",
+      "kind": "verification_finished",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 211,
+      "timestamp": "2026-10-22T13:58:22.480430Z"
+    },
+    {
+      "detail": "Verified integration commit c4b680535950de9994adc92c597e47bf28356f87",
+      "kind": "completed",
+      "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+      "sequence": 212,
+      "timestamp": "2026-10-22T13:58:22.950683Z"
+    }
+  ],
+  "interrupted_run": {
+    "approved_at": "2026-10-22T13:58:23.232634Z",
+    "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+    "blockers": [
+      {
+        "action": "Inspect retained workspaces and processes; submit a new plan when safe",
+        "created_at": "2026-10-22T13:58:24.864527Z",
+        "detail": "Daemon restarted; workflow ownership lost. Workspaces retained. Inspect surviving processes before starting a new run.",
+        "kind": "restart",
+        "task_id": null
+      }
+    ],
+    "created_at": "2026-10-22T13:58:23.325554Z",
+    "decisions": [
+      {
+        "attempt": null,
+        "audit": [
+          {
+            "at": "2026-10-22T13:58:24.184629Z",
+            "attempt": null,
+            "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+            "kind": "accepted",
+            "sequence": 1,
+            "task_id": null
+          }
+        ],
+        "category": "reversible",
+        "created_at": "2026-10-22T13:58:24.184629Z",
+        "evidence": [
+          {
+            "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+            "content_sha256": "70e0b10cf0b86c89c5b8089fd7998a6d4192ed3cf71cb77be13a1051e5ce2934",
+            "excerpt": "Default export format is CSV.",
+            "file": "format.sh",
+            "supports": "CSV",
+            "workspace_id": "ba82591b-acae-4faa-a9e2-0d9ab121de8d"
+          }
+        ],
+        "id": "D-e3dc54c082042d4d6b9a975f77fcc8aa20ea43296094987eb488a0f18cd5ae36",
+        "ordinal": 1,
+        "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+        "proposal": {
+          "affected_files": [
+            "format.sh",
+            "export.sh",
+            "test_export.sh",
+            "export.txt"
+          ],
+          "affected_tasks": [
+            "format",
+            "export",
+            "tests",
+            "docs"
+          ],
+          "alternatives": [
+            "JSON"
+          ],
+          "assumptions": [
+            "The existing default applies to report exports."
+          ],
+          "chosen": "CSV",
+          "evidence": [
+            {
+              "excerpt": "Default export format is CSV.",
+              "file": "format.sh",
+              "supports": "CSV"
+            }
+          ],
+          "key": "export-format",
+          "kind": "default_value",
+          "question": "Which default report export format?",
+          "rationale": "The existing report formatter documents CSV as the default; reuse that local convention.",
+          "requirements": [
+            "Implement report export with validation and tests."
+          ],
+          "supersedes": null,
+          "uncertainty": []
+        },
+        "run_id": "b200da42-7dfc-472e-8dde-3d56fff62843",
+        "session_id": "19b7d053-a7c4-407b-810c-a72caf437b4f",
+        "task_id": null
+      }
+    ],
+    "delegation": {
+      "authorized_at": "2026-10-22T13:58:23.232634Z",
+      "contract": {
+        "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+        "limitations": [
+          "Only Claude tool-free structured responses are supported for autonomous agents; Codex tool confinement is unavailable. No agent shell, filesystem tools, MCP, subagents, or session resume. Bare/restricted mode and disabled hooks/customizations are required; the default first-party API endpoint is the only supported backend.",
+          "Daemon may read authorized regular files (256 KiB each, 1 MiB total) and pinned project context, and create/replace authorized regular UTF-8 files inside assigned worktrees. No deletes, links, mode changes, hidden paths or protected instruction/configuration edits.",
+          "Only the exact configured verification argv may run, inside the recorded local sandbox with a cleared environment, no network, and no unrelated user-home file contents. System runtimes and the assigned checkout are readable; checkout and per-command temporary storage are writable. Sandbox availability is required; no unsandboxed fallback. Preflight may run help-only provider probes and a fixed sandboxed /usr/bin/true capability probe.",
+          "Owned worktree creation, dependency merges, immutable-tree preservation and optional local integration are permitted. Remote push, publishing, production deployment, main merge, credentials, dependency installation and arbitrary external operations are excluded.",
+          "Provider/model arguments and time/attempt/review/concurrency limits are enforced. Tool-free prompts, including full review diffs, are limited to 64 KiB; larger work blocks. Token/monetary accounting and spending caps are unavailable; provider defaults and inference charges cannot be certified. The trusted tool-free provider uses its configured API credentials in bare mode; OAuth subscription login and alternate cloud/custom backends are unsupported. Autono never reads or exposes credential values.",
+          "Authorization expires by wall-clock deadline from consent, including idle time. Crash/restart interrupts active runs and never resumes or blindly replays uncertain effects. Same-UID hostile processes and trusted installed provider binaries remain inside the local trust boundary."
+        ],
+        "repository_git": {
+          "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+          "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+          "metadata": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/commondir": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config.worktree": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/gitdir": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null
+          },
+          "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo"
+        },
+        "repository_identity": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo": "16777232:412431565:501",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git": "16777232:412431577:501"
+        },
+        "request": {
+          "local_integration": true,
+          "max_runtime_seconds": 120,
+          "submission": {
+            "base": "main",
+            "id": "b200da42-7dfc-472e-8dde-3d56fff62843",
+            "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo",
+            "specification": "Implement report export with validation and tests."
+          },
+          "writable_files": [
+            "format.sh",
+            "validate.sh",
+            "export.sh",
+            "test_export.sh",
+            "export.txt"
+          ]
+        },
+        "settings": {
+          "agents": {
+            "coder": {
+              "model": "fixture",
+              "provider": "claude",
+              "timeout_seconds": 30
+            },
+            "planner": {
+              "model": "fixture",
+              "provider": "claude",
+              "timeout_seconds": 30
+            },
+            "reviewer": {
+              "model": "fixture",
+              "provider": "claude",
+              "timeout_seconds": 30
+            }
+          },
+          "execution": {
+            "max_attempts": 3,
+            "max_parallel": 2,
+            "max_review_cycles": 2
+          },
+          "permissions": {
+            "rules": {
+              "run_checks": "REQUIRE_APPROVAL",
+              "workspace_write": "REQUIRE_APPROVAL"
+            }
+          },
+          "preflight": {
+            "external_services": [],
+            "required_directories": [],
+            "required_env": [],
+            "required_tools": []
+          },
+          "verification": {
+            "commands": [
+              [
+                "/bin/sh",
+                "-c",
+                "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+              ]
+            ],
+            "timeout_seconds": 10
+          }
+        },
+        "user_config_digest": "3414b6a2ad9537cbc157173dea27b20d2d326708f2820366a52e87600c8abfa8",
+        "verification_sandbox": "macos-seatbelt-v1",
+        "version": 1,
+        "worktree_root": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843"
+      },
+      "expires_at": "2026-10-22T14:00:23.232634Z"
+    },
+    "human_actions": [],
+    "id": "b200da42-7dfc-472e-8dde-3d56fff62843",
+    "integration_verification": [],
+    "integration_workspace": null,
+    "plan": {
+      "human_requirements": [],
+      "milestones": [
+        {
+          "goal": "Validated export",
+          "id": "report",
+          "task_ids": [
+            "format",
+            "validate",
+            "export",
+            "tests",
+            "docs"
+          ]
+        }
+      ],
+      "requirements": [
+        {
+          "id": "report",
+          "text": "Implement report export with validation and tests."
+        }
+      ],
+      "tasks": [
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement format using the recorded default format",
+          "goal": "Report format",
+          "id": "format",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement validate using the recorded default format",
+          "goal": "Report validate",
+          "id": "validate",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "format",
+            "validate"
+          ],
+          "description": "Implement export using the recorded default format",
+          "goal": "Report export",
+          "id": "export",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement tests using the recorded default format",
+          "goal": "Report tests",
+          "id": "tests",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement docs using the recorded default format",
+          "goal": "Report docs",
+          "id": "docs",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        }
+      ]
+    },
+    "planner": {
+      "id": "19b7d053-a7c4-407b-810c-a72caf437b4f",
+      "outcome": "succeeded",
+      "process_key": "6887798a-b8fb-41ef-9078-13f97a4f2016",
+      "process_run_id": "2dd0af1f-5b63-40bd-a1bf-951d715dbf0a",
+      "provider": "claude",
+      "provider_session_id": "0C3AB6FD-A149-4AC3-9C6B-46F95D5537CD",
+      "result": "{\"decisions\":[{\"affected_files\":[\"format.sh\",\"export.sh\",\"test_export.sh\",\"export.txt\"],\"affected_tasks\":[\"format\",\"export\",\"tests\",\"docs\"],\"alternatives\":[\"JSON\"],\"assumptions\":[\"The existing default applies to report exports.\"],\"chosen\":\"CSV\",\"evidence\":[{\"excerpt\":\"Default export format is CSV.\",\"file\":\"format.sh\",\"supports\":\"CSV\"}],\"key\":\"export-format\",\"kind\":\"default_value\",\"question\":\"Which default report export format?\",\"rationale\":\"The existing report formatter documents CSV as the default; reuse that local convention.\",\"requirements\":[\"Implement report export with validation and tests.\"],\"supersedes\":null,\"uncertainty\":[]}],\"human_requirements\":[],\"milestones\":[{\"goal\":\"Validated export\",\"id\":\"report\",\"task_ids\":[\"format\",\"validate\",\"export\",\"tests\",\"docs\"]}],\"requirements\":[{\"id\":\"report\",\"text\":\"Implement report export with validation and tests.\"}],\"tasks\":[{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[],\"description\":\"Implement format using the recorded default format\",\"goal\":\"Report format\",\"id\":\"format\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[],\"description\":\"Implement validate using the recorded default format\",\"goal\":\"Report validate\",\"id\":\"validate\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[\"format\",\"validate\"],\"description\":\"Implement export using the recorded default format\",\"goal\":\"Report export\",\"id\":\"export\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[\"export\"],\"description\":\"Implement tests using the recorded default format\",\"goal\":\"Report tests\",\"id\":\"tests\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[\"export\"],\"description\":\"Implement docs using the recorded default format\",\"goal\":\"Report docs\",\"id\":\"docs\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]}]}",
+      "resumed_from": null,
+      "role": "planner"
+    },
+    "planning_workspace": {
+      "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+      "branch": "autono/b200da42-7dfc-472e-8dde-3d56fff62843/planner",
+      "git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner1",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/planner/.git": "0bc6521319affc6a77b405bc364ab460754d77463229050cf1765d218eb6d1f8",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner1/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner1/gitdir": "b517c0c2a6e0f796f64803725fb33d774503b4c889c8da49ea71c77941c3698f",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner1/info/exclude": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/planner"
+      },
+      "head_commit": null,
+      "id": "ba82591b-acae-4faa-a9e2-0d9ab121de8d",
+      "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/planner"
+    },
+    "preflight": {
+      "action_ids": [],
+      "checked_at": "2026-10-22T13:58:24.259653Z",
+      "checks": [
+        {
+          "blocking": true,
+          "evidence": "Repository accessibility and pinned Git ownership",
+          "id": "repository",
+          "ready": true
+        },
+        {
+          "blocking": true,
+          "evidence": "Planning checkout accessibility and pinned Git ownership",
+          "id": "planning-workspace",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees",
+          "id": "git-working-state",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately",
+          "id": "installed-codex",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately",
+          "id": "installed-claude",
+          "ready": true
+        },
+        {
+          "blocking": true,
+          "evidence": "Configured verification executable availability; command behavior is validated during execution",
+          "id": "verification-0",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "WorkspaceWrite: RequireApproval; scope run b200da42-7dfc-472e-8dde-3d56fff62843 assigned task worktrees",
+          "id": "permission-WorkspaceWrite",
+          "ready": false
+        },
+        {
+          "blocking": false,
+          "evidence": "RunChecks: RequireApproval; scope run b200da42-7dfc-472e-8dde-3d56fff62843 immutable configured verification commands",
+          "id": "permission-RunChecks",
+          "ready": false
+        },
+        {
+          "blocking": true,
+          "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+          "id": "provider-coder",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+          "id": "authentication-coder",
+          "ready": null
+        },
+        {
+          "blocking": true,
+          "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+          "id": "provider-reviewer",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+          "id": "authentication-reviewer",
+          "ready": null
+        },
+        {
+          "blocking": true,
+          "evidence": "Exact configured verification executable must be available within the sandbox's system PATH or the assigned checkout",
+          "id": "delegation-check-0",
+          "ready": true
+        },
+        {
+          "blocking": true,
+          "evidence": "Fixed /usr/bin/true probe in the verification sandbox; no credentials or inference. Unavailable sandbox requires external repair",
+          "id": "delegation-sandbox",
+          "ready": true
+        }
+      ],
+      "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation.",
+      "ready": true
+    },
+    "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo",
+    "repository_git": {
+      "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+      "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+      "metadata": {
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/commondir": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config.worktree": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/gitdir": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null
+      },
+      "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo"
+    },
+    "requested_base": "main",
+    "revision": 31,
+    "settings": {
+      "agents": {
+        "coder": {
+          "model": "fixture",
+          "provider": "claude",
+          "timeout_seconds": 30
+        },
+        "planner": {
+          "model": "fixture",
+          "provider": "claude",
+          "timeout_seconds": 30
+        },
+        "reviewer": {
+          "model": "fixture",
+          "provider": "claude",
+          "timeout_seconds": 30
+        }
+      },
+      "execution": {
+        "max_attempts": 3,
+        "max_parallel": 2,
+        "max_review_cycles": 2
+      },
+      "permissions": {
+        "rules": {
+          "run_checks": "REQUIRE_APPROVAL",
+          "workspace_write": "REQUIRE_APPROVAL"
+        }
+      },
+      "preflight": {
+        "external_services": [],
+        "required_directories": [],
+        "required_env": [],
+        "required_tools": []
+      },
+      "verification": {
+        "commands": [
+          [
+            "/bin/sh",
+            "-c",
+            "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+          ]
+        ],
+        "timeout_seconds": 10
+      }
+    },
+    "specification": "Implement report export with validation and tests.",
+    "status": "INTERRUPTED",
+    "summary": "Daemon restarted; workflow ownership lost. Workspaces retained. Inspect surviving processes before starting a new run.",
+    "tasks": [
+      {
+        "artifact_commit": null,
+        "attempts": [
+          {
+            "coder": {
+              "id": "f9f088ab-1740-43d1-b101-5ce1925f5663",
+              "outcome": null,
+              "process_key": "55141b35-a352-4209-98ff-004c25900fa6",
+              "process_run_id": "35efaf99-5a70-4c2a-b949-3d0f3acc32ea",
+              "provider": "claude",
+              "provider_session_id": null,
+              "result": null,
+              "resumed_from": null,
+              "role": "coder"
+            },
+            "detail": null,
+            "number": 1,
+            "preserved_tree": null,
+            "review": null,
+            "reviewer": null,
+            "reviews": [],
+            "snapshot": null,
+            "verification": [],
+            "verified_tree": null
+          }
+        ],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement format using the recorded default format",
+          "goal": "Report format",
+          "id": "format",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "INTERRUPTED",
+        "workspace": {
+          "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+          "branch": "autono/b200da42-7dfc-472e-8dde-3d56fff62843/task-format",
+          "git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format1",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/task-format/.git": "460f6c0fc138a1cd4b0212f53382669ffc5d8451692fbccac396ca35a303727c",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format1/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format1/gitdir": "a8bc943db7c4ef898d8e4e4122dbfa753b88c104562fffeef58a198379d81627",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format1/info/exclude": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/task-format"
+          },
+          "head_commit": null,
+          "id": "e0dac234-d9c1-40ff-bc71-fd5b5db892b5",
+          "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/task-format"
+        }
+      },
+      {
+        "artifact_commit": null,
+        "attempts": [
+          {
+            "coder": {
+              "id": "6b6f114a-2f93-41cb-a3db-868230a30c3d",
+              "outcome": null,
+              "process_key": "20fef1bd-3724-43ee-bc94-21c4dcfbd3b6",
+              "process_run_id": "7f82f246-27dc-46bf-a05b-3b0452cc6014",
+              "provider": "claude",
+              "provider_session_id": null,
+              "result": null,
+              "resumed_from": null,
+              "role": "coder"
+            },
+            "detail": null,
+            "number": 1,
+            "preserved_tree": null,
+            "review": null,
+            "reviewer": null,
+            "reviews": [],
+            "snapshot": null,
+            "verification": [],
+            "verified_tree": null
+          }
+        ],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement validate using the recorded default format",
+          "goal": "Report validate",
+          "id": "validate",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "INTERRUPTED",
+        "workspace": {
+          "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+          "branch": "autono/b200da42-7dfc-472e-8dde-3d56fff62843/task-validate",
+          "git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate1",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/task-validate/.git": "6d5c4d760567a1d2f5f1d2e144088cd92c16426f4babbef72b284f1e7413bd2a",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate1/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate1/gitdir": "60dcb5540db2bf4ad01a4bab4238440f720cf7d2e5cf8aaf80ea484bfc7e2755",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate1/info/exclude": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/task-validate"
+          },
+          "head_commit": null,
+          "id": "daa3fa5f-7a2a-4ef0-9ac3-fd76466456ca",
+          "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b200da42-7dfc-472e-8dde-3d56fff62843/task-validate"
+        }
+      },
+      {
+        "artifact_commit": null,
+        "attempts": [],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "format",
+            "validate"
+          ],
+          "description": "Implement export using the recorded default format",
+          "goal": "Report export",
+          "id": "export",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "INTERRUPTED",
+        "workspace": null
+      },
+      {
+        "artifact_commit": null,
+        "attempts": [],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement tests using the recorded default format",
+          "goal": "Report tests",
+          "id": "tests",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "INTERRUPTED",
+        "workspace": null
+      },
+      {
+        "artifact_commit": null,
+        "attempts": [],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement docs using the recorded default format",
+          "goal": "Report docs",
+          "id": "docs",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "INTERRUPTED",
+        "workspace": null
+      }
+    ],
+    "updated_at": "2026-10-22T13:58:24.864525Z"
+  },
+  "paid_inference": false,
+  "provider_invocations": [
+    "planner",
+    "task-validate",
+    "task-format",
+    "review-validate-1",
+    "review-format-1",
+    "task-export",
+    "review-export-1",
+    "task-tests",
+    "task-docs",
+    "review-tests-1",
+    "review-docs-1"
+  ],
+  "restart_replayed": false,
+  "run": {
+    "approved_at": "2026-10-22T13:57:54.016029Z",
+    "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+    "blockers": [],
+    "created_at": "2026-10-22T13:57:54.100233Z",
+    "decisions": [
+      {
+        "attempt": null,
+        "audit": [
+          {
+            "at": "2026-10-22T13:57:55.318343Z",
+            "attempt": null,
+            "detail": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+            "kind": "accepted",
+            "sequence": 1,
+            "task_id": null
+          },
+          {
+            "at": "2026-10-22T13:57:59.656766Z",
+            "attempt": 1,
+            "detail": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+            "kind": "implemented",
+            "sequence": 2,
+            "task_id": "format"
+          },
+          {
+            "at": "2026-10-22T13:58:03.853505Z",
+            "attempt": 1,
+            "detail": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+            "kind": "checks_passed",
+            "sequence": 3,
+            "task_id": "format"
+          },
+          {
+            "at": "2026-10-22T13:58:06.642003Z",
+            "attempt": 1,
+            "detail": "Independent review result retained in task attempt; decision acceptance does not waive findings",
+            "kind": "review_accepted",
+            "sequence": 4,
+            "task_id": "format"
+          },
+          {
+            "at": "2026-10-22T13:58:08.100864Z",
+            "attempt": 1,
+            "detail": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+            "kind": "task_verified",
+            "sequence": 5,
+            "task_id": "format"
+          },
+          {
+            "at": "2026-10-22T13:58:09.429665Z",
+            "attempt": 1,
+            "detail": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+            "kind": "implemented",
+            "sequence": 6,
+            "task_id": "export"
+          },
+          {
+            "at": "2026-10-22T13:58:09.997305Z",
+            "attempt": 1,
+            "detail": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+            "kind": "checks_passed",
+            "sequence": 7,
+            "task_id": "export"
+          },
+          {
+            "at": "2026-10-22T13:58:11.192540Z",
+            "attempt": 1,
+            "detail": "Independent review result retained in task attempt; decision acceptance does not waive findings",
+            "kind": "review_accepted",
+            "sequence": 8,
+            "task_id": "export"
+          },
+          {
+            "at": "2026-10-22T13:58:12.486073Z",
+            "attempt": 1,
+            "detail": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+            "kind": "task_verified",
+            "sequence": 9,
+            "task_id": "export"
+          },
+          {
+            "at": "2026-10-22T13:58:14.001072Z",
+            "attempt": 1,
+            "detail": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+            "kind": "implemented",
+            "sequence": 10,
+            "task_id": "tests"
+          },
+          {
+            "at": "2026-10-22T13:58:14.061661Z",
+            "attempt": 1,
+            "detail": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+            "kind": "implemented",
+            "sequence": 11,
+            "task_id": "docs"
+          },
+          {
+            "at": "2026-10-22T13:58:14.889346Z",
+            "attempt": 1,
+            "detail": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+            "kind": "checks_passed",
+            "sequence": 12,
+            "task_id": "tests"
+          },
+          {
+            "at": "2026-10-22T13:58:14.931576Z",
+            "attempt": 1,
+            "detail": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+            "kind": "checks_passed",
+            "sequence": 13,
+            "task_id": "docs"
+          },
+          {
+            "at": "2026-10-22T13:58:17.102217Z",
+            "attempt": 1,
+            "detail": "Independent review result retained in task attempt; decision acceptance does not waive findings",
+            "kind": "review_accepted",
+            "sequence": 14,
+            "task_id": "docs"
+          },
+          {
+            "at": "2026-10-22T13:58:17.121620Z",
+            "attempt": 1,
+            "detail": "Independent review result retained in task attempt; decision acceptance does not waive findings",
+            "kind": "review_accepted",
+            "sequence": 15,
+            "task_id": "tests"
+          },
+          {
+            "at": "2026-10-22T13:58:18.402880Z",
+            "attempt": 1,
+            "detail": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+            "kind": "task_verified",
+            "sequence": 16,
+            "task_id": "docs"
+          },
+          {
+            "at": "2026-10-22T13:58:18.597861Z",
+            "attempt": 1,
+            "detail": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+            "kind": "task_verified",
+            "sequence": 17,
+            "task_id": "tests"
+          }
+        ],
+        "category": "reversible",
+        "created_at": "2026-10-22T13:57:55.318343Z",
+        "evidence": [
+          {
+            "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+            "content_sha256": "70e0b10cf0b86c89c5b8089fd7998a6d4192ed3cf71cb77be13a1051e5ce2934",
+            "excerpt": "Default export format is CSV.",
+            "file": "format.sh",
+            "supports": "CSV",
+            "workspace_id": "aa063586-56dc-43a7-be35-747d5dab1650"
+          }
+        ],
+        "id": "D-6362fb718c2a1bd35433a814f9123f24fa37cc56035e567bda4db3150c8f6680",
+        "ordinal": 1,
+        "policy_basis": "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required",
+        "proposal": {
+          "affected_files": [
+            "format.sh",
+            "export.sh",
+            "test_export.sh",
+            "export.txt"
+          ],
+          "affected_tasks": [
+            "format",
+            "export",
+            "tests",
+            "docs"
+          ],
+          "alternatives": [
+            "JSON"
+          ],
+          "assumptions": [
+            "The existing default applies to report exports."
+          ],
+          "chosen": "CSV",
+          "evidence": [
+            {
+              "excerpt": "Default export format is CSV.",
+              "file": "format.sh",
+              "supports": "CSV"
+            }
+          ],
+          "key": "export-format",
+          "kind": "default_value",
+          "question": "Which default report export format?",
+          "rationale": "The existing report formatter documents CSV as the default; reuse that local convention.",
+          "requirements": [
+            "Implement report export with validation and tests."
+          ],
+          "supersedes": null,
+          "uncertainty": []
+        },
+        "run_id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+        "session_id": "adfbc6de-0b60-40ee-8ba8-efcaeda91a1c",
+        "task_id": null
+      }
+    ],
+    "delegation": {
+      "authorized_at": "2026-10-22T13:57:54.016029Z",
+      "contract": {
+        "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+        "limitations": [
+          "Only Claude tool-free structured responses are supported for autonomous agents; Codex tool confinement is unavailable. No agent shell, filesystem tools, MCP, subagents, or session resume. Bare/restricted mode and disabled hooks/customizations are required; the default first-party API endpoint is the only supported backend.",
+          "Daemon may read authorized regular files (256 KiB each, 1 MiB total) and pinned project context, and create/replace authorized regular UTF-8 files inside assigned worktrees. No deletes, links, mode changes, hidden paths or protected instruction/configuration edits.",
+          "Only the exact configured verification argv may run, inside the recorded local sandbox with a cleared environment, no network, and no unrelated user-home file contents. System runtimes and the assigned checkout are readable; checkout and per-command temporary storage are writable. Sandbox availability is required; no unsandboxed fallback. Preflight may run help-only provider probes and a fixed sandboxed /usr/bin/true capability probe.",
+          "Owned worktree creation, dependency merges, immutable-tree preservation and optional local integration are permitted. Remote push, publishing, production deployment, main merge, credentials, dependency installation and arbitrary external operations are excluded.",
+          "Provider/model arguments and time/attempt/review/concurrency limits are enforced. Tool-free prompts, including full review diffs, are limited to 64 KiB; larger work blocks. Token/monetary accounting and spending caps are unavailable; provider defaults and inference charges cannot be certified. The trusted tool-free provider uses its configured API credentials in bare mode; OAuth subscription login and alternate cloud/custom backends are unsupported. Autono never reads or exposes credential values.",
+          "Authorization expires by wall-clock deadline from consent, including idle time. Crash/restart interrupts active runs and never resumes or blindly replays uncertain effects. Same-UID hostile processes and trusted installed provider binaries remain inside the local trust boundary."
+        ],
+        "repository_git": {
+          "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+          "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+          "metadata": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/commondir": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config.worktree": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/gitdir": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null
+          },
+          "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo"
+        },
+        "repository_identity": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo": "16777232:412431565:501",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git": "16777232:412431577:501"
+        },
+        "request": {
+          "local_integration": true,
+          "max_runtime_seconds": 120,
+          "submission": {
+            "base": "main",
+            "id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+            "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo",
+            "specification": "Implement report export with validation and tests."
+          },
+          "writable_files": [
+            "format.sh",
+            "validate.sh",
+            "export.sh",
+            "test_export.sh",
+            "export.txt"
+          ]
+        },
+        "settings": {
+          "agents": {
+            "coder": {
+              "model": "fixture",
+              "provider": "claude",
+              "timeout_seconds": 30
+            },
+            "planner": {
+              "model": "fixture",
+              "provider": "claude",
+              "timeout_seconds": 30
+            },
+            "reviewer": {
+              "model": "fixture",
+              "provider": "claude",
+              "timeout_seconds": 30
+            }
+          },
+          "execution": {
+            "max_attempts": 3,
+            "max_parallel": 2,
+            "max_review_cycles": 2
+          },
+          "permissions": {
+            "rules": {
+              "run_checks": "REQUIRE_APPROVAL",
+              "workspace_write": "REQUIRE_APPROVAL"
+            }
+          },
+          "preflight": {
+            "external_services": [],
+            "required_directories": [],
+            "required_env": [],
+            "required_tools": []
+          },
+          "verification": {
+            "commands": [
+              [
+                "/bin/sh",
+                "-c",
+                "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+              ]
+            ],
+            "timeout_seconds": 10
+          }
+        },
+        "user_config_digest": "3414b6a2ad9537cbc157173dea27b20d2d326708f2820366a52e87600c8abfa8",
+        "verification_sandbox": "macos-seatbelt-v1",
+        "version": 1,
+        "worktree_root": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3"
+      },
+      "expires_at": "2026-10-22T13:59:54.016029Z"
+    },
+    "human_actions": [],
+    "id": "b6557895-0b10-49bf-a751-fae58921dbb3",
+    "integration_verification": [
+      {
+        "command": [
+          "/bin/sh",
+          "-c",
+          "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+        ],
+        "exit_code": 0,
+        "outcome": "passed",
+        "output_complete": true,
+        "passed": true,
+        "process_key": "f7c683d2-c515-4e3b-a3f1-4d5b21e94c6c",
+        "process_run_id": "cc70aa7c-dece-4491-88e8-d1d93180bb25",
+        "summary": "process=cc70aa7c-dece-4491-88e8-d1d93180bb25 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+      }
+    ],
+    "integration_workspace": {
+      "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+      "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/integration",
+      "git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/integration",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/integration/.git": "bffd96e6592f1137630823fbb017c41deae715c1b8e2d96e403b6e5e68384e58",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/integration/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/integration/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/integration/gitdir": "ffb45a7e9ec5cecedf3837ca6bde52776875ccc9cee478556b07ad4b9bd19a70",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/integration/info/exclude": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/integration"
+      },
+      "head_commit": "c4b680535950de9994adc92c597e47bf28356f87",
+      "id": "4e383758-f69e-46ad-9173-38467319a687",
+      "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/integration"
+    },
+    "plan": {
+      "human_requirements": [],
+      "milestones": [
+        {
+          "goal": "Validated export",
+          "id": "report",
+          "task_ids": [
+            "format",
+            "validate",
+            "export",
+            "tests",
+            "docs"
+          ]
+        }
+      ],
+      "requirements": [
+        {
+          "id": "report",
+          "text": "Implement report export with validation and tests."
+        }
+      ],
+      "tasks": [
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement format using the recorded default format",
+          "goal": "Report format",
+          "id": "format",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement validate using the recorded default format",
+          "goal": "Report validate",
+          "id": "validate",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "format",
+            "validate"
+          ],
+          "description": "Implement export using the recorded default format",
+          "goal": "Report export",
+          "id": "export",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement tests using the recorded default format",
+          "goal": "Report tests",
+          "id": "tests",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement docs using the recorded default format",
+          "goal": "Report docs",
+          "id": "docs",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        }
+      ]
+    },
+    "planner": {
+      "id": "adfbc6de-0b60-40ee-8ba8-efcaeda91a1c",
+      "outcome": "succeeded",
+      "process_key": "edf22279-e5dd-43b5-9872-40c48f536415",
+      "process_run_id": "c963e9ee-839a-4cda-84c6-7fd0031ddf06",
+      "provider": "claude",
+      "provider_session_id": "E76477BD-3FD9-45BA-BAE5-77F0DDC122C3",
+      "result": "{\"decisions\":[{\"affected_files\":[\"format.sh\",\"export.sh\",\"test_export.sh\",\"export.txt\"],\"affected_tasks\":[\"format\",\"export\",\"tests\",\"docs\"],\"alternatives\":[\"JSON\"],\"assumptions\":[\"The existing default applies to report exports.\"],\"chosen\":\"CSV\",\"evidence\":[{\"excerpt\":\"Default export format is CSV.\",\"file\":\"format.sh\",\"supports\":\"CSV\"}],\"key\":\"export-format\",\"kind\":\"default_value\",\"question\":\"Which default report export format?\",\"rationale\":\"The existing report formatter documents CSV as the default; reuse that local convention.\",\"requirements\":[\"Implement report export with validation and tests.\"],\"supersedes\":null,\"uncertainty\":[]}],\"human_requirements\":[],\"milestones\":[{\"goal\":\"Validated export\",\"id\":\"report\",\"task_ids\":[\"format\",\"validate\",\"export\",\"tests\",\"docs\"]}],\"requirements\":[{\"id\":\"report\",\"text\":\"Implement report export with validation and tests.\"}],\"tasks\":[{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[],\"description\":\"Implement format using the recorded default format\",\"goal\":\"Report format\",\"id\":\"format\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[],\"description\":\"Implement validate using the recorded default format\",\"goal\":\"Report validate\",\"id\":\"validate\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[\"format\",\"validate\"],\"description\":\"Implement export using the recorded default format\",\"goal\":\"Report export\",\"id\":\"export\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[\"export\"],\"description\":\"Implement tests using the recorded default format\",\"goal\":\"Report tests\",\"id\":\"tests\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]},{\"acceptance_criteria\":[\"Report export behavior satisfies the original requirements and configured checks\"],\"dependencies\":[\"export\"],\"description\":\"Implement docs using the recorded default format\",\"goal\":\"Report docs\",\"id\":\"docs\",\"requirement_ids\":[\"report\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured sandboxed checks\"]}]}",
+      "resumed_from": null,
+      "role": "planner"
+    },
+    "planning_workspace": {
+      "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+      "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/planner",
+      "git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/planner/.git": "fdfb3c6eaa205941909a7a741a69c8943d08f011fec9514548e3f6db56950bef",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner/gitdir": "e1c435888c95009572afc7259bf095f7185c0babf8bd84313207ea2b7add4b9f",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/planner/info/exclude": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/planner"
+      },
+      "head_commit": null,
+      "id": "aa063586-56dc-43a7-be35-747d5dab1650",
+      "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/planner"
+    },
+    "preflight": {
+      "action_ids": [],
+      "checked_at": "2026-10-22T13:57:55.495500Z",
+      "checks": [
+        {
+          "blocking": true,
+          "evidence": "Repository accessibility and pinned Git ownership",
+          "id": "repository",
+          "ready": true
+        },
+        {
+          "blocking": true,
+          "evidence": "Planning checkout accessibility and pinned Git ownership",
+          "id": "planning-workspace",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees",
+          "id": "git-working-state",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately",
+          "id": "installed-codex",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately",
+          "id": "installed-claude",
+          "ready": true
+        },
+        {
+          "blocking": true,
+          "evidence": "Configured verification executable availability; command behavior is validated during execution",
+          "id": "verification-0",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "WorkspaceWrite: RequireApproval; scope run b6557895-0b10-49bf-a751-fae58921dbb3 assigned task worktrees",
+          "id": "permission-WorkspaceWrite",
+          "ready": false
+        },
+        {
+          "blocking": false,
+          "evidence": "RunChecks: RequireApproval; scope run b6557895-0b10-49bf-a751-fae58921dbb3 immutable configured verification commands",
+          "id": "permission-RunChecks",
+          "ready": false
+        },
+        {
+          "blocking": true,
+          "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+          "id": "provider-coder",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+          "id": "authentication-coder",
+          "ready": null
+        },
+        {
+          "blocking": true,
+          "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+          "id": "provider-reviewer",
+          "ready": true
+        },
+        {
+          "blocking": false,
+          "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+          "id": "authentication-reviewer",
+          "ready": null
+        },
+        {
+          "blocking": true,
+          "evidence": "Exact configured verification executable must be available within the sandbox's system PATH or the assigned checkout",
+          "id": "delegation-check-0",
+          "ready": true
+        },
+        {
+          "blocking": true,
+          "evidence": "Fixed /usr/bin/true probe in the verification sandbox; no credentials or inference. Unavailable sandbox requires external repair",
+          "id": "delegation-sandbox",
+          "ready": true
+        }
+      ],
+      "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation.",
+      "ready": true
+    },
+    "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo",
+    "repository_git": {
+      "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+      "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+      "metadata": {
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/commondir": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config.worktree": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/gitdir": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null
+      },
+      "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo"
+    },
+    "requested_base": "main",
+    "revision": 192,
+    "settings": {
+      "agents": {
+        "coder": {
+          "model": "fixture",
+          "provider": "claude",
+          "timeout_seconds": 30
+        },
+        "planner": {
+          "model": "fixture",
+          "provider": "claude",
+          "timeout_seconds": 30
+        },
+        "reviewer": {
+          "model": "fixture",
+          "provider": "claude",
+          "timeout_seconds": 30
+        }
+      },
+      "execution": {
+        "max_attempts": 3,
+        "max_parallel": 2,
+        "max_review_cycles": 2
+      },
+      "permissions": {
+        "rules": {
+          "run_checks": "REQUIRE_APPROVAL",
+          "workspace_write": "REQUIRE_APPROVAL"
+        }
+      },
+      "preflight": {
+        "external_services": [],
+        "required_directories": [],
+        "required_env": [],
+        "required_tools": []
+      },
+      "verification": {
+        "commands": [
+          [
+            "/bin/sh",
+            "-c",
+            "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+          ]
+        ],
+        "timeout_seconds": 10
+      }
+    },
+    "specification": "Implement report export with validation and tests.",
+    "status": "COMPLETED",
+    "summary": "All 5 tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch autono/b6557895-0b10-49bf-a751-fae58921dbb3/integration at c4b680535950de9994adc92c597e47bf28356f87 (/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/integration). No merge to main was performed.",
+    "tasks": [
+      {
+        "artifact_commit": "83a36a3ff810c16cd470ced81e1605ef4dd04b98",
+        "attempts": [
+          {
+            "coder": {
+              "id": "916680dd-bde1-45c2-8776-25beccf18df6",
+              "outcome": "succeeded",
+              "process_key": "fb99db1b-efa3-45d9-947e-5d610310c8ea",
+              "process_run_id": "28729005-19f2-4104-a677-cf38be64067e",
+              "provider": "claude",
+              "provider_session_id": "0C73EC86-774C-4D87-9E54-2AF66E64449F",
+              "result": "{\"blocker\":\"\",\"decisions\":[],\"edits\":[{\"content\":\"# Default export format is CSV.\\nformat_report() { printf 'name,value\\\\n%s,%s\\\\n' \\\"$1\\\" \\\"$2\\\"; }\\n\",\"path\":\"format.sh\"}],\"summary\":\"Implemented report export task\"}",
+              "resumed_from": null,
+              "role": "coder"
+            },
+            "detail": null,
+            "number": 1,
+            "preserved_tree": "bac3ac2e810d23675791c9a45c62f53ad5accc5a",
+            "review": {
+              "accepted": true,
+              "blocker": "",
+              "criteria": [
+                {
+                  "criterion": "Works",
+                  "criterion_id": "format-C1",
+                  "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                  "satisfied": true
+                }
+              ],
+              "findings": []
+            },
+            "reviewer": {
+              "id": "3ed8797f-fca4-4f78-bed2-5aa2412164f7",
+              "outcome": "succeeded",
+              "process_key": "d6f0ea62-f807-442e-bc68-961fc7be6607",
+              "process_run_id": "8d8d8003-c7de-45e5-8632-34d05bb7cc23",
+              "provider": "claude",
+              "provider_session_id": "48106F6E-541E-47E3-8AC6-14DCA4532848",
+              "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"format-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+              "resumed_from": null,
+              "role": "reviewer"
+            },
+            "reviews": [
+              {
+                "diagnostic": null,
+                "review": {
+                  "accepted": true,
+                  "blocker": "",
+                  "criteria": [
+                    {
+                      "criterion": "Works",
+                      "criterion_id": "format-C1",
+                      "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                      "satisfied": true
+                    }
+                  ],
+                  "findings": []
+                },
+                "session": {
+                  "id": "3ed8797f-fca4-4f78-bed2-5aa2412164f7",
+                  "outcome": "succeeded",
+                  "process_key": "d6f0ea62-f807-442e-bc68-961fc7be6607",
+                  "process_run_id": "8d8d8003-c7de-45e5-8632-34d05bb7cc23",
+                  "provider": "claude",
+                  "provider_session_id": "48106F6E-541E-47E3-8AC6-14DCA4532848",
+                  "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"format-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+                  "resumed_from": null,
+                  "role": "reviewer"
+                },
+                "workspace": {
+                  "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+                  "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/review-format-1",
+                  "git": {
+                    "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+                    "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-format-1",
+                    "metadata": {
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-format-1/.git": "e9c31ed3af3012a5d4caccc6ba6c13bbafad69955e9c3aaa4321c25e772edca2",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-format-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-format-1/config.worktree": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-format-1/gitdir": "28cc739e39ba60ad40a429ebfd886fff15074a2c55187ca2874f4c01b12107ff",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-format-1/info/exclude": null
+                    },
+                    "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-format-1"
+                  },
+                  "head_commit": null,
+                  "id": "04e3e2a5-59ff-4a63-a597-fefc60be4d94",
+                  "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-format-1"
+                }
+              }
+            ],
+            "snapshot": "ed30ed3a7da837f9d2b7e6fab40fddb9b97eefeb260a181b9905a7b03f39b295",
+            "verification": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-c",
+                  "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                ],
+                "exit_code": 0,
+                "outcome": "passed",
+                "output_complete": true,
+                "passed": true,
+                "process_key": "83d7336c-6f49-4579-8292-be3e241e3b16",
+                "process_run_id": "fd7fee17-0140-456a-9892-d00acbca9cac",
+                "summary": "process=fd7fee17-0140-456a-9892-d00acbca9cac status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+              }
+            ],
+            "verified_tree": "bac3ac2e810d23675791c9a45c62f53ad5accc5a"
+          }
+        ],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement format using the recorded default format",
+          "goal": "Report format",
+          "id": "format",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+          "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-format",
+          "git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-format/.git": "f3eea60332df6abb840f3615329a50792fe30c9d6d2fd9840c4f5728caf431c6",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format/gitdir": "ac6240b0a818b58440a3eab6bcc0d67926495fd392a037adb1b0e10f527afa83",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-format/info/exclude": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-format"
+          },
+          "head_commit": "83a36a3ff810c16cd470ced81e1605ef4dd04b98",
+          "id": "d64b8a42-5c2c-4446-89f2-4ba3929d3cc8",
+          "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-format"
+        }
+      },
+      {
+        "artifact_commit": "188f68d6b59f6d737f9f715c8bca17f34d41dbcc",
+        "attempts": [
+          {
+            "coder": {
+              "id": "b63ffe04-299a-47bd-9791-14559d8627a2",
+              "outcome": "succeeded",
+              "process_key": "2476a3cc-b24e-445e-8b20-46d3df6590b6",
+              "process_run_id": "d57a1efe-3957-4eed-a21c-463a14866f8c",
+              "provider": "claude",
+              "provider_session_id": "8F88EA2B-DD04-4D4F-9435-0C01EEC5761A",
+              "result": "{\"blocker\":\"\",\"decisions\":[],\"edits\":[{\"content\":\"validate_report() {\\n test \\\"$#\\\" -eq 2 && test -n \\\"$1\\\" || return 1\\n case \\\"$1\\\" in *,*) return 1;; esac\\n case \\\"$2\\\" in ''|*[!0-9]*) return 1;; esac\\n}\\n\",\"path\":\"validate.sh\"}],\"summary\":\"Implemented report export task\"}",
+              "resumed_from": null,
+              "role": "coder"
+            },
+            "detail": null,
+            "number": 1,
+            "preserved_tree": "2a08883e84bbbeed93acd86ea8747401bc33f194",
+            "review": {
+              "accepted": true,
+              "blocker": "",
+              "criteria": [
+                {
+                  "criterion": "Works",
+                  "criterion_id": "validate-C1",
+                  "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                  "satisfied": true
+                }
+              ],
+              "findings": []
+            },
+            "reviewer": {
+              "id": "25af4e6c-c86d-4f33-a076-3af4c5276a56",
+              "outcome": "succeeded",
+              "process_key": "c0838662-8e0d-419d-93b6-fb6d42aa3a81",
+              "process_run_id": "138f9477-9ff1-41e1-89ca-e518a2e84cf0",
+              "provider": "claude",
+              "provider_session_id": "DD1D4468-6A46-4D9D-B467-471BED3FE4EA",
+              "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"validate-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+              "resumed_from": null,
+              "role": "reviewer"
+            },
+            "reviews": [
+              {
+                "diagnostic": null,
+                "review": {
+                  "accepted": true,
+                  "blocker": "",
+                  "criteria": [
+                    {
+                      "criterion": "Works",
+                      "criterion_id": "validate-C1",
+                      "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                      "satisfied": true
+                    }
+                  ],
+                  "findings": []
+                },
+                "session": {
+                  "id": "25af4e6c-c86d-4f33-a076-3af4c5276a56",
+                  "outcome": "succeeded",
+                  "process_key": "c0838662-8e0d-419d-93b6-fb6d42aa3a81",
+                  "process_run_id": "138f9477-9ff1-41e1-89ca-e518a2e84cf0",
+                  "provider": "claude",
+                  "provider_session_id": "DD1D4468-6A46-4D9D-B467-471BED3FE4EA",
+                  "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"validate-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+                  "resumed_from": null,
+                  "role": "reviewer"
+                },
+                "workspace": {
+                  "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+                  "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/review-validate-1",
+                  "git": {
+                    "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+                    "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-validate-1",
+                    "metadata": {
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-validate-1/.git": "802aa07bff9856d8b77588397ec79155f18673cfa6b4aaea825cf96821314302",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-validate-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-validate-1/config.worktree": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-validate-1/gitdir": "75e7ded6045cc264e3e2b15ab1d7bc86f9e05bf083da59748a4236dc5973897f",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-validate-1/info/exclude": null
+                    },
+                    "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-validate-1"
+                  },
+                  "head_commit": null,
+                  "id": "ebd80ec0-49c7-4d53-b90c-5909eda7431f",
+                  "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-validate-1"
+                }
+              }
+            ],
+            "snapshot": "254c6710c56fdbbf1e6fa0697b61c92d22b5e8af31b83c248654827404e070a0",
+            "verification": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-c",
+                  "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                ],
+                "exit_code": 0,
+                "outcome": "passed",
+                "output_complete": true,
+                "passed": true,
+                "process_key": "e0bb541c-3d83-4968-9bb7-6e0261226420",
+                "process_run_id": "806c9af9-eacb-4b57-9aff-cbf4ac38c67c",
+                "summary": "process=806c9af9-eacb-4b57-9aff-cbf4ac38c67c status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+              }
+            ],
+            "verified_tree": "2a08883e84bbbeed93acd86ea8747401bc33f194"
+          }
+        ],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [],
+          "description": "Implement validate using the recorded default format",
+          "goal": "Report validate",
+          "id": "validate",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+          "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-validate",
+          "git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-validate/.git": "9ac952b0da96e6c69b05a17f20348a0e766da765e0a5cd524afe97d6448af7aa",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate/gitdir": "e814e77881c74cae962285e1165c435c34f94161e9a8b38e309dc57fc02b80a4",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-validate/info/exclude": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-validate"
+          },
+          "head_commit": "188f68d6b59f6d737f9f715c8bca17f34d41dbcc",
+          "id": "26dfdd6e-4edd-41b3-a283-b7672ba224c2",
+          "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-validate"
+        }
+      },
+      {
+        "artifact_commit": "accda7af804bb83c098db8202a9e4d2abe454b24",
+        "attempts": [
+          {
+            "coder": {
+              "id": "db144137-a1b3-4a00-b2e4-0303cf1b11a3",
+              "outcome": "succeeded",
+              "process_key": "b5a607d6-c603-471d-a715-217536f9a2c7",
+              "process_run_id": "68d6a084-82ff-461c-8aca-8f042907347e",
+              "provider": "claude",
+              "provider_session_id": "60D08563-F971-4688-A93B-4880FE7D3F9F",
+              "result": "{\"blocker\":\"\",\"decisions\":[],\"edits\":[{\"content\":\". ./format.sh\\n. ./validate.sh\\nexport_report() { validate_report \\\"$@\\\" || return 1; format_report \\\"$@\\\"; }\\n\",\"path\":\"export.sh\"}],\"summary\":\"Implemented report export task\"}",
+              "resumed_from": null,
+              "role": "coder"
+            },
+            "detail": null,
+            "number": 1,
+            "preserved_tree": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7",
+            "review": {
+              "accepted": true,
+              "blocker": "",
+              "criteria": [
+                {
+                  "criterion": "Works",
+                  "criterion_id": "export-C1",
+                  "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                  "satisfied": true
+                }
+              ],
+              "findings": []
+            },
+            "reviewer": {
+              "id": "36ffbbfa-135a-4b41-bf57-5c6cb7ec1eac",
+              "outcome": "succeeded",
+              "process_key": "5e7888de-a523-4e8a-a561-c635d15528ac",
+              "process_run_id": "57dc3844-cd68-4ee3-b95c-da0080755939",
+              "provider": "claude",
+              "provider_session_id": "12565D32-298A-4402-9EA4-9BDAFE8AC38E",
+              "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"export-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+              "resumed_from": null,
+              "role": "reviewer"
+            },
+            "reviews": [
+              {
+                "diagnostic": null,
+                "review": {
+                  "accepted": true,
+                  "blocker": "",
+                  "criteria": [
+                    {
+                      "criterion": "Works",
+                      "criterion_id": "export-C1",
+                      "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                      "satisfied": true
+                    }
+                  ],
+                  "findings": []
+                },
+                "session": {
+                  "id": "36ffbbfa-135a-4b41-bf57-5c6cb7ec1eac",
+                  "outcome": "succeeded",
+                  "process_key": "5e7888de-a523-4e8a-a561-c635d15528ac",
+                  "process_run_id": "57dc3844-cd68-4ee3-b95c-da0080755939",
+                  "provider": "claude",
+                  "provider_session_id": "12565D32-298A-4402-9EA4-9BDAFE8AC38E",
+                  "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"export-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+                  "resumed_from": null,
+                  "role": "reviewer"
+                },
+                "workspace": {
+                  "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+                  "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/review-export-1",
+                  "git": {
+                    "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+                    "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-export-1",
+                    "metadata": {
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-export-1/.git": "16db4ea0258b23f180f87cad6b53ade1ddfda2a9d8a8aacc05ebb2b19bf625fa",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-export-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-export-1/config.worktree": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-export-1/gitdir": "f43b9abea3eeb1e2e77e0ddac991c8d24847ae966a84a49335e4328bd878856c",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-export-1/info/exclude": null
+                    },
+                    "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-export-1"
+                  },
+                  "head_commit": null,
+                  "id": "61811089-c930-413a-898a-5729b29e6254",
+                  "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-export-1"
+                }
+              }
+            ],
+            "snapshot": "2e2fe97e3b9168df4d6ee65d20b9c8679da239271d9a866620556b59da0379d1",
+            "verification": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-c",
+                  "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                ],
+                "exit_code": 0,
+                "outcome": "passed",
+                "output_complete": true,
+                "passed": true,
+                "process_key": "55da2207-cf40-4743-a685-e25b5a2d1265",
+                "process_run_id": "6c9ae2b8-2877-47a5-874b-a788fc58050b",
+                "summary": "process=6c9ae2b8-2877-47a5-874b-a788fc58050b status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+              }
+            ],
+            "verified_tree": "17f21fa1be84f6855a64dce7208d6f7a3ba61ad7"
+          }
+        ],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "format",
+            "validate"
+          ],
+          "description": "Implement export using the recorded default format",
+          "goal": "Report export",
+          "id": "export",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "base_commit": "ae8171ae50e5f7aeeac50fb5a485b68d3fbd4144",
+          "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-export",
+          "git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-export",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-export/.git": "ef7b8e74f8580daee361b4dd5916cf2101ea95ef123c970a8017dd9503f13366",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-export/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-export/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-export/gitdir": "043b8dd8f292fd08ff3556b649b9abdce231d9b71bbfd5870876dd4b623d920f",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-export/info/exclude": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-export"
+          },
+          "head_commit": "accda7af804bb83c098db8202a9e4d2abe454b24",
+          "id": "8d667dc4-0354-4e70-b322-696592b2dc63",
+          "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-export"
+        }
+      },
+      {
+        "artifact_commit": "c93c7c6f5b954e49a6120372c33015457a5dacf5",
+        "attempts": [
+          {
+            "coder": {
+              "id": "13ec8b87-be7a-4f89-8840-65d47f7ae3f6",
+              "outcome": "succeeded",
+              "process_key": "b1753d48-098f-4784-9e7c-8c80449874af",
+              "process_run_id": "279e4500-7430-47f5-b932-e5c2fa993042",
+              "provider": "claude",
+              "provider_session_id": "EFF10DDA-EE57-447D-AF50-5095AD2B8416",
+              "result": "{\"blocker\":\"\",\"decisions\":[],\"edits\":[{\"content\":\"set -eu\\n. ./export.sh\\nexpected=$(printf 'name,value\\\\nalpha,42')\\ntest \\\"$(export_report alpha 42)\\\" = \\\"$expected\\\"\\nif export_report '' 42; then exit 1; fi\\nif export_report alpha invalid; then exit 1; fi\\nif export_report 'comma,name' 42; then exit 1; fi\\n\",\"path\":\"test_export.sh\"}],\"summary\":\"Implemented report export task\"}",
+              "resumed_from": null,
+              "role": "coder"
+            },
+            "detail": null,
+            "number": 1,
+            "preserved_tree": "f348e4aeabe834bc24f40c1ab1d826688831b058",
+            "review": {
+              "accepted": true,
+              "blocker": "",
+              "criteria": [
+                {
+                  "criterion": "Works",
+                  "criterion_id": "tests-C1",
+                  "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                  "satisfied": true
+                }
+              ],
+              "findings": []
+            },
+            "reviewer": {
+              "id": "8a3432a4-b4b2-4156-b1fb-b248512118f8",
+              "outcome": "succeeded",
+              "process_key": "27563db0-0e71-46ed-9da2-229305619437",
+              "process_run_id": "6bd594ec-1a6f-4d33-acbc-11b76dc0b908",
+              "provider": "claude",
+              "provider_session_id": "C3AE0055-0DDE-4D1C-BC7C-6F984DD27F6F",
+              "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"tests-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+              "resumed_from": null,
+              "role": "reviewer"
+            },
+            "reviews": [
+              {
+                "diagnostic": null,
+                "review": {
+                  "accepted": true,
+                  "blocker": "",
+                  "criteria": [
+                    {
+                      "criterion": "Works",
+                      "criterion_id": "tests-C1",
+                      "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                      "satisfied": true
+                    }
+                  ],
+                  "findings": []
+                },
+                "session": {
+                  "id": "8a3432a4-b4b2-4156-b1fb-b248512118f8",
+                  "outcome": "succeeded",
+                  "process_key": "27563db0-0e71-46ed-9da2-229305619437",
+                  "process_run_id": "6bd594ec-1a6f-4d33-acbc-11b76dc0b908",
+                  "provider": "claude",
+                  "provider_session_id": "C3AE0055-0DDE-4D1C-BC7C-6F984DD27F6F",
+                  "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"tests-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+                  "resumed_from": null,
+                  "role": "reviewer"
+                },
+                "workspace": {
+                  "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+                  "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/review-tests-1",
+                  "git": {
+                    "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+                    "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-tests-1",
+                    "metadata": {
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-tests-1/.git": "eef391f6fe08c0983cea0b97ae709de06ead4451741aa704121a3a679b7df32d",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-tests-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-tests-1/config.worktree": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-tests-1/gitdir": "9c05ebaaada20fd673a0b0153ac9e7e5d44345e48695b123506330895e7ddbd9",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-tests-1/info/exclude": null
+                    },
+                    "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-tests-1"
+                  },
+                  "head_commit": null,
+                  "id": "83438bfd-b7c8-4754-9425-acc7d2e55a00",
+                  "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-tests-1"
+                }
+              }
+            ],
+            "snapshot": "dd6be8f971fa64af5a52cdec62c84cf30bda58cb29ca74ec7097febe7efba3d1",
+            "verification": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-c",
+                  "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                ],
+                "exit_code": 0,
+                "outcome": "passed",
+                "output_complete": true,
+                "passed": true,
+                "process_key": "1b4d4606-295e-4a60-89b6-35eafdfb8010",
+                "process_run_id": "07da079b-68a5-4fa5-9905-bd013ade48d4",
+                "summary": "process=07da079b-68a5-4fa5-9905-bd013ade48d4 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+              }
+            ],
+            "verified_tree": "f348e4aeabe834bc24f40c1ab1d826688831b058"
+          }
+        ],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement tests using the recorded default format",
+          "goal": "Report tests",
+          "id": "tests",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "base_commit": "b154e14ad659d38dc27f1a9bae3ae23e6e1f92ec",
+          "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-tests",
+          "git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-tests",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-tests/.git": "4ab4e28db08d91ba45d49a8ae3c791d95a2deccd1a29eea3aaa476461f0dd6ef",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-tests/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-tests/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-tests/gitdir": "529598eacd5e272557e118cd347cfe4b9ea51b2563e7733c1767baafdd3064fe",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-tests/info/exclude": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-tests"
+          },
+          "head_commit": "c93c7c6f5b954e49a6120372c33015457a5dacf5",
+          "id": "9a6785f4-89de-4f27-975f-38baa2751640",
+          "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-tests"
+        }
+      },
+      {
+        "artifact_commit": "5d6242f8d57b09d1cc43df7474ad46d14641f16e",
+        "attempts": [
+          {
+            "coder": {
+              "id": "b6c915fb-1104-49c1-a16a-ae753eb50545",
+              "outcome": "succeeded",
+              "process_key": "7ff8cc14-3e02-494b-8143-f20586b2df13",
+              "process_run_id": "ddfb31ca-9a00-4753-b7f6-339bd3921874",
+              "provider": "claude",
+              "provider_session_id": "8EB47351-0C78-4062-B872-8A5C84995DF2",
+              "result": "{\"blocker\":\"\",\"decisions\":[],\"edits\":[{\"content\":\"Report exports default to CSV with name,value header. A name and nonnegative integer value are required; comma-containing names are rejected.\\n\",\"path\":\"export.txt\"}],\"summary\":\"Implemented report export task\"}",
+              "resumed_from": null,
+              "role": "coder"
+            },
+            "detail": null,
+            "number": 1,
+            "preserved_tree": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3",
+            "review": {
+              "accepted": true,
+              "blocker": "",
+              "criteria": [
+                {
+                  "criterion": "Works",
+                  "criterion_id": "docs-C1",
+                  "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                  "satisfied": true
+                }
+              ],
+              "findings": []
+            },
+            "reviewer": {
+              "id": "f1fa9758-8441-43f6-8a51-a05890e19089",
+              "outcome": "succeeded",
+              "process_key": "6826841d-734a-4a65-93de-f657f57ceaa4",
+              "process_run_id": "d1477cf6-0e47-4db7-b893-fd343dc4f589",
+              "provider": "claude",
+              "provider_session_id": "EA99ABFE-A73D-4DE5-972C-3591EEB0D30D",
+              "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"docs-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+              "resumed_from": null,
+              "role": "reviewer"
+            },
+            "reviews": [
+              {
+                "diagnostic": null,
+                "review": {
+                  "accepted": true,
+                  "blocker": "",
+                  "criteria": [
+                    {
+                      "criterion": "Works",
+                      "criterion_id": "docs-C1",
+                      "evidence": "Full candidate diff, original requirements, CSV decision and configured checks reviewed independently",
+                      "satisfied": true
+                    }
+                  ],
+                  "findings": []
+                },
+                "session": {
+                  "id": "f1fa9758-8441-43f6-8a51-a05890e19089",
+                  "outcome": "succeeded",
+                  "process_key": "6826841d-734a-4a65-93de-f657f57ceaa4",
+                  "process_run_id": "d1477cf6-0e47-4db7-b893-fd343dc4f589",
+                  "provider": "claude",
+                  "provider_session_id": "EA99ABFE-A73D-4DE5-972C-3591EEB0D30D",
+                  "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"docs-C1\",\"evidence\":\"Full candidate diff, original requirements, CSV decision and configured checks reviewed independently\",\"satisfied\":true}],\"findings\":[]}",
+                  "resumed_from": null,
+                  "role": "reviewer"
+                },
+                "workspace": {
+                  "base_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3",
+                  "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/review-docs-1",
+                  "git": {
+                    "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+                    "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-docs-1",
+                    "metadata": {
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-docs-1/.git": "8125bca36e8e8ff46299d8f1acc3e0bc5286438becfc9bc73a08f140c23793f3",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-docs-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-docs-1/config.worktree": null,
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-docs-1/gitdir": "ce545a51386a244aec9c108691846c2b4d59f08b7904b85233593852e57ceaa8",
+                      "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/review-docs-1/info/exclude": null
+                    },
+                    "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-docs-1"
+                  },
+                  "head_commit": null,
+                  "id": "41a5909d-29e9-4bd0-a3f1-e68941dea8bf",
+                  "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/review-docs-1"
+                }
+              }
+            ],
+            "snapshot": "cb4a9905aa572230c74dad3367ba76d87472dbfc2dce4d069e0345bc5d5612eb",
+            "verification": [
+              {
+                "command": [
+                  "/bin/sh",
+                  "-c",
+                  "for f in format.sh validate.sh export.sh test_export.sh; do if test -f \"$f\"; then /bin/sh -n \"$f\" || exit 1; fi; done; if test -f test_export.sh; then /bin/sh ./test_export.sh || exit 1; fi; if test \"${PWD##*/}\" = integration; then test -f export.txt && test -f test_export.sh || exit 1; fi"
+                ],
+                "exit_code": 0,
+                "outcome": "passed",
+                "output_complete": true,
+                "passed": true,
+                "process_key": "ab763799-3ac4-4e8d-aa32-402b50a17d3b",
+                "process_run_id": "100e8065-e86e-4f1c-9234-e7ee53d9a747",
+                "summary": "process=100e8065-e86e-4f1c-9234-e7ee53d9a747 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+              }
+            ],
+            "verified_tree": "a02e9dcbbddb5e0f894f1b5051bc2f776610f9c3"
+          }
+        ],
+        "plan": {
+          "acceptance_criteria": [
+            "Report export behavior satisfies the original requirements and configured checks"
+          ],
+          "dependencies": [
+            "export"
+          ],
+          "description": "Implement docs using the recorded default format",
+          "goal": "Report docs",
+          "id": "docs",
+          "requirement_ids": [
+            "report"
+          ],
+          "role": "coder",
+          "verification_expectations": [
+            "Configured sandboxed checks"
+          ]
+        },
+        "status": "COMPLETED",
+        "workspace": {
+          "base_commit": "cc92b034b957880c2bd9007250b9ccee532c2647",
+          "branch": "autono/b6557895-0b10-49bf-a751-fae58921dbb3/task-docs",
+          "git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-docs",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-docs/.git": "4aeadeff14793ecd47741ebed21a7076024f45b308789dc2d8d282c4d518e58c",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/objects/info/http-alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-docs/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-docs/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-docs/gitdir": "0f334e8851086efd3762251342ef2c9aac9a4f43f348dba8246c81c2ddecc78c",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/repo/.git/worktrees/task-docs/info/exclude": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-docs"
+          },
+          "head_commit": "5d6242f8d57b09d1cc43df7474ad46d14641f16e",
+          "id": "2418deaa-9ff6-4b54-ab71-a19a45d63d49",
+          "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmpcVXswX/home/engineering/b6557895-0b10-49bf-a751-fae58921dbb3/task-docs"
+        }
+      }
+    ],
+    "updated_at": "2026-10-22T13:58:22.940794Z"
+  },
+  "seed_commit": "4592f409936372e9279e3e18acbb30b0bfe473b3"
+}

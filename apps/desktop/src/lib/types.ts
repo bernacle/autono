@@ -89,6 +89,11 @@ export interface Verification {
   summary: string;
 }
 export interface Review {
+  decision_reviews?: {
+    decision_id: string;
+    implemented: boolean;
+    evidence: string;
+  }[];
   accepted: boolean;
   blocker: string;
   criteria: {
@@ -123,6 +128,8 @@ export interface Task {
   artifact_commit: string | null;
   attempts: {
     number: number;
+    decision_context?: string[];
+    decision_ids?: string[] | null;
     coder: Session;
     reviewer: Session | null;
     verification: Verification[];
@@ -154,6 +161,7 @@ export interface Settings {
   verification: { commands: string[][]; timeout_seconds: number };
 }
 export interface Run {
+  decisions?: DecisionRecord[];
   id: string;
   revision: number;
   status: Status;
@@ -277,3 +285,32 @@ export type Request =
       action_id: string;
       resolution: Resolution;
     };
+
+export interface DecisionRecord {
+  id: string;
+  policy_basis: string;
+  proposal: {
+    question: string;
+    chosen: string;
+    rationale: string;
+    alternatives: string[];
+    affected_tasks: string[];
+    assumptions: string[];
+    uncertainty: string[];
+  };
+  evidence: {
+    file: string | null;
+    content_sha256: string;
+    excerpt: string;
+    source?: "frozen_base" | "specification" | "legacy_unverified";
+    base_commit?: string | null;
+  }[];
+  audit: {
+    sequence: number;
+    at: string;
+    kind: string;
+    task_id: string | null;
+    attempt: number | null;
+    detail: string;
+  }[];
+}

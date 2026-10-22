@@ -116,3 +116,5 @@ pub struct PowerStatus {
     pub helper_pid: Option<u32>,
     pub last_error: Option<String>,
 }
+
+pub mod decisions;

@@ -45,6 +45,7 @@ async fn daemon_restart_reconciles_engineering_checkpoints_without_agent_login()
         role: AgentRole::Coder,
     };
     let run = EngineeringRun {
+        decisions: vec![],
         id,
         delegation: None,
         revision: 0,
@@ -58,6 +59,7 @@ async fn daemon_restart_reconciles_engineering_checkpoints_without_agent_login()
         specification: "Feature".into(),
         settings: WorkflowSettings::default(),
         plan: Some(ExecutionPlan {
+            decisions: vec![],
             human_requirements: vec![],
             requirements: vec![Requirement {
                 id: "r".into(),
