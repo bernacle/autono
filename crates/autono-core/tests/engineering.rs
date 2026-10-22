@@ -23,6 +23,7 @@ use uuid::Uuid;
 
 fn plan(ids: &[(&str, &[&str])]) -> ExecutionPlan {
     ExecutionPlan {
+        decisions: vec![],
         human_requirements: vec![],
         requirements: vec![Requirement {
             id: "r1".into(),

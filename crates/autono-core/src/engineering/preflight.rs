@@ -203,6 +203,19 @@ pub(super) async fn inspect(
             None,
         ));
     }
+    // Decision actions remain part of refreshed readiness, including task-local holds.
+    actions.extend(
+        run.human_actions
+            .iter()
+            .filter(|a| {
+                run.decisions.iter().any(|d| {
+                    !d.autonomous()
+                        && !d.superseded()
+                        && a.requirement.evidence == format!("Daemon decision assessment: {}", d.id)
+                })
+            })
+            .cloned(),
+    );
     // Baseline harness operations are brokered too; policy cannot silently deny checks/writes.
     for operation in [
         PermissionOperation::WorkspaceWrite,

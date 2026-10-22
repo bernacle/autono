@@ -252,8 +252,10 @@ impl ProcessRunner {
         let mut truncated = false;
         let mut cancelled = false;
         loop {
-            let run = store.get(id).await?;
-            let events = store.events(id, cursor, 500).await?;
+            // Ledger checkpoints and polling clients can briefly occupy the bounded
+            // reader pool. Retry reads only; never resubmit a process or effect.
+            let run = crate::persistence::retry(|| store.get(id)).await?;
+            let events = crate::persistence::retry(|| store.events(id, cursor, 500)).await?;
             let empty = events.is_empty();
             for event in events {
                 cursor = event.sequence;
@@ -391,5 +393,54 @@ impl ProcessRunner {
             self.git_ownership(cwd)?;
         }
         output.stdout_text()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[tokio::test]
+    async fn transient_evidence_reader_contention_does_not_replay_or_cancel_a_process() -> Result<()>
+    {
+        let dir = tempfile::tempdir()?;
+        let store = crate::Store::open(&dir.path().join("db")).await?;
+        let config = crate::config::Config::default();
+        let supervisor = Supervisor::configured(store.clone(), &config.runner);
+        let runner = ProcessRunner::new(supervisor.clone());
+        let stop = CancellationToken::new();
+        let run = runner
+            .start(
+                vec![
+                    "/bin/sh".into(),
+                    "-c".into(),
+                    "sleep 0.5; printf evidence".into(),
+                ],
+                dir.path(),
+                5,
+                Uuid::new_v4(),
+                &stop,
+            )
+            .await?;
+        let mut readers = Vec::new();
+        for _ in 0..4 {
+            readers.push(store.readers.acquire().await?);
+        }
+        let waiting = runner.wait(run.id, &stop);
+        let release = async {
+            tokio::time::sleep(Duration::from_millis(400)).await;
+            drop(readers);
+        };
+        let (output, ()) = tokio::join!(waiting, release);
+        let output = output?;
+        assert!(output.succeeded());
+        assert_eq!(output.stdout_text()?, "evidence");
+        assert!(!stop.is_cancelled());
+        assert_eq!(
+            store.list(10, 0).await?.len(),
+            1,
+            "read retries must not resubmit the process"
+        );
+        supervisor.shutdown().await?;
+        Ok(())
     }
 }

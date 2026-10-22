@@ -1,4 +1,5 @@
 //! Engineering workflow contracts. Process runs remain separate execution attempts.
+pub use crate::decisions::*;
 use anyhow::{Result, ensure};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -184,6 +185,8 @@ pub struct PlannedTask {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ExecutionPlan {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub decisions: Vec<DecisionProposal>,
     #[serde(default)]
     pub human_requirements: Vec<HumanRequirement>,
     pub requirements: Vec<Requirement>,
@@ -605,6 +608,8 @@ pub struct EngineeringTask {
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EngineeringRun {
+    #[serde(default)]
+    pub decisions: Vec<DecisionRecord>,
     pub id: Uuid,
     pub revision: i64,
     pub status: EngineeringStatus,

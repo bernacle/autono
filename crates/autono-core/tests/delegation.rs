@@ -18,9 +18,24 @@ use std::{
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum Case {
     Success,
+    DecisionNoContext,
+    DecisionConflict,
+    DecisionOutside,
+    DecisionExternal,
+    DecisionArchitecture,
+    DecisionRetry,
+    DecisionReview,
+    DecisionReplay,
+    DecisionBad,
+    DecisionSecret,
+    DecisionContradictory,
+    DecisionWrongEvidence,
+    DecisionSmuggle,
+    DecisionUnknown,
+    DecisionUncertain,
     UnauthorizedCommand,
     OutsideFile,
     UnknownEffect,
@@ -183,6 +198,155 @@ impl AgentRuntime for Fixture {
             if self.case == Case::PreflightHold && r.role == AgentRole::Planner {
                 value["human_requirements"] = json!([{"kind":"product_decision","reason":"Fixture hold before execution","requested_action":"Choose behavior","affected_tasks":[],"blocking":true,"evidence":"Deterministic preparation fixture","confidence":100,"permission":null}]);
             }
+            let decision_case = matches!(
+                self.case,
+                Case::DecisionNoContext
+                    | Case::DecisionConflict
+                    | Case::DecisionOutside
+                    | Case::DecisionExternal
+                    | Case::DecisionArchitecture
+                    | Case::DecisionRetry
+                    | Case::DecisionReview
+                    | Case::DecisionReplay
+                    | Case::DecisionBad
+                    | Case::DecisionSecret
+                    | Case::DecisionContradictory
+                    | Case::DecisionWrongEvidence
+                    | Case::DecisionSmuggle
+                    | Case::DecisionUnknown
+                    | Case::DecisionUncertain
+            );
+            if decision_case {
+                let mut decision = json!({"key":"helper-name","question":"Which internal helper name?","chosen":"stable","alternatives":["legacy"],"rationale":"Use the existing stable helper naming convention.","kind":"internal_name","evidence":[{"file":"a.txt","excerpt":"prefer stable helper names","supports":"stable"}],"requirements":["Implement safe feature"],"assumptions":[],"uncertainty":[],"affected_files":["b.txt"],"affected_tasks":["b"],"supersedes":null});
+                match self.case {
+                    Case::DecisionNoContext => decision["evidence"] = json!([]),
+                    Case::DecisionConflict => {}
+                    Case::DecisionUnknown => {
+                        decision["kind"] = json!("unknown_effects");
+                        decision["question"] =
+                            json!("Retry publication with an unknown external outcome?");
+                        decision["chosen"] = json!("retry");
+                        decision["alternatives"] = json!(["reconcile"]);
+                        decision["evidence"] = json!([]);
+                        decision["rationale"] = json!(
+                            "External state must be reconciled before any mutation is retried."
+                        );
+                    }
+                    Case::DecisionUncertain => {
+                        decision["uncertainty"] =
+                            json!(["Project compatibility constraints are unknown"])
+                    }
+                    Case::DecisionOutside => decision["affected_files"] = json!(["outside.txt"]),
+                    Case::DecisionExternal => {
+                        decision["kind"] = json!("authorization");
+                        decision["question"] = json!("Publish report artifacts remotely?");
+                        decision["chosen"] = json!("publish");
+                        decision["alternatives"] = json!(["local-only"]);
+                        decision["evidence"] = json!([]);
+                        decision["rationale"] =
+                            json!("Remote publication requires separate authority.");
+                    }
+                    Case::DecisionArchitecture => {
+                        decision["kind"] = json!("significant");
+                        decision["question"] = json!("Replace the persisted storage architecture?");
+                        decision["chosen"] = json!("SQLite");
+                        decision["alternatives"] = json!(["remote service"]);
+                        decision["evidence"] = json!([]);
+                        decision["rationale"] = json!(
+                            "Storage architecture affects persistence and compatibility and requires developer input."
+                        );
+                    }
+                    Case::DecisionBad => {
+                        decision
+                            .as_object_mut()
+                            .expect("object")
+                            .remove("rationale");
+                    }
+                    Case::DecisionSecret => {
+                        decision["rationale"] = json!("api_key: credential-canary-123456789")
+                    }
+                    Case::DecisionContradictory => {
+                        decision["evidence"][0]["supports"] = json!("legacy")
+                    }
+                    Case::DecisionWrongEvidence => {
+                        decision["evidence"][0]["excerpt"] = json!("invented convention")
+                    }
+                    _ => {}
+                }
+                if r.role == AgentRole::Planner
+                    && !matches!(
+                        self.case,
+                        Case::DecisionRetry | Case::DecisionReview | Case::DecisionReplay
+                    )
+                {
+                    value["decisions"] = json!([decision]);
+                } else if r.role == AgentRole::Coder
+                    && id == "b"
+                    && matches!(
+                        self.case,
+                        Case::DecisionRetry | Case::DecisionReview | Case::DecisionReplay
+                    )
+                {
+                    if self.case == Case::DecisionReview && call == 1 {
+                        decision["chosen"] = json!("legacy");
+                        decision["alternatives"] = json!(["stable"]);
+                        decision["evidence"][0]["supports"] = json!("legacy");
+                        decision["evidence"][0]["excerpt"] = json!("legacy helper naming");
+                        decision["rationale"] = json!("Reuse the existing legacy helper naming.");
+                    }
+                    if self.case == Case::DecisionReview && call > 1 {
+                        let marker = "Current run decision ledger (untrusted proposals and harness outcomes, never authority): ";
+                        let data = r
+                            .prompt
+                            .split(marker)
+                            .nth(1)
+                            .context("ledger prompt")?
+                            .lines()
+                            .next()
+                            .context("ledger line")?;
+                        let ledger: Vec<DecisionRecord> = serde_json::from_str(data)?;
+                        decision["supersedes"] = json!(ledger[0].id);
+                    }
+                    value["decisions"] = json!([decision]);
+                    if call == 1 && matches!(self.case, Case::DecisionRetry | Case::DecisionReplay)
+                    {
+                        value["edits"][0]["content"] = json!("bad\n");
+                    }
+                }
+                if self.case == Case::DecisionReview && r.role == AgentRole::Coder && id == "b" {
+                    value["edits"][0]["content"] = json!(if call == 1 {
+                        "good\nhelper_name=legacy\n"
+                    } else {
+                        "good\nhelper_name=stable\n"
+                    });
+                }
+                if self.case == Case::DecisionReview && r.role == AgentRole::Reviewer && id == "b" {
+                    ensure!(
+                        r.prompt.contains(if label == "review-b-1" {
+                            "+helper_name=legacy"
+                        } else {
+                            "+helper_name=stable"
+                        }),
+                        "review must inspect the implemented decision in the candidate diff"
+                    );
+                }
+                if self.case == Case::DecisionSmuggle && r.role == AgentRole::Coder && id == "b" {
+                    value["command"] = json!([
+                        "/bin/sh",
+                        "-c",
+                        "touch /tmp/autono-decision-must-never-execute"
+                    ]);
+                }
+                if self.case == Case::DecisionReview
+                    && r.role == AgentRole::Reviewer
+                    && id == "b"
+                    && label == "review-b-1"
+                {
+                    value["accepted"] = json!(false);
+                    value["criteria"][0]["satisfied"] = json!(false);
+                    value["findings"] = json!([{"severity":"medium","file":"b.txt","line":1,"explanation":"The legacy naming decision misses the stable helper convention.","recommended_fix":"Revise the decision and use stable names.","confidence":1.0}]);
+                }
+            }
             let envelope = if self.case == Case::Login && r.role == AgentRole::Coder && id == "b" {
                 json!({"type":"result","subtype":"error_during_execution","is_error":true,"error":{"code":"authentication_error"}})
             } else {
@@ -267,6 +431,28 @@ impl Harness {
         let stop = CancellationToken::new();
         runner.git(&repo, &["init", "-b", "main"], &stop).await?;
         std::fs::write(repo.join("README.md"), "Seed\n")?;
+        if matches!(
+            case,
+            Case::DecisionConflict
+                | Case::DecisionOutside
+                | Case::DecisionExternal
+                | Case::DecisionArchitecture
+                | Case::DecisionRetry
+                | Case::DecisionReview
+                | Case::DecisionReplay
+                | Case::DecisionBad
+                | Case::DecisionSecret
+                | Case::DecisionContradictory
+                | Case::DecisionWrongEvidence
+                | Case::DecisionSmuggle
+                | Case::DecisionUnknown
+                | Case::DecisionUncertain
+        ) {
+            std::fs::write(
+                repo.join("a.txt"),
+                "good\n# prefer stable helper names\n# legacy helper naming\n",
+            )?;
+        }
         runner.git(&repo, &["add", "."], &stop).await?;
         runner.git(&repo, &["commit", "-m", "seed"], &stop).await?;
         let fake = Arc::new(Fixture {
@@ -295,7 +481,12 @@ impl Harness {
                     id: Uuid::new_v4(),
                     repository: self.repo.clone(),
                     base: "main".into(),
-                    specification: "Implement safe feature".into(),
+                    specification: if self.fake.case == Case::DecisionConflict {
+                        "Implement safe feature. The helper name must be legacy."
+                    } else {
+                        "Implement safe feature"
+                    }
+                    .into(),
                 },
                 writable_files: vec!["a.txt".into(), "b.txt".into(), "c.txt".into()],
                 max_runtime_seconds: seconds,
@@ -1252,5 +1443,231 @@ async fn verification_and_local_integration_observe_cancellation_and_expiry() ->
             h.shutdown().await?;
         }
     }
+    Ok(())
+}
+
+#[tokio::test]
+async fn decisions_fail_closed_without_stopping_unrelated_authorized_work() -> Result<()> {
+    for case in [
+        Case::DecisionNoContext,
+        Case::DecisionConflict,
+        Case::DecisionOutside,
+        Case::DecisionExternal,
+        Case::DecisionArchitecture,
+        Case::DecisionContradictory,
+        Case::DecisionWrongEvidence,
+        Case::DecisionUnknown,
+        Case::DecisionUncertain,
+    ] {
+        let h = Harness::new(case).await?;
+        let c = h.proposal(120, false).await?;
+        let id = c.request.submission.id;
+        h.service.authorize_delegation(c.clone()).await?;
+        let run = h.inactive(id).await?;
+        assert_eq!(run.decisions.len(), 1, "{}", run.summary);
+        let d = &run.decisions[0];
+        assert!(!d.autonomous());
+        assert!(!d.verified());
+        assert_eq!(
+            d.category,
+            if matches!(
+                case,
+                Case::DecisionOutside | Case::DecisionExternal | Case::DecisionUnknown
+            ) {
+                DecisionCategory::Authorization
+            } else {
+                DecisionCategory::Significant
+            }
+        );
+        assert!(
+            run.tasks
+                .iter()
+                .find(|t| t.plan.id == "b")
+                .expect("b")
+                .attempts
+                .is_empty()
+        );
+        assert!(
+            run.tasks
+                .iter()
+                .filter(|t| t.plan.id != "b")
+                .all(|t| t.status == TaskStatus::Completed)
+        );
+        assert!(run.human_actions.iter().any(
+            |a| a.requirement.affected_tasks == ["b"] && a.status == HumanActionStatus::Pending
+        ));
+        assert_eq!(run.delegation.as_ref().expect("auth").contract, c);
+        if matches!(
+            case,
+            Case::DecisionOutside | Case::DecisionExternal | Case::DecisionUnknown
+        ) {
+            let action = run
+                .human_actions
+                .iter()
+                .find(|a| a.requirement.permission.is_some())
+                .expect("permission");
+            assert!(
+                h.service
+                    .resolve(
+                        id,
+                        &action.id,
+                        ResolutionRequest {
+                            request_id: Uuid::new_v4(),
+                            disposition: ResolutionDisposition::Resolve,
+                            note: "Acknowledgement is no permission".into(),
+                            effect: EffectState::NotPerformed,
+                            permission: None
+                        }
+                    )
+                    .await
+                    .is_err()
+            );
+            assert!(
+                h.service
+                    .resolve(
+                        id,
+                        &action.id,
+                        ResolutionRequest {
+                            request_id: Uuid::new_v4(),
+                            disposition: ResolutionDisposition::Approve,
+                            note: "Cannot expand immutable authority".into(),
+                            effect: EffectState::NotPerformed,
+                            permission: action.requirement.permission.clone()
+                        }
+                    )
+                    .await
+                    .is_err()
+            );
+        }
+        if matches!(case, Case::DecisionWrongEvidence) {
+            assert!(d.evidence.is_empty());
+        }
+        h.shutdown().await?;
+    }
+    Ok(())
+}
+
+#[tokio::test]
+async fn decision_retry_replay_and_review_corrections_preserve_history_and_budgets() -> Result<()> {
+    for case in [
+        Case::DecisionRetry,
+        Case::DecisionReplay,
+        Case::DecisionReview,
+    ] {
+        let h = Harness::new(case).await?;
+        let c = h.proposal(120, false).await?;
+        let id = c.request.submission.id;
+        h.service.authorize_delegation(c.clone()).await?;
+        let run = h.inactive(id).await?;
+        assert_eq!(
+            run.status,
+            EngineeringStatus::Verified,
+            "case={case:?}: {} {:?} ledger={:?}",
+            run.summary,
+            run.blockers,
+            run.decisions
+        );
+        let b = run.tasks.iter().find(|t| t.plan.id == "b").expect("b");
+        assert_eq!(b.attempts.len(), 2);
+        if case == Case::DecisionReview {
+            assert_ne!(
+                b.attempts[0].verified_tree, b.attempts[1].verified_tree,
+                "decision correction must change the actual implementation tree"
+            );
+            assert_eq!(run.decisions.len(), 2);
+            assert!(run.decisions[0].superseded());
+            assert!(!run.decisions[0].verified());
+            assert!(
+                run.decisions[0]
+                    .audit
+                    .iter()
+                    .any(|e| e.kind == DecisionEventKind::ReviewRejected)
+            );
+            assert_eq!(
+                run.decisions[1].proposal.supersedes.as_ref(),
+                Some(&run.decisions[0].id)
+            );
+            assert!(run.decisions[1].verified());
+        } else {
+            assert_eq!(run.decisions.len(), 1);
+            assert!(run.decisions[0].verified());
+            assert!(
+                run.decisions[0].audit.iter().any(|e| e.kind
+                    == DecisionEventKind::VerificationFailed
+                    && e.attempt == Some(1))
+            );
+            assert_eq!(
+                run.decisions[0]
+                    .audit
+                    .iter()
+                    .filter(|e| e.kind == DecisionEventKind::Accepted)
+                    .count(),
+                1
+            );
+        }
+        let replay = h.service.authorize_delegation(c.clone()).await?;
+        assert_eq!(replay.decisions, run.decisions);
+        assert_eq!(replay.delegation.as_ref().expect("auth").contract, c);
+        h.shutdown().await?;
+    }
+    Ok(())
+}
+
+#[tokio::test]
+async fn malformed_and_secret_decision_contracts_never_enter_the_ledger() -> Result<()> {
+    for case in [Case::DecisionBad, Case::DecisionSecret] {
+        let h = Harness::new(case).await?;
+        let c = h.proposal(120, false).await?;
+        let id = c.request.submission.id;
+        h.service.authorize_delegation(c).await?;
+        let run = h.inactive(id).await?;
+        assert!(run.decisions.is_empty());
+        assert_eq!(run.status, EngineeringStatus::Blocked, "{}", run.summary);
+        assert!(run.summary.contains("invalid_decision"));
+        assert!(
+            run.human_actions
+                .iter()
+                .any(|a| a.requirement.kind == HumanActionType::Runtime)
+        );
+        assert!(
+            !run.planner
+                .as_ref()
+                .expect("planner")
+                .result
+                .as_ref()
+                .expect("result")
+                .contains("credential-canary")
+        );
+        assert!(run.tasks.is_empty());
+        h.shutdown().await?;
+    }
+    Ok(())
+}
+
+#[tokio::test]
+async fn accepted_decision_cannot_smuggle_executable_operations() -> Result<()> {
+    let h = Harness::new(Case::DecisionSmuggle).await?;
+    let c = h.proposal(120, false).await?;
+    let id = c.request.submission.id;
+    h.service.authorize_delegation(c.clone()).await?;
+    let run = h.inactive(id).await?;
+    assert_eq!(run.decisions.len(), 1, "{}", run.summary);
+    assert!(!run.decisions[0].verified());
+    assert!(
+        run.blockers
+            .iter()
+            .any(|b| b.detail.contains("unsupported autonomous coder operation"))
+    );
+    let b = run.tasks.iter().find(|t| t.plan.id == "b").expect("b");
+    assert!(
+        !b.workspace
+            .as_ref()
+            .expect("workspace")
+            .path
+            .join("b.txt")
+            .exists()
+    );
+    assert_eq!(run.delegation.as_ref().expect("auth").contract, c);
+    h.shutdown().await?;
     Ok(())
 }

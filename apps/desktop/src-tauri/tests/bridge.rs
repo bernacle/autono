@@ -272,6 +272,7 @@ async fn authenticated_run_projection_preserves_nonempty_review_blockers() -> Re
     run["tasks"][0]["attempts"][0]["review"] = records[0]["review"].clone();
     run["tasks"][0]["attempts"][0]["reviews"] = json!(records);
     run["summary"] = json!("Readable run summary");
+    run["decisions"] = json!([{"id":"D-csv","policy_basis":"Exact A2 file scope", "proposal":{"chosen":"CSV","rationale":"Existing convention; Bearer decision-canary-1234567890"},"audit":[{"kind":"review_rejected"}]}]);
     let id: Uuid = serde_json::from_value(run["id"].clone())?;
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
     let address = listener.local_addr()?;
@@ -322,6 +323,16 @@ async fn authenticated_run_projection_preserves_nonempty_review_blockers() -> Re
         .await
         .map_err(|e| anyhow::anyhow!(e.message))?;
     assert_eq!(projected["summary"], "Readable run summary");
+    assert_eq!(projected["decisions"][0]["proposal"]["chosen"], "CSV");
+    assert_eq!(
+        projected["decisions"][0]["policy_basis"],
+        "Exact A2 file scope"
+    );
+    assert_eq!(
+        projected["decisions"][0]["audit"][0]["kind"],
+        "review_rejected"
+    );
+    assert!(!projected.to_string().contains("decision-canary-1234567890"));
     assert!(!projected.to_string().contains(token));
     let attempt = &projected["tasks"][0]["attempts"][0];
     assert!(!serde_json::from_value::<ReviewResult>(attempt["review"].clone())?.accepts());

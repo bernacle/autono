@@ -82,6 +82,12 @@ enum Commands {
     Tasks { id: Uuid },
     /// Inspect independent review findings and manual blockers.
     Findings { id: Uuid },
+    /// Inspect decisions, evidence and append-only review history for a run.
+    Decisions {
+        id: Uuid,
+        #[arg(long)]
+        json: bool,
+    },
     /// Merge verified task artifacts into a local Autono integration branch and check it.
     Integrate { id: Uuid },
     /// Show a detailed engineering run summary.
@@ -199,6 +205,7 @@ async fn main() -> Result<()> {
         Commands::ShowDelegation { id } => engineering::show_delegation(&paths, id).await,
         Commands::ShowPlan { id } => engineering::inspect(&paths, id, "plan").await,
         Commands::Tasks { id } => engineering::inspect(&paths, id, "tasks").await,
+        Commands::Decisions { id, json } => engineering::decisions(&paths, id, json).await,
         Commands::Findings { id } => engineering::inspect(&paths, id, "findings").await,
         Commands::Summary { id } => engineering::inspect(&paths, id, "summary").await,
         Commands::Preflight { id } => engineering::preflight(&paths, id).await,

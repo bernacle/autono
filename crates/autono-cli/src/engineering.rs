@@ -209,3 +209,54 @@ pub async fn show_delegation(paths: &Paths, id: Uuid) -> Result<()> {
     println!("{}", serde_json::to_string_pretty(&contract)?);
     Ok(())
 }
+
+pub async fn decisions(paths: &Paths, id: Uuid, json_output: bool) -> Result<()> {
+    let ledger: Vec<autono_protocol::engineering::DecisionRecord> = Client::connect(paths)
+        .await?
+        .get(&format!("/v1/engineering/{id}/decisions"))
+        .await?;
+    if json_output {
+        println!("{}", serde_json::to_string_pretty(&ledger)?);
+    } else {
+        println!("Decisions Autono made while you were away ({id})");
+        if ledger.is_empty() {
+            println!("No recorded decisions.");
+        }
+        for d in ledger {
+            let state = if d.superseded() {
+                "superseded"
+            } else if d.verified() {
+                "independently verified"
+            } else if d.autonomous() {
+                "accepted; verification incomplete"
+            } else {
+                "unresolved; human action required"
+            };
+            println!(
+                "\n{} — {}\n{}: {}\nWhy: {}\nAlternatives: {}\nAuthority: {}",
+                d.id,
+                state,
+                d.proposal.question,
+                d.proposal.chosen,
+                d.proposal.rationale,
+                d.proposal.alternatives.join("; "),
+                d.policy_basis
+            );
+            for e in &d.evidence {
+                println!(
+                    "Evidence: {} (SHA-256 {}): {}",
+                    e.file.as_deref().unwrap_or("original specification"),
+                    e.content_sha256,
+                    e.excerpt
+                );
+            }
+            for e in &d.audit {
+                println!(
+                    "  {} {:?} task={:?} attempt={:?}: {}",
+                    e.at, e.kind, e.task_id, e.attempt, e.detail
+                );
+            }
+        }
+    }
+    Ok(())
+}

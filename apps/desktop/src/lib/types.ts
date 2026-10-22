@@ -154,6 +154,7 @@ export interface Settings {
   verification: { commands: string[][]; timeout_seconds: number };
 }
 export interface Run {
+  decisions?: DecisionRecord[];
   id: string;
   revision: number;
   status: Status;
@@ -277,3 +278,26 @@ export type Request =
       action_id: string;
       resolution: Resolution;
     };
+
+export interface DecisionRecord {
+  id: string;
+  policy_basis: string;
+  proposal: {
+    question: string;
+    chosen: string;
+    rationale: string;
+    alternatives: string[];
+    affected_tasks: string[];
+    assumptions: string[];
+    uncertainty: string[];
+  };
+  evidence: { file: string | null; content_sha256: string; excerpt: string }[];
+  audit: {
+    sequence: number;
+    at: string;
+    kind: string;
+    task_id: string | null;
+    attempt: number | null;
+    detail: string;
+  }[];
+}
