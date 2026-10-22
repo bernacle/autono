@@ -131,6 +131,16 @@ acceptance tests. This affects CI setup only; runtime sandbox requirements,
 filesystem/network confinement and fail-closed admission remain unchanged.
 [Ubuntu documents this AppArmor namespace restriction](https://ubuntu.com/blog/ubuntu-23-10-restricted-unprivileged-user-namespaces).
 
+Once that prerequisite was enabled, Linux CI passed the real daemon lifecycle
+fixture and exposed a separate profile defect in the existing filesystem-denial
+test: bubblewrap's synthesized ancestor directories were writable in its private
+root. The external host file stayed isolated, but the private-root write exceeded
+the advertised checkout/scratch write scope. The profile now remounts `/` read-only
+after setup, preserving the separate writable checkout and scratch bind mounts.
+The original denial assertions remain, with an additional scratch-write success
+assertion. This narrows enforcement to the existing contract; it adds no grant or
+schema field. [Bubblewrap documents the nonrecursive remount behavior](https://github.com/containers/bubblewrap/blob/main/bwrap.xml).
+
 ## Remaining limits
 
 SQLite reconciliation/finalization may finish after cancellation or expiry;

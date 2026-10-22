@@ -510,6 +510,11 @@ pub(super) fn sandbox_command(command: &[String], cwd: &Path, temp: &Path) -> Re
             temp.to_string_lossy().into_owned(),
             "--chdir".into(),
             cwd.to_string_lossy().into_owned(),
+            // Bubblewrap synthesizes writable ancestor directories in its private
+            // root. Seal that mount after setup; checkout/scratch are separate
+            // writable bind mounts and remain writable (nonrecursive remount).
+            "--remount-ro".into(),
+            "/".into(),
         ]);
     }
     args.extend(clean);
@@ -569,9 +574,10 @@ mod tests {
         std::fs::write(root.join("secret"), "credential-fixture")?;
         let quote = |p: &Path| format!("'{}'", p.to_string_lossy().replace('\'', "'\\''"));
         let script = format!(
-            "test -z \"$AUTONO_TEST_SECRET\" || exit 10; if cat {} > attempted-read; then exit 11; fi; if printf changed > {}; then exit 12; fi; printf good > local-output",
+            "test -z \"$AUTONO_TEST_SECRET\" || exit 10; if cat {} > attempted-read; then exit 11; fi; if printf changed > {}; then exit 12; fi; printf good > local-output; printf scratch > {}",
             quote(&root.join("secret")),
-            quote(&root.join("external-write"))
+            quote(&root.join("external-write")),
+            quote(&temp.join("scratch-output"))
         );
         let argv = sandbox_command(&["/bin/sh".into(), "-c".into(), script], &cwd, &temp)?;
         let output = Command::new(&argv[0])
@@ -587,6 +593,10 @@ mod tests {
         assert_eq!(std::fs::read_to_string(cwd.join("attempted-read"))?, "");
         assert!(!root.join("external-write").exists());
         assert_eq!(std::fs::read_to_string(cwd.join("local-output"))?, "good");
+        assert_eq!(
+            std::fs::read_to_string(temp.join("scratch-output"))?,
+            "scratch"
+        );
         Ok(())
     }
 
