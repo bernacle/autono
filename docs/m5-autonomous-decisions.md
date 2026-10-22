@@ -67,7 +67,7 @@ incomplete proposal fails closed. The new bounded provider schemas request the
 field explicitly. Supervised schemas and approval behavior are unchanged.
 
 A record's ID hashes `(run UUID, ambiguity key, predecessor ID)`. Identical replay
-is a no-op; a changed payload with that identity is rejected. Rekeying the same
+is a no-op only while that revision is active; a superseded replay or changed payload is rejected. Rekeying the same
 normalized question with overlapping task scope is rejected too. A new revision must
 name the current predecessor and keep the affected task set. The journal lock
 serializes concurrent proposals and allocates durable ordinals. The ledger has
@@ -77,7 +77,7 @@ There are no extra inference calls or decision retry loops.
 
 The harness accepts only local pattern/name/default/test-structure kinds, with
 exact-file authority, known original requirement excerpts, actual matching source
-bytes, no contradictory support claims, and at least one supporting excerpt naming
+bytes from the original frozen base or specification, no contradictory support claims, and at least one supporting excerpt naming
 the chosen option. Missing files, unavailable evidence, explicit uncertainty,
 lexical requirement conflicts, existing material human requirements, or changes
 involving another running/completed task prevent autonomous acceptance. Declared
@@ -89,9 +89,14 @@ outside the allowlist is probed or read.
 
 `DecisionRecord` binds the proposal to the run, planner/coder session and optional
 task/attempt. Verified provenance records the actual content SHA-256, excerpt,
-option, original base and owned workspace ID. The proposal's evidence remains a
-claim; only the separate provenance array contains byte-checked evidence. Hashes
-identify supplied bytes, not a claim that those bytes prove the rationale.
+option and explicit source kind. Frozen-base evidence includes the original commit
+and Git blob ID, read via exact literal allowlisted paths and regular-blob modes.
+The SHA-256 hashes those immutable blob bytes. Specification evidence hashes the
+original immutable request. Mutable workspaces, failed attempts and even completed
+dependency artifacts remain candidate context in this policy; they cannot establish
+conventions. Unsupported citations stay in the proposal without trusted provenance.
+Legacy provenance defaults to `legacy_unverified`; historical rows are never rewritten.
+The proposal's evidence remains a claim; hashes identify bytes, not proof of a rationale.
 
 Additive `0007_decisions.sql` adds `engineering_decisions` (immutable identity,
 unique run/ID and run/ordinal) and `engineering_decision_events` (append-only
@@ -109,8 +114,17 @@ unrecorded authoritative choice. Candidate tree, failed/passed checks, independe
 review rejection/acceptance, preserved task artifact, supersession and human
 resolution-receipt references append separate facts. Review findings stay in the
 original immutable attempt evidence; audit events point to those task/attempts.
-`verified()` requires preserved, independently accepted task evidence for **every**
-affected task. This is task-scoped verification; the run and combined integration
+Each attempt freezes `decision_context` when admitted, then atomically stores
+`decision_ids` and a `consumed` audit event with accepted proposals before edits.
+Only its own explicit revisions may replace the supplied context. These bindings
+are immutable. Implementation/check/review/preservation events target those exact
+IDs, never a search for whichever revision is active later. A reviewer must return
+`decision_reviews` for every consumed ID exactly once; a negative implementation
+finding rejects acceptance even when feature criteria pass. Each successful event
+references the same immutable tree. `verified()` requires an ordered consumed →
+implemented → checks_passed → review_accepted → task_verified chain on the same
+attempt/tree for **every** affected task. Legacy unbound events do not certify this
+predicate. The CLI and desktop share these semantics. This is task-scoped verification; the run and combined integration
 status remain authoritative for the overall result. Passing tests alone is insufficient. Startup interruption retains
 all committed facts and does not resume/replay an agent or external effect.
 
@@ -129,7 +143,7 @@ continues independent work. Existing planner human requirements are never erased
 or automatically recategorized. A generic coder blocker is also never guessed to
 be a reversible choice.
 
-The fresh reviewer receives the ledger as untrusted data alongside the original
+The fresh reviewer receives the exact consumed revision IDs and the ledger as untrusted data alongside the original
 specification, immutable plan, configured check receipts, original trusted base
 and full candidate diff. It has no authority to bypass checks or accept a
 self-certified outcome. The coder/reviewer remain fresh, separate processes,
@@ -261,3 +275,10 @@ integration `c4b680535950de9994adc92c597e47bf28356f87`, with main unchanged.
 See [actual run/journal](m5-decisions-acceptance.json) and
 [validation manifest](m5-decisions-validation.json). Linux and remote macOS CI
 results remain pending at submission; the matrix now includes release builds.
+
+## Independent review corrections
+
+See [A3 review fixes](m5-decisions-review-fixes.md) for reproductions, root causes,
+regressions and the separate A2 expiry-receipt disposition. The original acceptance
+JSON records the earlier implementation; it remains historical evidence rather
+than being silently relabeled as evidence for these corrections.

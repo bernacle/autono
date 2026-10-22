@@ -1,0 +1,167 @@
+{
+  "reviewed_head": "b10c9666fed45a77f5fa369c95cb1d2ddc0ba7db",
+  "validated_at": "2026-10-22T18:08:10.558459+00:00",
+  "platform": "Darwin arm64",
+  "paid_inference": false,
+  "rust_workspace": {
+    "passed": 138,
+    "failed": 0,
+    "ignored": 2,
+    "result_groups": 24
+  },
+  "frontend": {
+    "commands": [
+      "npm run typecheck",
+      "npm run lint",
+      "npm test",
+      "npm run build"
+    ],
+    "passed": 106,
+    "failed": 0,
+    "test_files": 8,
+    "production_module_smoke": "passed"
+  },
+  "steps": [
+    {
+      "name": "fmt",
+      "command": [
+        "cargo",
+        "fmt",
+        "--all",
+        "--check"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-fmt.log",
+      "started_at": "2026-10-22T17:50:03Z",
+      "exit_code": 0,
+      "elapsed_seconds": 0.67
+    },
+    {
+      "name": "tests",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace",
+        "--locked"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-tests.log",
+      "started_at": "2026-10-22T17:50:03Z",
+      "exit_code": 0,
+      "elapsed_seconds": 510.46
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--workspace",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-clippy.log",
+      "started_at": "2026-10-22T17:58:34Z",
+      "exit_code": 0,
+      "elapsed_seconds": 45.97
+    },
+    {
+      "name": "debug",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--locked"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-debug.log",
+      "started_at": "2026-10-22T17:59:20Z",
+      "exit_code": 0,
+      "elapsed_seconds": 1.06
+    },
+    {
+      "name": "release",
+      "command": [
+        "cargo",
+        "build",
+        "--workspace",
+        "--release",
+        "--locked"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-release.log",
+      "started_at": "2026-10-22T17:59:21Z",
+      "exit_code": 0,
+      "elapsed_seconds": 171.66
+    },
+    {
+      "name": "msrv",
+      "command": [
+        "cargo",
+        "+1.89.0",
+        "check",
+        "--workspace",
+        "--exclude",
+        "autono-desktop",
+        "--all-targets",
+        "--locked"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-msrv.log",
+      "started_at": "2026-10-22T18:02:13Z",
+      "exit_code": 0,
+      "elapsed_seconds": 31.92
+    },
+    {
+      "name": "doc",
+      "command": [
+        "cargo",
+        "doc",
+        "--workspace",
+        "--no-deps",
+        "--locked"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-doc.log",
+      "started_at": "2026-10-22T18:02:45Z",
+      "exit_code": 0,
+      "elapsed_seconds": 8.35
+    },
+    {
+      "name": "native",
+      "command": [
+        "npm",
+        "run",
+        "tauri",
+        "--",
+        "build",
+        "--bundles",
+        "app"
+      ],
+      "log": "/tmp/autono-a3-fixes-final-native.log",
+      "started_at": "2026-10-22T18:02:53Z",
+      "exit_code": 0,
+      "elapsed_seconds": 101.87
+    }
+  ],
+  "native_smoke": {
+    "status": "passed",
+    "bundle_path": "/Users/brunosimplicio/.t3/worktrees/autono/t3-aec8910e/target/release/bundle/macos/Autono.app",
+    "run_id": "2b934e3a-9558-4697-801e-8fe36455cc52",
+    "decision_id": "D-88052bc56bbb4a391ad988fb0bb32445c5da7e42c77b0429e162000038c7b215",
+    "origin": "tauri://localhost",
+    "authenticated_daemon_connected": true,
+    "completed_tasks": 5,
+    "decision_label": "Independently verified",
+    "chosen": "CSV",
+    "alternative": "JSON",
+    "evidence_source": "Frozen base",
+    "consumption_events": 4,
+    "independent_revision_reviews": 4,
+    "provider_invocations_unchanged": true
+  },
+  "deterministic_fixture_evidence": "m5-decisions-review-evidence.json",
+  "ci_results_url": "https://github.com/bernacle/autono/pull/6/checks",
+  "limitations": [
+    "Linux builds/tests run in the existing GitHub Actions matrix, not on this macOS host.",
+    "The exact intermittent pre-existing A2 Cancelled receipt was not reproduced locally; absolute-cutoff timer regression and all four workflow receipt expectations pass.",
+    "Requirements compatibility is a conservative lexical gate, not semantic understanding.",
+    "Dependency and unreviewed workspace artifacts are candidate context and cannot establish Category A conventions."
+  ]
+}
