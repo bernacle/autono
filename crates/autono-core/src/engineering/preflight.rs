@@ -76,6 +76,7 @@ pub(super) async fn inspect(
     agents: &Arc<dyn AgentRuntime>,
     stop: &CancellationToken,
 ) -> Result<()> {
+    runner.check_authority(stop)?;
     let run = journal.read().await;
     let mut checks = Vec::new();
     let mut actions = Vec::new();
@@ -226,7 +227,9 @@ pub(super) async fn inspect(
                 permission.scope
             ),
         );
-        if run.settings.permissions.classify(operation) != PermissionRule::Allow {
+        if run.settings.permissions.classify(operation) != PermissionRule::Allow
+            && !super::delegation::covers(&run, &permission)
+        {
             let mut req = requirement(
                 HumanActionType::Permission,
                 "Execution requires a configured permission".into(),
@@ -256,6 +259,9 @@ pub(super) async fn inspect(
                 .into(),
         });
     }
+    if run.delegation.is_some() {
+        checks.extend(super::delegation::readiness(&run, runner, stop).await?);
+    }
     // Failed deterministic checks have stable checklist actions too. Resolving an
     // acknowledgement cannot override the failed check; the next probe must pass.
     for c in checks
@@ -274,9 +280,10 @@ pub(super) async fn inspect(
             None,
         ));
     }
-    ensure!(!stop.is_cancelled(), "preflight cancelled");
+    runner.check_authority(stop)?;
     let ids: Vec<_> = actions.iter().map(|a| a.id.clone()).collect();
     journal.change("preflight", "Preflight checks and human checklist refreshed (no credential values)", |r| {
+        runner.check_authority(stop)?;
         for a in &mut r.human_actions {
             let passed = checks.iter().any(|c| c.ready == Some(true) && (a.id == stable_id(&format!("check-{}", c.id)) || (c.id.starts_with("env-") && a.id == stable_id(&c.id))));
             if passed && a.requirement.kind == HumanActionType::Environment && a.status != HumanActionStatus::Resolved {
@@ -298,12 +305,7 @@ pub(super) async fn inspect(
             } else { r.human_actions.push(candidate); }
         }
         let ready = !checks.iter().any(|c| c.blocking && c.ready != Some(true)) &&
-            !r.human_actions.iter().filter(|a| ids.contains(&a.id)).any(|a| {
-                if let Some(p) = &a.requirement.permission {
-                    return matches!(a.status, HumanActionStatus::Rejected | HumanActionStatus::Deferred) || r.settings.permissions.classify(p.operation) == PermissionRule::Deny || !p.supported(r.id) || (r.settings.permissions.classify(p.operation) != PermissionRule::Allow && a.status != HumanActionStatus::Resolved);
-                }
-                a.blocks()
-            });
+            !r.human_actions.iter().filter(|a| ids.contains(&a.id)).any(|a| r.action_blocks(a));
         r.preflight = Some(PreflightReport { checked_at: Utc::now(), checks, action_ids: ids, ready,
             limitation: "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation.".into() });
         Ok(())

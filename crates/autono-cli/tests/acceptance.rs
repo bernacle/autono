@@ -46,6 +46,7 @@ async fn daemon_restart_reconciles_engineering_checkpoints_without_agent_login()
     };
     let run = EngineeringRun {
         id,
+        delegation: None,
         revision: 0,
         status: EngineeringStatus::Running,
         created_at: now,

@@ -1,0 +1,2520 @@
+{
+  "milestone": "Autono M5 A2: bounded autonomous delegation",
+  "source_main": "d4a1a95",
+  "executed_at_utc": "2026-10-21T22:17:05.533780+00:00",
+  "platform": {
+    "os": "26.5.1",
+    "architecture": "arm64",
+    "rust": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "node": "v24.1.0"
+  },
+  "paid_inference": false,
+  "fixture_root": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K",
+  "fixture_retention": "Temporary directory retained by the test; OS cleanup is possible. This committed evidence and the test are durable.",
+  "safe_vertical_slice": {
+    "events": [
+      {
+        "detail": "Developer consented to the exact immutable bounded contract; no monetary accounting is available",
+        "kind": "delegation_authorized",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 1,
+        "timestamp": "2026-10-21T22:05:17.971050Z"
+      },
+      {
+        "detail": "Feature specification and configuration preserved; planning requested",
+        "kind": "created",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 2,
+        "timestamp": "2026-10-21T22:05:17.971565Z"
+      },
+      {
+        "detail": "Allowed planning and owned worktree creation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 3,
+        "timestamp": "2026-10-21T22:05:18.012384Z"
+      },
+      {
+        "detail": "Pinned Git ownership",
+        "kind": "planning_workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 4,
+        "timestamp": "2026-10-21T22:05:18.092690Z"
+      },
+      {
+        "detail": "Allowed Planner invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 5,
+        "timestamp": "2026-10-21T22:05:18.411543Z"
+      },
+      {
+        "detail": "Planner Claude; session=1d6dd921-1bf5-4d27-8ae4-35eb617c6558 process_key=7c30eb2f-41e5-404a-b191-ffb3644c0c8d",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 6,
+        "timestamp": "2026-10-21T22:05:18.412770Z"
+      },
+      {
+        "detail": "Allowed Planner process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 7,
+        "timestamp": "2026-10-21T22:05:18.861548Z"
+      },
+      {
+        "detail": "Planner process=1ece9cc7-7bc6-47c2-aae9-2fa642c53cc9",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 8,
+        "timestamp": "2026-10-21T22:05:18.863850Z"
+      },
+      {
+        "detail": "Planner session=1d6dd921-1bf5-4d27-8ae4-35eb617c6558 outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 9,
+        "timestamp": "2026-10-21T22:05:18.880212Z"
+      },
+      {
+        "detail": "Validated plan awaits developer approval",
+        "kind": "plan_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 10,
+        "timestamp": "2026-10-21T22:05:18.995218Z"
+      },
+      {
+        "detail": "a: None -> Ready",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 11,
+        "timestamp": "2026-10-21T22:05:18.995312Z"
+      },
+      {
+        "detail": "b: None -> Ready",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 12,
+        "timestamp": "2026-10-21T22:05:18.995358Z"
+      },
+      {
+        "detail": "c: None -> Waiting",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 13,
+        "timestamp": "2026-10-21T22:05:18.995407Z"
+      },
+      {
+        "detail": "Preflight checks and human checklist refreshed (no credential values)",
+        "kind": "preflight",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 14,
+        "timestamp": "2026-10-21T22:05:19.085782Z"
+      },
+      {
+        "detail": "Allowed execution admission: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 15,
+        "timestamp": "2026-10-21T22:05:19.132015Z"
+      },
+      {
+        "detail": "Original delegation admits the immutable plan and configured checks",
+        "kind": "delegation_execution",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 16,
+        "timestamp": "2026-10-21T22:05:19.133787Z"
+      },
+      {
+        "detail": "Dependency states evaluated",
+        "kind": "scheduler",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 17,
+        "timestamp": "2026-10-21T22:05:19.136252Z"
+      },
+      {
+        "detail": "a",
+        "kind": "task_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 18,
+        "timestamp": "2026-10-21T22:05:19.137920Z"
+      },
+      {
+        "detail": "a: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-a (autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-a)",
+        "kind": "workspace_reserved",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 19,
+        "timestamp": "2026-10-21T22:05:19.139707Z"
+      },
+      {
+        "detail": "a: Some(Ready) -> Running",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 20,
+        "timestamp": "2026-10-21T22:05:19.139738Z"
+      },
+      {
+        "detail": "b",
+        "kind": "task_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 21,
+        "timestamp": "2026-10-21T22:05:19.142378Z"
+      },
+      {
+        "detail": "b: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-b (autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-b)",
+        "kind": "workspace_reserved",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 22,
+        "timestamp": "2026-10-21T22:05:19.144606Z"
+      },
+      {
+        "detail": "b: Some(Ready) -> Running",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 23,
+        "timestamp": "2026-10-21T22:05:19.144641Z"
+      },
+      {
+        "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 24,
+        "timestamp": "2026-10-21T22:05:19.183685Z"
+      },
+      {
+        "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 25,
+        "timestamp": "2026-10-21T22:05:19.185022Z"
+      },
+      {
+        "detail": "a",
+        "kind": "workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 26,
+        "timestamp": "2026-10-21T22:05:19.327127Z"
+      },
+      {
+        "detail": "b",
+        "kind": "workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 27,
+        "timestamp": "2026-10-21T22:05:19.328891Z"
+      },
+      {
+        "detail": "a: attempt 1",
+        "kind": "attempt_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 28,
+        "timestamp": "2026-10-21T22:05:19.330814Z"
+      },
+      {
+        "detail": "b: attempt 1",
+        "kind": "attempt_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 29,
+        "timestamp": "2026-10-21T22:05:19.332678Z"
+      },
+      {
+        "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 30,
+        "timestamp": "2026-10-21T22:05:19.427190Z"
+      },
+      {
+        "detail": "Coder Claude; session=a9df6e10-cbed-4c46-ab2b-35855dbb9a0c process_key=538c839c-b9d1-43a3-b48f-349715ffa2e8",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 31,
+        "timestamp": "2026-10-21T22:05:19.429561Z"
+      },
+      {
+        "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 32,
+        "timestamp": "2026-10-21T22:05:19.443102Z"
+      },
+      {
+        "detail": "Coder Claude; session=54c8e4d1-1d96-47c9-97a6-48b4ee43a2e3 process_key=ee06a1b3-ce11-4321-a8b9-7b2f1ff0c462",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 33,
+        "timestamp": "2026-10-21T22:05:19.446465Z"
+      },
+      {
+        "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 34,
+        "timestamp": "2026-10-21T22:05:19.518049Z"
+      },
+      {
+        "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 35,
+        "timestamp": "2026-10-21T22:05:19.519644Z"
+      },
+      {
+        "detail": "Coder process=1d17c1a7-77e5-48ea-96de-a0147a6f6d4b",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 36,
+        "timestamp": "2026-10-21T22:05:19.521932Z"
+      },
+      {
+        "detail": "Coder process=26eb3939-3b19-4868-b35c-72f18e2a9070",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 37,
+        "timestamp": "2026-10-21T22:05:19.525626Z"
+      },
+      {
+        "detail": "Coder session=54c8e4d1-1d96-47c9-97a6-48b4ee43a2e3 outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 38,
+        "timestamp": "2026-10-21T22:05:19.539250Z"
+      },
+      {
+        "detail": "Coder session=a9df6e10-cbed-4c46-ab2b-35855dbb9a0c outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 39,
+        "timestamp": "2026-10-21T22:05:19.541336Z"
+      },
+      {
+        "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 40,
+        "timestamp": "2026-10-21T22:05:19.582241Z"
+      },
+      {
+        "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 41,
+        "timestamp": "2026-10-21T22:05:19.594687Z"
+      },
+      {
+        "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 42,
+        "timestamp": "2026-10-21T22:05:20.225089Z"
+      },
+      {
+        "detail": "target=Some((\"a\", 1)) process_key=d54c025b-8904-48c3-b434-aec000b6d29e command=[\"/bin/sh\",\"-c\",\"for f in a b c; do if test -f \\\"$f.sh\\\"; then case \\\"$f\\\" in a) expected=A;; b) expected=B;; c) expected=\\\"$(/bin/echo A; /bin/echo C)\\\";; esac; actual=\\\"$(/bin/sh \\\"./$f.sh\\\")\\\" || exit 1; test \\\"$actual\\\" = \\\"$expected\\\" || exit 1; fi; done\"]",
+        "kind": "verification_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 43,
+        "timestamp": "2026-10-21T22:05:20.227240Z"
+      },
+      {
+        "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 44,
+        "timestamp": "2026-10-21T22:05:20.235298Z"
+      },
+      {
+        "detail": "target=Some((\"b\", 1)) process_key=1a6e8bfe-0509-4f06-87d5-015d0f2cde12 command=[\"/bin/sh\",\"-c\",\"for f in a b c; do if test -f \\\"$f.sh\\\"; then case \\\"$f\\\" in a) expected=A;; b) expected=B;; c) expected=\\\"$(/bin/echo A; /bin/echo C)\\\";; esac; actual=\\\"$(/bin/sh \\\"./$f.sh\\\")\\\" || exit 1; test \\\"$actual\\\" = \\\"$expected\\\" || exit 1; fi; done\"]",
+        "kind": "verification_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 45,
+        "timestamp": "2026-10-21T22:05:20.238125Z"
+      },
+      {
+        "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 46,
+        "timestamp": "2026-10-21T22:05:20.265345Z"
+      },
+      {
+        "detail": "target=Some((\"a\", 1)) process=3a2b0bf5-69a1-4c1e-90a7-bd7838a1009a",
+        "kind": "verification_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 47,
+        "timestamp": "2026-10-21T22:05:20.268113Z"
+      },
+      {
+        "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 48,
+        "timestamp": "2026-10-21T22:05:20.276650Z"
+      },
+      {
+        "detail": "target=Some((\"b\", 1)) process=c43bb4fb-376d-47f4-b059-c8805b1c67e2",
+        "kind": "verification_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 49,
+        "timestamp": "2026-10-21T22:05:20.279370Z"
+      },
+      {
+        "detail": "target=Some((\"a\", 1)) process=3a2b0bf5-69a1-4c1e-90a7-bd7838a1009a passed=true",
+        "kind": "verification_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 50,
+        "timestamp": "2026-10-21T22:05:20.295449Z"
+      },
+      {
+        "detail": "target=Some((\"b\", 1)) process=c43bb4fb-376d-47f4-b059-c8805b1c67e2 passed=false",
+        "kind": "verification_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 51,
+        "timestamp": "2026-10-21T22:05:20.304614Z"
+      },
+      {
+        "detail": "a",
+        "kind": "verification_passed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 52,
+        "timestamp": "2026-10-21T22:05:20.615682Z"
+      },
+      {
+        "detail": "b: attempt 1",
+        "kind": "attempt_feedback",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 53,
+        "timestamp": "2026-10-21T22:05:20.617956Z"
+      },
+      {
+        "detail": "b: attempt 2",
+        "kind": "attempt_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 54,
+        "timestamp": "2026-10-21T22:05:20.621657Z"
+      },
+      {
+        "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 55,
+        "timestamp": "2026-10-21T22:05:20.718703Z"
+      },
+      {
+        "detail": "Coder Claude; session=e63176e1-8d1a-4612-b77f-092fd1267e52 process_key=fc6ae89b-b3fe-47a8-906b-86af48523156",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 56,
+        "timestamp": "2026-10-21T22:05:20.722068Z"
+      },
+      {
+        "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 57,
+        "timestamp": "2026-10-21T22:05:20.783844Z"
+      },
+      {
+        "detail": "Coder process=d759a7ef-64ac-47bf-bb39-db0c0721e980",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 58,
+        "timestamp": "2026-10-21T22:05:20.786529Z"
+      },
+      {
+        "detail": "Coder session=e63176e1-8d1a-4612-b77f-092fd1267e52 outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 59,
+        "timestamp": "2026-10-21T22:05:20.800106Z"
+      },
+      {
+        "detail": "a: review 1",
+        "kind": "review_reserved",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 60,
+        "timestamp": "2026-10-21T22:05:20.810835Z"
+      },
+      {
+        "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 61,
+        "timestamp": "2026-10-21T22:05:20.836707Z"
+      },
+      {
+        "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 62,
+        "timestamp": "2026-10-21T22:05:20.853850Z"
+      },
+      {
+        "detail": "a",
+        "kind": "review_workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 63,
+        "timestamp": "2026-10-21T22:05:20.928256Z"
+      },
+      {
+        "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 64,
+        "timestamp": "2026-10-21T22:05:21.117280Z"
+      },
+      {
+        "detail": "Reviewer Claude; session=8db78485-7f7f-48b8-8699-45b73be365c8 process_key=0d2162c4-7ebc-43e2-b3ac-88529f0d6a3f",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 65,
+        "timestamp": "2026-10-21T22:05:21.144843Z"
+      },
+      {
+        "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 66,
+        "timestamp": "2026-10-21T22:05:21.220835Z"
+      },
+      {
+        "detail": "Reviewer process=1cf50229-3965-4190-9e5a-2b505a16c35f",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 67,
+        "timestamp": "2026-10-21T22:05:21.224645Z"
+      },
+      {
+        "detail": "Reviewer session=8db78485-7f7f-48b8-8699-45b73be365c8 outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 68,
+        "timestamp": "2026-10-21T22:05:21.240124Z"
+      },
+      {
+        "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 69,
+        "timestamp": "2026-10-21T22:05:21.359738Z"
+      },
+      {
+        "detail": "target=Some((\"b\", 2)) process_key=223adee1-100c-4cc9-a007-45343ff31221 command=[\"/bin/sh\",\"-c\",\"for f in a b c; do if test -f \\\"$f.sh\\\"; then case \\\"$f\\\" in a) expected=A;; b) expected=B;; c) expected=\\\"$(/bin/echo A; /bin/echo C)\\\";; esac; actual=\\\"$(/bin/sh \\\"./$f.sh\\\")\\\" || exit 1; test \\\"$actual\\\" = \\\"$expected\\\" || exit 1; fi; done\"]",
+        "kind": "verification_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 70,
+        "timestamp": "2026-10-21T22:05:21.362515Z"
+      },
+      {
+        "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 71,
+        "timestamp": "2026-10-21T22:05:21.403197Z"
+      },
+      {
+        "detail": "target=Some((\"b\", 2)) process=c475e22e-0628-4f3f-9755-149a5e0bc8cf",
+        "kind": "verification_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 72,
+        "timestamp": "2026-10-21T22:05:21.407026Z"
+      },
+      {
+        "detail": "target=Some((\"b\", 2)) process=c475e22e-0628-4f3f-9755-149a5e0bc8cf passed=true",
+        "kind": "verification_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 73,
+        "timestamp": "2026-10-21T22:05:21.434526Z"
+      },
+      {
+        "detail": "a: accepted=true findings=0",
+        "kind": "review_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 74,
+        "timestamp": "2026-10-21T22:05:21.473625Z"
+      },
+      {
+        "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 75,
+        "timestamp": "2026-10-21T22:05:21.541944Z"
+      },
+      {
+        "detail": "b",
+        "kind": "verification_passed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 76,
+        "timestamp": "2026-10-21T22:05:21.699971Z"
+      },
+      {
+        "detail": "b: review 1",
+        "kind": "review_reserved",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 77,
+        "timestamp": "2026-10-21T22:05:21.874093Z"
+      },
+      {
+        "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 78,
+        "timestamp": "2026-10-21T22:05:21.920213Z"
+      },
+      {
+        "detail": "b",
+        "kind": "review_workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 79,
+        "timestamp": "2026-10-21T22:05:22.030098Z"
+      },
+      {
+        "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 80,
+        "timestamp": "2026-10-21T22:05:22.286959Z"
+      },
+      {
+        "detail": "Reviewer Claude; session=e1bf908b-4f2d-47e3-a801-b519662b2382 process_key=baaa74a6-8f95-485c-9cf7-a376234ae1d3",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 81,
+        "timestamp": "2026-10-21T22:05:22.292278Z"
+      },
+      {
+        "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 82,
+        "timestamp": "2026-10-21T22:05:22.422954Z"
+      },
+      {
+        "detail": "Reviewer process=de59f67f-350e-469f-9edd-6a07b55fa356",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 83,
+        "timestamp": "2026-10-21T22:05:22.426396Z"
+      },
+      {
+        "detail": "Reviewer session=e1bf908b-4f2d-47e3-a801-b519662b2382 outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 84,
+        "timestamp": "2026-10-21T22:05:22.444954Z"
+      },
+      {
+        "detail": "a: 69a436d9b8e21ff9c1061a4bf5118967537f5d9d",
+        "kind": "task_completed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 85,
+        "timestamp": "2026-10-21T22:05:22.504185Z"
+      },
+      {
+        "detail": "a: Some(Running) -> Completed",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 86,
+        "timestamp": "2026-10-21T22:05:22.504228Z"
+      },
+      {
+        "detail": "Dependency states evaluated",
+        "kind": "scheduler",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 87,
+        "timestamp": "2026-10-21T22:05:22.507961Z"
+      },
+      {
+        "detail": "c",
+        "kind": "task_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 88,
+        "timestamp": "2026-10-21T22:05:22.511576Z"
+      },
+      {
+        "detail": "c: Some(Waiting) -> Ready",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 89,
+        "timestamp": "2026-10-21T22:05:22.511662Z"
+      },
+      {
+        "detail": "c: /private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-c (autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-c)",
+        "kind": "workspace_reserved",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 90,
+        "timestamp": "2026-10-21T22:05:22.515934Z"
+      },
+      {
+        "detail": "c: Some(Ready) -> Running",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 91,
+        "timestamp": "2026-10-21T22:05:22.515998Z"
+      },
+      {
+        "detail": "Allowed task worktree and dependency admission: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 92,
+        "timestamp": "2026-10-21T22:05:22.558246Z"
+      },
+      {
+        "detail": "Allowed dependency merge: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 93,
+        "timestamp": "2026-10-21T22:05:22.724839Z"
+      },
+      {
+        "detail": "b: accepted=true findings=0",
+        "kind": "review_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 94,
+        "timestamp": "2026-10-21T22:05:22.728711Z"
+      },
+      {
+        "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 95,
+        "timestamp": "2026-10-21T22:05:22.842199Z"
+      },
+      {
+        "detail": "c",
+        "kind": "workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 96,
+        "timestamp": "2026-10-21T22:05:22.862849Z"
+      },
+      {
+        "detail": "c: attempt 1",
+        "kind": "attempt_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 97,
+        "timestamp": "2026-10-21T22:05:22.866658Z"
+      },
+      {
+        "detail": "Allowed Coder invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 98,
+        "timestamp": "2026-10-21T22:05:22.955484Z"
+      },
+      {
+        "detail": "Coder Claude; session=59374875-7444-495c-8cbf-7a5e0ac56eb5 process_key=963a37b6-f282-421d-8f23-8bc2e8c8fb21",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 99,
+        "timestamp": "2026-10-21T22:05:22.969014Z"
+      },
+      {
+        "detail": "Allowed Coder process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 100,
+        "timestamp": "2026-10-21T22:05:23.084659Z"
+      },
+      {
+        "detail": "Coder process=3b86cdbb-b991-4195-a940-ceb7de2c9f43",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 101,
+        "timestamp": "2026-10-21T22:05:23.094586Z"
+      },
+      {
+        "detail": "Coder session=59374875-7444-495c-8cbf-7a5e0ac56eb5 outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 102,
+        "timestamp": "2026-10-21T22:05:23.119750Z"
+      },
+      {
+        "detail": "Allowed exact file replacements: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 103,
+        "timestamp": "2026-10-21T22:05:23.173407Z"
+      },
+      {
+        "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 104,
+        "timestamp": "2026-10-21T22:05:23.636964Z"
+      },
+      {
+        "detail": "target=Some((\"c\", 1)) process_key=695faef1-2988-4448-8ec8-c7bb88f78bf2 command=[\"/bin/sh\",\"-c\",\"for f in a b c; do if test -f \\\"$f.sh\\\"; then case \\\"$f\\\" in a) expected=A;; b) expected=B;; c) expected=\\\"$(/bin/echo A; /bin/echo C)\\\";; esac; actual=\\\"$(/bin/sh \\\"./$f.sh\\\")\\\" || exit 1; test \\\"$actual\\\" = \\\"$expected\\\" || exit 1; fi; done\"]",
+        "kind": "verification_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 105,
+        "timestamp": "2026-10-21T22:05:23.640982Z"
+      },
+      {
+        "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 106,
+        "timestamp": "2026-10-21T22:05:23.726024Z"
+      },
+      {
+        "detail": "target=Some((\"c\", 1)) process=c48cb80e-ed90-4b01-aa6e-11927a9ea904",
+        "kind": "verification_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 107,
+        "timestamp": "2026-10-21T22:05:23.741531Z"
+      },
+      {
+        "detail": "b: 3b7004e3c44960e0a3e052bf8444b6ae180bbe0c",
+        "kind": "task_completed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 108,
+        "timestamp": "2026-10-21T22:05:23.795754Z"
+      },
+      {
+        "detail": "b: Some(Running) -> Completed",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 109,
+        "timestamp": "2026-10-21T22:05:23.796178Z"
+      },
+      {
+        "detail": "Dependency states evaluated",
+        "kind": "scheduler",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 110,
+        "timestamp": "2026-10-21T22:05:23.809980Z"
+      },
+      {
+        "detail": "target=Some((\"c\", 1)) process=c48cb80e-ed90-4b01-aa6e-11927a9ea904 passed=true",
+        "kind": "verification_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 111,
+        "timestamp": "2026-10-21T22:05:23.828933Z"
+      },
+      {
+        "detail": "c",
+        "kind": "verification_passed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 112,
+        "timestamp": "2026-10-21T22:05:24.122625Z"
+      },
+      {
+        "detail": "c: review 1",
+        "kind": "review_reserved",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 113,
+        "timestamp": "2026-10-21T22:05:24.325252Z"
+      },
+      {
+        "detail": "Allowed independent review worktree creation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 114,
+        "timestamp": "2026-10-21T22:05:24.365090Z"
+      },
+      {
+        "detail": "c",
+        "kind": "review_workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 115,
+        "timestamp": "2026-10-21T22:05:24.449218Z"
+      },
+      {
+        "detail": "Allowed Reviewer invocation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 116,
+        "timestamp": "2026-10-21T22:05:24.664468Z"
+      },
+      {
+        "detail": "Reviewer Claude; session=95914028-1943-4cfb-8af3-7aaab440a194 process_key=268d066b-30cd-4ecb-bccd-421bfbbc3a84",
+        "kind": "agent_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 117,
+        "timestamp": "2026-10-21T22:05:24.673247Z"
+      },
+      {
+        "detail": "Allowed Reviewer process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 118,
+        "timestamp": "2026-10-21T22:05:24.756616Z"
+      },
+      {
+        "detail": "Reviewer process=bff5ae8f-0e16-462c-9efd-3e35bdc6168c",
+        "kind": "agent_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 119,
+        "timestamp": "2026-10-21T22:05:24.761877Z"
+      },
+      {
+        "detail": "Reviewer session=95914028-1943-4cfb-8af3-7aaab440a194 outcome=succeeded",
+        "kind": "agent_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 120,
+        "timestamp": "2026-10-21T22:05:24.783083Z"
+      },
+      {
+        "detail": "c: accepted=true findings=0",
+        "kind": "review_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 121,
+        "timestamp": "2026-10-21T22:05:25.023816Z"
+      },
+      {
+        "detail": "Allowed reviewed immutable-tree preservation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 122,
+        "timestamp": "2026-10-21T22:05:25.106290Z"
+      },
+      {
+        "detail": "c: f60f54e60b5f6e22799704c1176696bfbc83845b",
+        "kind": "task_completed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 123,
+        "timestamp": "2026-10-21T22:05:25.945888Z"
+      },
+      {
+        "detail": "c: Some(Running) -> Completed",
+        "kind": "task_state",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 124,
+        "timestamp": "2026-10-21T22:05:25.945923Z"
+      },
+      {
+        "detail": "Dependency states evaluated",
+        "kind": "scheduler",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 125,
+        "timestamp": "2026-10-21T22:05:25.951096Z"
+      },
+      {
+        "detail": "All currently runnable tasks finished",
+        "kind": "execution_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 126,
+        "timestamp": "2026-10-21T22:05:25.956532Z"
+      },
+      {
+        "detail": "Allowed local integration admission: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 127,
+        "timestamp": "2026-10-21T22:05:25.996392Z"
+      },
+      {
+        "detail": "Original delegation admits isolated local integration and combined checks",
+        "kind": "delegation_integration",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 128,
+        "timestamp": "2026-10-21T22:05:26.001399Z"
+      },
+      {
+        "detail": "Allowed integration worktree creation: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 129,
+        "timestamp": "2026-10-21T22:05:26.040221Z"
+      },
+      {
+        "detail": "Pinned Git ownership",
+        "kind": "integration_workspace_ready",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 130,
+        "timestamp": "2026-10-21T22:05:26.159425Z"
+      },
+      {
+        "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 131,
+        "timestamp": "2026-10-21T22:05:26.199688Z"
+      },
+      {
+        "detail": "a: 69a436d9b8e21ff9c1061a4bf5118967537f5d9d",
+        "kind": "integration_merge",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 132,
+        "timestamp": "2026-10-21T22:05:26.482604Z"
+      },
+      {
+        "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 133,
+        "timestamp": "2026-10-21T22:05:26.524793Z"
+      },
+      {
+        "detail": "b: 3b7004e3c44960e0a3e052bf8444b6ae180bbe0c",
+        "kind": "integration_merge",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 134,
+        "timestamp": "2026-10-21T22:05:26.828650Z"
+      },
+      {
+        "detail": "Allowed integration of accepted task artifact: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 135,
+        "timestamp": "2026-10-21T22:05:26.880624Z"
+      },
+      {
+        "detail": "c: f60f54e60b5f6e22799704c1176696bfbc83845b",
+        "kind": "integration_merge",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 136,
+        "timestamp": "2026-10-21T22:05:27.203920Z"
+      },
+      {
+        "detail": "Allowed exact configured verification command: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 137,
+        "timestamp": "2026-10-21T22:05:27.656260Z"
+      },
+      {
+        "detail": "target=None process_key=610b9663-0398-45fc-8e88-5fcda736f616 command=[\"/bin/sh\",\"-c\",\"for f in a b c; do if test -f \\\"$f.sh\\\"; then case \\\"$f\\\" in a) expected=A;; b) expected=B;; c) expected=\\\"$(/bin/echo A; /bin/echo C)\\\";; esac; actual=\\\"$(/bin/sh \\\"./$f.sh\\\")\\\" || exit 1; test \\\"$actual\\\" = \\\"$expected\\\" || exit 1; fi; done\"]",
+        "kind": "verification_started",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 138,
+        "timestamp": "2026-10-21T22:05:27.661816Z"
+      },
+      {
+        "detail": "Allowed verification process launch: exact per-run delegation; context and deadline revalidated",
+        "kind": "delegation_allowed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 139,
+        "timestamp": "2026-10-21T22:05:27.712686Z"
+      },
+      {
+        "detail": "target=None process=43d07898-11d4-42d2-a012-0377c1ba900b",
+        "kind": "verification_process",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 140,
+        "timestamp": "2026-10-21T22:05:27.719143Z"
+      },
+      {
+        "detail": "target=None process=43d07898-11d4-42d2-a012-0377c1ba900b passed=true",
+        "kind": "verification_finished",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 141,
+        "timestamp": "2026-10-21T22:05:27.779914Z"
+      },
+      {
+        "detail": "Verified integration commit 46a7930e77b397e24752cfb2ab230617d9071bd0",
+        "kind": "completed",
+        "run_id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+        "sequence": 142,
+        "timestamp": "2026-10-21T22:05:28.088962Z"
+      }
+    ],
+    "paid_inference": false,
+    "post_restart_replayed": false,
+    "provider_invocations": [
+      "planner",
+      "task-b",
+      "task-a",
+      "task-b",
+      "review-a-1",
+      "review-b-1",
+      "task-c",
+      "review-c-1"
+    ],
+    "run": {
+      "approved_at": "2026-10-21T22:05:17.927863Z",
+      "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+      "blockers": [],
+      "created_at": "2026-10-21T22:05:17.969889Z",
+      "delegation": {
+        "authorized_at": "2026-10-21T22:05:17.927863Z",
+        "contract": {
+          "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+          "limitations": [
+            "Only Claude tool-free structured responses are supported for autonomous agents; Codex tool confinement is unavailable. No agent shell, filesystem tools, MCP, subagents, or session resume. Bare/restricted mode and disabled hooks/customizations are required; the default first-party API endpoint is the only supported backend.",
+            "Daemon may read authorized regular files (256 KiB each, 1 MiB total) and pinned project context, and create/replace authorized regular UTF-8 files inside assigned worktrees. No deletes, links, mode changes, hidden paths or protected instruction/configuration edits.",
+            "Only the exact configured verification argv may run, inside the recorded local sandbox with a cleared environment, no network, and no unrelated user-home file contents. System runtimes and the assigned checkout are readable; checkout and per-command temporary storage are writable. Sandbox availability is required; no unsandboxed fallback. Preflight may run help-only provider probes and a fixed sandboxed /usr/bin/true capability probe.",
+            "Owned worktree creation, dependency merges, immutable-tree preservation and optional local integration are permitted. Remote push, publishing, production deployment, main merge, credentials, dependency installation and arbitrary external operations are excluded.",
+            "Provider/model arguments and time/attempt/review/concurrency limits are enforced. Tool-free prompts, including full review diffs, are limited to 64 KiB; larger work blocks. Token/monetary accounting and spending caps are unavailable; provider defaults and inference charges cannot be certified. The trusted tool-free provider uses its configured API credentials in bare mode; OAuth subscription login and alternate cloud/custom backends are unsupported. Autono never reads or exposes credential values.",
+            "Authorization expires by wall-clock deadline from consent, including idle time. Crash/restart interrupts active runs and never resumes or blindly replays uncertain effects. Same-UID hostile processes and trusted installed provider binaries remain inside the local trust boundary."
+          ],
+          "repository_git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/commondir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/gitdir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo"
+          },
+          "repository_identity": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo": "16777232:411663523:501",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git": "16777232:411663528:501"
+          },
+          "request": {
+            "local_integration": true,
+            "max_runtime_seconds": 120,
+            "submission": {
+              "base": "main",
+              "id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+              "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo",
+              "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n"
+            },
+            "writable_files": [
+              "a.sh",
+              "b.sh",
+              "c.sh"
+            ]
+          },
+          "settings": {
+            "agents": {
+              "coder": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "planner": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "reviewer": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              }
+            },
+            "execution": {
+              "max_attempts": 3,
+              "max_parallel": 2,
+              "max_review_cycles": 2
+            },
+            "permissions": {
+              "rules": {
+                "run_checks": "REQUIRE_APPROVAL",
+                "workspace_write": "REQUIRE_APPROVAL"
+              }
+            },
+            "preflight": {
+              "external_services": [],
+              "required_directories": [],
+              "required_env": [],
+              "required_tools": []
+            },
+            "verification": {
+              "commands": [
+                [
+                  "/bin/sh",
+                  "-c",
+                  "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                ]
+              ],
+              "timeout_seconds": 10
+            }
+          },
+          "user_config_digest": "4d346c4c9e891609e6bde852b08f0de36142abc0ccbc0a091f403179835e35aa",
+          "verification_sandbox": "macos-seatbelt-v1",
+          "version": 1,
+          "worktree_root": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d"
+        },
+        "expires_at": "2026-10-21T22:07:17.927863Z"
+      },
+      "human_actions": [],
+      "id": "f11058f4-dd46-4a8c-8781-6ac4e46f148d",
+      "integration_verification": [
+        {
+          "command": [
+            "/bin/sh",
+            "-c",
+            "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+          ],
+          "exit_code": 0,
+          "outcome": "passed",
+          "output_complete": true,
+          "passed": true,
+          "process_key": "610b9663-0398-45fc-8e88-5fcda736f616",
+          "process_run_id": "43d07898-11d4-42d2-a012-0377c1ba900b",
+          "summary": "process=43d07898-11d4-42d2-a012-0377c1ba900b status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+        }
+      ],
+      "integration_workspace": {
+        "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+        "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/integration",
+        "git": {
+          "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+          "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration",
+          "metadata": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/integration/.git": "d62d8c794355b28dad9b916bb1142df3651187ce47c1a8d0451f866b47351802",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration/config.worktree": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration/gitdir": "701bb2afedc2a4c962e958d6bec7c3b64e1a4cf48985fdcda42c2c2ecdd177ac",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration/info/exclude": null
+          },
+          "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/integration"
+        },
+        "head_commit": "46a7930e77b397e24752cfb2ab230617d9071bd0",
+        "id": "3626a493-dca5-4b58-a041-1dac26c30aeb",
+        "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/integration"
+      },
+      "plan": {
+        "human_requirements": [],
+        "milestones": [
+          {
+            "goal": "Feature",
+            "id": "m",
+            "task_ids": [
+              "a",
+              "b",
+              "c"
+            ]
+          }
+        ],
+        "requirements": [
+          {
+            "id": "r",
+            "text": "Safe feature"
+          }
+        ],
+        "tasks": [
+          {
+            "acceptance_criteria": [
+              "A works"
+            ],
+            "dependencies": [],
+            "description": "Create A",
+            "goal": "A",
+            "id": "a",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          {
+            "acceptance_criteria": [
+              "B works"
+            ],
+            "dependencies": [],
+            "description": "Create B",
+            "goal": "B",
+            "id": "b",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          {
+            "acceptance_criteria": [
+              "C works"
+            ],
+            "dependencies": [
+              "a"
+            ],
+            "description": "Create C",
+            "goal": "C",
+            "id": "c",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          }
+        ]
+      },
+      "planner": {
+        "id": "1d6dd921-1bf5-4d27-8ae4-35eb617c6558",
+        "outcome": "succeeded",
+        "process_key": "7c30eb2f-41e5-404a-b191-ffb3644c0c8d",
+        "process_run_id": "1ece9cc7-7bc6-47c2-aae9-2fa642c53cc9",
+        "provider": "claude",
+        "provider_session_id": "8E0ECDB2-AF58-4FC1-8A11-08FC7766E51C",
+        "result": "{\"human_requirements\":[],\"milestones\":[{\"goal\":\"Feature\",\"id\":\"m\",\"task_ids\":[\"a\",\"b\",\"c\"]}],\"requirements\":[{\"id\":\"r\",\"text\":\"Safe feature\"}],\"tasks\":[{\"acceptance_criteria\":[\"A works\"],\"dependencies\":[],\"description\":\"Create A\",\"goal\":\"A\",\"id\":\"a\",\"requirement_ids\":[\"r\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured check\"]},{\"acceptance_criteria\":[\"B works\"],\"dependencies\":[],\"description\":\"Create B\",\"goal\":\"B\",\"id\":\"b\",\"requirement_ids\":[\"r\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured check\"]},{\"acceptance_criteria\":[\"C works\"],\"dependencies\":[\"a\"],\"description\":\"Create C\",\"goal\":\"C\",\"id\":\"c\",\"requirement_ids\":[\"r\"],\"role\":\"coder\",\"verification_expectations\":[\"Configured check\"]}]}",
+        "resumed_from": null,
+        "role": "planner"
+      },
+      "planning_workspace": {
+        "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+        "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/planner",
+        "git": {
+          "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+          "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner",
+          "metadata": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/planner/.git": "8ad06b7d47ceb84a2dc9c134bf19f06aed3fdbb5eec9d42fa5d997302fdbbce2",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner/config.worktree": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner/gitdir": "88e0cf44da5b0e2e3c0a185436627fd469f2e2bdba4b4e53e261b9a693a97a0e",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner/info/exclude": null
+          },
+          "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/planner"
+        },
+        "head_commit": null,
+        "id": "2ac97612-d1d7-4149-93e9-6faad8fbac69",
+        "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/planner"
+      },
+      "preflight": {
+        "action_ids": [],
+        "checked_at": "2026-10-21T22:05:19.084450Z",
+        "checks": [
+          {
+            "blocking": true,
+            "evidence": "Repository accessibility and pinned Git ownership",
+            "id": "repository",
+            "ready": true
+          },
+          {
+            "blocking": true,
+            "evidence": "Planning checkout accessibility and pinned Git ownership",
+            "id": "planning-workspace",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Developer checkout cleanliness; execution uses the pinned base in isolated worktrees",
+            "id": "git-working-state",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Optional installed provider executable: codex; configured adapters are capability-checked separately",
+            "id": "installed-codex",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Optional installed provider executable: claude; configured adapters are capability-checked separately",
+            "id": "installed-claude",
+            "ready": true
+          },
+          {
+            "blocking": true,
+            "evidence": "Configured verification executable availability; command behavior is validated during execution",
+            "id": "verification-0",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "WorkspaceWrite: RequireApproval; scope run f11058f4-dd46-4a8c-8781-6ac4e46f148d assigned task worktrees",
+            "id": "permission-WorkspaceWrite",
+            "ready": false
+          },
+          {
+            "blocking": false,
+            "evidence": "RunChecks: RequireApproval; scope run f11058f4-dd46-4a8c-8781-6ac4e46f148d immutable configured verification commands",
+            "id": "permission-RunChecks",
+            "ready": false
+          },
+          {
+            "blocking": true,
+            "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+            "id": "provider-coder",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+            "id": "authentication-coder",
+            "ready": null
+          },
+          {
+            "blocking": true,
+            "evidence": "CLI availability and noninteractive sandbox capability probes (15-second bounds); inspect installation if unavailable",
+            "id": "provider-reviewer",
+            "ready": true
+          },
+          {
+            "blocking": false,
+            "evidence": "Unknown: credential files and credential-bearing authentication output are not inspected; use existing CLI login",
+            "id": "authentication-reviewer",
+            "ready": null
+          },
+          {
+            "blocking": true,
+            "evidence": "Exact configured verification executable must be available within the sandbox's system PATH or the assigned checkout",
+            "id": "delegation-check-0",
+            "ready": true
+          },
+          {
+            "blocking": true,
+            "evidence": "Fixed /usr/bin/true probe in the verification sandbox; no credentials or inference. Unavailable sandbox requires external repair",
+            "id": "delegation-sandbox",
+            "ready": true
+          }
+        ],
+        "limitation": "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation.",
+        "ready": true
+      },
+      "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo",
+      "repository_git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/commondir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/gitdir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo"
+      },
+      "requested_base": "main",
+      "revision": 130,
+      "settings": {
+        "agents": {
+          "coder": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "planner": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "reviewer": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          }
+        },
+        "execution": {
+          "max_attempts": 3,
+          "max_parallel": 2,
+          "max_review_cycles": 2
+        },
+        "permissions": {
+          "rules": {
+            "run_checks": "REQUIRE_APPROVAL",
+            "workspace_write": "REQUIRE_APPROVAL"
+          }
+        },
+        "preflight": {
+          "external_services": [],
+          "required_directories": [],
+          "required_env": [],
+          "required_tools": []
+        },
+        "verification": {
+          "commands": [
+            [
+              "/bin/sh",
+              "-c",
+              "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+            ]
+          ],
+          "timeout_seconds": 10
+        }
+      },
+      "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n",
+      "status": "COMPLETED",
+      "summary": "All 3 tasks passed deterministic checks and independent review. Combined checks passed. Local integration branch autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/integration at 46a7930e77b397e24752cfb2ab230617d9071bd0 (/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/integration). No merge to main was performed.",
+      "tasks": [
+        {
+          "artifact_commit": "69a436d9b8e21ff9c1061a4bf5118967537f5d9d",
+          "attempts": [
+            {
+              "coder": {
+                "id": "54c8e4d1-1d96-47c9-97a6-48b4ee43a2e3",
+                "outcome": "succeeded",
+                "process_key": "ee06a1b3-ce11-4321-a8b9-7b2f1ff0c462",
+                "process_run_id": "26eb3939-3b19-4868-b35c-72f18e2a9070",
+                "provider": "claude",
+                "provider_session_id": "31E642EA-3282-460E-A7D7-103B22D3B23E",
+                "result": "{\"blocker\":\"\",\"edits\":[{\"content\":\"/bin/echo A\\n\",\"path\":\"a.sh\"}],\"summary\":\"Implemented\"}",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "detail": null,
+              "number": 1,
+              "preserved_tree": "cc25a1524c232311952e0eee175f58a341f45830",
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "a-C1",
+                    "evidence": "Independent full diff and passing verification",
+                    "satisfied": true
+                  }
+                ],
+                "findings": []
+              },
+              "reviewer": {
+                "id": "8db78485-7f7f-48b8-8699-45b73be365c8",
+                "outcome": "succeeded",
+                "process_key": "0d2162c4-7ebc-43e2-b3ac-88529f0d6a3f",
+                "process_run_id": "1cf50229-3965-4190-9e5a-2b505a16c35f",
+                "provider": "claude",
+                "provider_session_id": "54A44361-1E2B-47E2-B4C4-C4225D97ECF3",
+                "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"a-C1\",\"evidence\":\"Independent full diff and passing verification\",\"satisfied\":true}],\"findings\":[]}",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "reviews": [
+                {
+                  "diagnostic": null,
+                  "review": {
+                    "accepted": true,
+                    "blocker": "",
+                    "criteria": [
+                      {
+                        "criterion": "Works",
+                        "criterion_id": "a-C1",
+                        "evidence": "Independent full diff and passing verification",
+                        "satisfied": true
+                      }
+                    ],
+                    "findings": []
+                  },
+                  "session": {
+                    "id": "8db78485-7f7f-48b8-8699-45b73be365c8",
+                    "outcome": "succeeded",
+                    "process_key": "0d2162c4-7ebc-43e2-b3ac-88529f0d6a3f",
+                    "process_run_id": "1cf50229-3965-4190-9e5a-2b505a16c35f",
+                    "provider": "claude",
+                    "provider_session_id": "54A44361-1E2B-47E2-B4C4-C4225D97ECF3",
+                    "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"a-C1\",\"evidence\":\"Independent full diff and passing verification\",\"satisfied\":true}],\"findings\":[]}",
+                    "resumed_from": null,
+                    "role": "reviewer"
+                  },
+                  "workspace": {
+                    "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+                    "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-a-1",
+                    "git": {
+                      "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+                      "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-a-1",
+                      "metadata": {
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-a-1/.git": "4b8d1854dc78809350a5c821c8b0cff5053c6ef946897d4c00b6b00a83ab8a0f",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-a-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-a-1/config.worktree": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-a-1/gitdir": "fa21c2fcd4acafc76b212cb022fc8a668099365e83fed6f316145170a45c5b17",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-a-1/info/exclude": null
+                      },
+                      "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-a-1"
+                    },
+                    "head_commit": null,
+                    "id": "7923fe73-a7e9-4b39-9ccc-77d2ad55dc3c",
+                    "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-a-1"
+                  }
+                }
+              ],
+              "snapshot": "c6be978f8656c4db1229352dacee4b5320c60ea9918adae0f9aa28f5208c45f0",
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "d54c025b-8904-48c3-b434-aec000b6d29e",
+                  "process_run_id": "3a2b0bf5-69a1-4c1e-90a7-bd7838a1009a",
+                  "summary": "process=3a2b0bf5-69a1-4c1e-90a7-bd7838a1009a status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "verified_tree": "cc25a1524c232311952e0eee175f58a341f45830"
+            }
+          ],
+          "plan": {
+            "acceptance_criteria": [
+              "A works"
+            ],
+            "dependencies": [],
+            "description": "Create A",
+            "goal": "A",
+            "id": "a",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          "status": "COMPLETED",
+          "workspace": {
+            "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+            "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-a",
+            "git": {
+              "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+              "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-a",
+              "metadata": {
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-a/.git": "96a0d0a7c6df2f277a21496c814021fdaee8d74995dfe2edaa3e2ded2994a127",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-a/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-a/config.worktree": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-a/gitdir": "191daf142b62676694db4d441a90116e51fdf2a2195af10b96c476fcf96bbf10",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-a/info/exclude": null
+              },
+              "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-a"
+            },
+            "head_commit": "69a436d9b8e21ff9c1061a4bf5118967537f5d9d",
+            "id": "fadf95ba-755d-4093-853c-849f6cb76b6d",
+            "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-a"
+          }
+        },
+        {
+          "artifact_commit": "3b7004e3c44960e0a3e052bf8444b6ae180bbe0c",
+          "attempts": [
+            {
+              "coder": {
+                "id": "a9df6e10-cbed-4c46-ab2b-35855dbb9a0c",
+                "outcome": "succeeded",
+                "process_key": "538c839c-b9d1-43a3-b48f-349715ffa2e8",
+                "process_run_id": "1d17c1a7-77e5-48ea-96de-a0147a6f6d4b",
+                "provider": "claude",
+                "provider_session_id": "DA20D053-B49B-48C6-9F1F-613AA61B8F70",
+                "result": "{\"blocker\":\"\",\"edits\":[{\"content\":\"/bin/echo incorrect\\n\",\"path\":\"b.sh\"}],\"summary\":\"Implemented\"}",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "detail": "Required verification failed. Fix the implementation without weakening checks:\n[{\"process_key\":\"1a6e8bfe-0509-4f06-87d5-015d0f2cde12\",\"process_run_id\":\"c43bb4fb-376d-47f4-b059-c8805b1c67e2\",\"command\":[\"/bin/sh\",\"-c\",\"for f in a b c; do if test -f \\\"$f.sh\\\"; then case \\\"$f\\\" in a) expected=A;; b) expected=B;; c) expected=\\\"$(/bin/echo A; /bin/echo C)\\\";; esac; actual=\\\"$(/bin/sh \\\"./$f.sh\\\")\\\" || exit 1; test \\\"$actual\\\" = \\\"$expected\\\" || exit 1; fi; done\"],\"exit_code\":1,\"passed\":false,\"outcome\":\"test_failure\",\"output_complete\":true,\"summary\":\"process=c43bb4fb-376d-47f4-b059-c8805b1c67e2 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\\\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\\\"]; process exited: exit status: 1\"}]",
+              "number": 1,
+              "preserved_tree": null,
+              "review": null,
+              "reviewer": null,
+              "reviews": [],
+              "snapshot": null,
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                  ],
+                  "exit_code": 1,
+                  "outcome": "test_failure",
+                  "output_complete": true,
+                  "passed": false,
+                  "process_key": "1a6e8bfe-0509-4f06-87d5-015d0f2cde12",
+                  "process_run_id": "c43bb4fb-376d-47f4-b059-c8805b1c67e2",
+                  "summary": "process=c43bb4fb-376d-47f4-b059-c8805b1c67e2 status=Failed exit=Some(1) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; process exited: exit status: 1"
+                }
+              ],
+              "verified_tree": null
+            },
+            {
+              "coder": {
+                "id": "e63176e1-8d1a-4612-b77f-092fd1267e52",
+                "outcome": "succeeded",
+                "process_key": "fc6ae89b-b3fe-47a8-906b-86af48523156",
+                "process_run_id": "d759a7ef-64ac-47bf-bb39-db0c0721e980",
+                "provider": "claude",
+                "provider_session_id": "E11367C1-3BA5-40EF-A7F1-FC6C16993FE6",
+                "result": "{\"blocker\":\"\",\"edits\":[{\"content\":\"/bin/echo B\\n\",\"path\":\"b.sh\"}],\"summary\":\"Implemented\"}",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "detail": null,
+              "number": 2,
+              "preserved_tree": "601f52ff72c7ceb3413cbfdfa0052c0e0165e89d",
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "b-C1",
+                    "evidence": "Independent full diff and passing verification",
+                    "satisfied": true
+                  }
+                ],
+                "findings": []
+              },
+              "reviewer": {
+                "id": "e1bf908b-4f2d-47e3-a801-b519662b2382",
+                "outcome": "succeeded",
+                "process_key": "baaa74a6-8f95-485c-9cf7-a376234ae1d3",
+                "process_run_id": "de59f67f-350e-469f-9edd-6a07b55fa356",
+                "provider": "claude",
+                "provider_session_id": "0F992039-42E5-4634-9538-5B3B07ED20FC",
+                "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"b-C1\",\"evidence\":\"Independent full diff and passing verification\",\"satisfied\":true}],\"findings\":[]}",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "reviews": [
+                {
+                  "diagnostic": null,
+                  "review": {
+                    "accepted": true,
+                    "blocker": "",
+                    "criteria": [
+                      {
+                        "criterion": "Works",
+                        "criterion_id": "b-C1",
+                        "evidence": "Independent full diff and passing verification",
+                        "satisfied": true
+                      }
+                    ],
+                    "findings": []
+                  },
+                  "session": {
+                    "id": "e1bf908b-4f2d-47e3-a801-b519662b2382",
+                    "outcome": "succeeded",
+                    "process_key": "baaa74a6-8f95-485c-9cf7-a376234ae1d3",
+                    "process_run_id": "de59f67f-350e-469f-9edd-6a07b55fa356",
+                    "provider": "claude",
+                    "provider_session_id": "0F992039-42E5-4634-9538-5B3B07ED20FC",
+                    "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"b-C1\",\"evidence\":\"Independent full diff and passing verification\",\"satisfied\":true}],\"findings\":[]}",
+                    "resumed_from": null,
+                    "role": "reviewer"
+                  },
+                  "workspace": {
+                    "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+                    "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-b-1",
+                    "git": {
+                      "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+                      "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-b-1",
+                      "metadata": {
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-b-1/.git": "023a2b55d6262e49625ee3ec7468ffee64aaeb9d7faaed14a0639c590fb4821f",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-b-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-b-1/config.worktree": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-b-1/gitdir": "e55b3fbe0d489f0f9f872932ff66567a34bdbed972db768d5e2fc4321f91f1f6",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-b-1/info/exclude": null
+                      },
+                      "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-b-1"
+                    },
+                    "head_commit": null,
+                    "id": "0543c522-34d5-4f9f-b5e7-1a034c41be67",
+                    "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-b-1"
+                  }
+                }
+              ],
+              "snapshot": "2374d75229a9c8b6e10e4426864478cf92300e9e1e50d4e65b49c47e83aa7a57",
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "223adee1-100c-4cc9-a007-45343ff31221",
+                  "process_run_id": "c475e22e-0628-4f3f-9755-149a5e0bc8cf",
+                  "summary": "process=c475e22e-0628-4f3f-9755-149a5e0bc8cf status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "verified_tree": "601f52ff72c7ceb3413cbfdfa0052c0e0165e89d"
+            }
+          ],
+          "plan": {
+            "acceptance_criteria": [
+              "B works"
+            ],
+            "dependencies": [],
+            "description": "Create B",
+            "goal": "B",
+            "id": "b",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          "status": "COMPLETED",
+          "workspace": {
+            "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+            "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-b",
+            "git": {
+              "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+              "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-b",
+              "metadata": {
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-b/.git": "148d0d48facf40e63ff93edbde0b58237109476425bf6ae004e3903c29ecc594",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-b/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-b/config.worktree": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-b/gitdir": "7396707e61ec30f1948242d48325e167822b8cfa52020e77c9d99a63c8706761",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-b/info/exclude": null
+              },
+              "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-b"
+            },
+            "head_commit": "3b7004e3c44960e0a3e052bf8444b6ae180bbe0c",
+            "id": "aff0ee5a-4ad2-4291-a670-9628e439a7a5",
+            "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-b"
+          }
+        },
+        {
+          "artifact_commit": "f60f54e60b5f6e22799704c1176696bfbc83845b",
+          "attempts": [
+            {
+              "coder": {
+                "id": "59374875-7444-495c-8cbf-7a5e0ac56eb5",
+                "outcome": "succeeded",
+                "process_key": "963a37b6-f282-421d-8f23-8bc2e8c8fb21",
+                "process_run_id": "3b86cdbb-b991-4195-a940-ceb7de2c9f43",
+                "provider": "claude",
+                "provider_session_id": "A3A878E4-2317-4B04-A67E-3C146CD5E4E6",
+                "result": "{\"blocker\":\"\",\"edits\":[{\"content\":\". ./a.sh; /bin/echo C\\n\",\"path\":\"c.sh\"}],\"summary\":\"Implemented\"}",
+                "resumed_from": null,
+                "role": "coder"
+              },
+              "detail": null,
+              "number": 1,
+              "preserved_tree": "aa36a8226c608e5e2152a64a21ef234d3cb18a12",
+              "review": {
+                "accepted": true,
+                "blocker": "",
+                "criteria": [
+                  {
+                    "criterion": "Works",
+                    "criterion_id": "c-C1",
+                    "evidence": "Independent full diff and passing verification",
+                    "satisfied": true
+                  }
+                ],
+                "findings": []
+              },
+              "reviewer": {
+                "id": "95914028-1943-4cfb-8af3-7aaab440a194",
+                "outcome": "succeeded",
+                "process_key": "268d066b-30cd-4ecb-bccd-421bfbbc3a84",
+                "process_run_id": "bff5ae8f-0e16-462c-9efd-3e35bdc6168c",
+                "provider": "claude",
+                "provider_session_id": "FC0A2C0E-EB68-4E4C-9845-F3B59B932EA0",
+                "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"c-C1\",\"evidence\":\"Independent full diff and passing verification\",\"satisfied\":true}],\"findings\":[]}",
+                "resumed_from": null,
+                "role": "reviewer"
+              },
+              "reviews": [
+                {
+                  "diagnostic": null,
+                  "review": {
+                    "accepted": true,
+                    "blocker": "",
+                    "criteria": [
+                      {
+                        "criterion": "Works",
+                        "criterion_id": "c-C1",
+                        "evidence": "Independent full diff and passing verification",
+                        "satisfied": true
+                      }
+                    ],
+                    "findings": []
+                  },
+                  "session": {
+                    "id": "95914028-1943-4cfb-8af3-7aaab440a194",
+                    "outcome": "succeeded",
+                    "process_key": "268d066b-30cd-4ecb-bccd-421bfbbc3a84",
+                    "process_run_id": "bff5ae8f-0e16-462c-9efd-3e35bdc6168c",
+                    "provider": "claude",
+                    "provider_session_id": "FC0A2C0E-EB68-4E4C-9845-F3B59B932EA0",
+                    "result": "{\"accepted\":true,\"blocker\":\"\",\"criteria\":[{\"criterion\":\"Works\",\"criterion_id\":\"c-C1\",\"evidence\":\"Independent full diff and passing verification\",\"satisfied\":true}],\"findings\":[]}",
+                    "resumed_from": null,
+                    "role": "reviewer"
+                  },
+                  "workspace": {
+                    "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+                    "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-c-1",
+                    "git": {
+                      "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+                      "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-c-1",
+                      "metadata": {
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-c-1/.git": "35fc725a0008d67ebd59237d52cac21fc6f6c5716e1fc5169356b25e4059c33b",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-c-1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-c-1/config.worktree": null,
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-c-1/gitdir": "81041745d739ee5dd859255c381345e4a66509afb48f384919043d61f24684e8",
+                        "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/review-c-1/info/exclude": null
+                      },
+                      "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-c-1"
+                    },
+                    "head_commit": null,
+                    "id": "3fd0a440-f75f-4002-82bc-c1b1956d4be0",
+                    "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/review-c-1"
+                  }
+                }
+              ],
+              "snapshot": "b47f0d0617344630d36c0db5ab0e0d273ee399eb539ed0e5bb5e39923e7ee7d2",
+              "verification": [
+                {
+                  "command": [
+                    "/bin/sh",
+                    "-c",
+                    "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                  ],
+                  "exit_code": 0,
+                  "outcome": "passed",
+                  "output_complete": true,
+                  "passed": true,
+                  "process_key": "695faef1-2988-4448-8ec8-c7bb88f78bf2",
+                  "process_run_id": "c48cb80e-ed90-4b01-aa6e-11927a9ea904",
+                  "summary": "process=c48cb80e-ed90-4b01-aa6e-11927a9ea904 status=Succeeded exit=Some(0) output_complete=Some(true) warnings=[\"process-group cleanup uncertain: terminate pinned process group: Operation not permitted (os error 1)\"]; "
+                }
+              ],
+              "verified_tree": "aa36a8226c608e5e2152a64a21ef234d3cb18a12"
+            }
+          ],
+          "plan": {
+            "acceptance_criteria": [
+              "C works"
+            ],
+            "dependencies": [
+              "a"
+            ],
+            "description": "Create C",
+            "goal": "C",
+            "id": "c",
+            "requirement_ids": [
+              "r"
+            ],
+            "role": "coder",
+            "verification_expectations": [
+              "Configured check"
+            ]
+          },
+          "status": "COMPLETED",
+          "workspace": {
+            "base_commit": "ba25137fed9ea8cc137e9d39679d1343df07ba3d",
+            "branch": "autono/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-c",
+            "git": {
+              "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+              "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-c",
+              "metadata": {
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-c/.git": "124cfde1303d12882ec32a5d121bdff9aeda4b893bbeb933d0ce321aea3fecc6",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-c/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-c/config.worktree": null,
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-c/gitdir": "4665e3e1f7bc1134d3b77de3e26b0620d387ab0ec25bb727ad2cad52529b879a",
+                "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/task-c/info/exclude": null
+              },
+              "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-c"
+            },
+            "head_commit": "f60f54e60b5f6e22799704c1176696bfbc83845b",
+            "id": "d2a746ab-bd23-40f0-b5e5-4230be1f412b",
+            "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/f11058f4-dd46-4a8c-8781-6ac4e46f148d/task-c"
+          }
+        }
+      ],
+      "updated_at": "2026-10-21T22:05:28.083182Z"
+    },
+    "seed_commit": "7701fa3276136af253d035638f359a11cf354b7b"
+  },
+  "adversarial_real_daemon": {
+    "interrupted": {
+      "approved_at": null,
+      "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+      "blockers": [
+        {
+          "action": "Inspect retained workspaces and processes; submit a new plan when safe",
+          "created_at": "2026-10-21T22:05:28.894169Z",
+          "detail": "Daemon restarted; workflow ownership lost. Workspaces retained. Inspect surviving processes before starting a new run.",
+          "kind": "restart",
+          "task_id": null
+        }
+      ],
+      "created_at": "2026-10-21T22:05:28.317675Z",
+      "delegation": {
+        "authorized_at": "2026-10-21T22:05:28.282952Z",
+        "contract": {
+          "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+          "limitations": [
+            "Only Claude tool-free structured responses are supported for autonomous agents; Codex tool confinement is unavailable. No agent shell, filesystem tools, MCP, subagents, or session resume. Bare/restricted mode and disabled hooks/customizations are required; the default first-party API endpoint is the only supported backend.",
+            "Daemon may read authorized regular files (256 KiB each, 1 MiB total) and pinned project context, and create/replace authorized regular UTF-8 files inside assigned worktrees. No deletes, links, mode changes, hidden paths or protected instruction/configuration edits.",
+            "Only the exact configured verification argv may run, inside the recorded local sandbox with a cleared environment, no network, and no unrelated user-home file contents. System runtimes and the assigned checkout are readable; checkout and per-command temporary storage are writable. Sandbox availability is required; no unsandboxed fallback. Preflight may run help-only provider probes and a fixed sandboxed /usr/bin/true capability probe.",
+            "Owned worktree creation, dependency merges, immutable-tree preservation and optional local integration are permitted. Remote push, publishing, production deployment, main merge, credentials, dependency installation and arbitrary external operations are excluded.",
+            "Provider/model arguments and time/attempt/review/concurrency limits are enforced. Tool-free prompts, including full review diffs, are limited to 64 KiB; larger work blocks. Token/monetary accounting and spending caps are unavailable; provider defaults and inference charges cannot be certified. The trusted tool-free provider uses its configured API credentials in bare mode; OAuth subscription login and alternate cloud/custom backends are unsupported. Autono never reads or exposes credential values.",
+            "Authorization expires by wall-clock deadline from consent, including idle time. Crash/restart interrupts active runs and never resumes or blindly replays uncertain effects. Same-UID hostile processes and trusted installed provider binaries remain inside the local trust boundary."
+          ],
+          "repository_git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/commondir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/gitdir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo"
+          },
+          "repository_identity": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo": "16777232:411663523:501",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git": "16777232:411663528:501"
+          },
+          "request": {
+            "local_integration": true,
+            "max_runtime_seconds": 120,
+            "submission": {
+              "base": "main",
+              "id": "6d56ffb0-60ad-4134-8bec-d7d307c8a3f0",
+              "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo",
+              "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n"
+            },
+            "writable_files": [
+              "a.sh",
+              "b.sh",
+              "c.sh"
+            ]
+          },
+          "settings": {
+            "agents": {
+              "coder": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "planner": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "reviewer": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              }
+            },
+            "execution": {
+              "max_attempts": 3,
+              "max_parallel": 2,
+              "max_review_cycles": 2
+            },
+            "permissions": {
+              "rules": {
+                "run_checks": "REQUIRE_APPROVAL",
+                "workspace_write": "REQUIRE_APPROVAL"
+              }
+            },
+            "preflight": {
+              "external_services": [],
+              "required_directories": [],
+              "required_env": [],
+              "required_tools": []
+            },
+            "verification": {
+              "commands": [
+                [
+                  "/bin/sh",
+                  "-c",
+                  "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                ]
+              ],
+              "timeout_seconds": 10
+            }
+          },
+          "user_config_digest": "4d346c4c9e891609e6bde852b08f0de36142abc0ccbc0a091f403179835e35aa",
+          "verification_sandbox": "macos-seatbelt-v1",
+          "version": 1,
+          "worktree_root": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/6d56ffb0-60ad-4134-8bec-d7d307c8a3f0"
+        },
+        "expires_at": "2026-10-21T22:07:28.282952Z"
+      },
+      "human_actions": [],
+      "id": "6d56ffb0-60ad-4134-8bec-d7d307c8a3f0",
+      "integration_verification": [],
+      "integration_workspace": null,
+      "plan": null,
+      "planner": {
+        "id": "4b371bf6-8272-4a5e-9cda-996db5946507",
+        "outcome": null,
+        "process_key": "62ea5f1a-7a95-4091-bd4c-7c71ae05c687",
+        "process_run_id": "68ed4c09-3401-4220-afef-c26098b94c2d",
+        "provider": "claude",
+        "provider_session_id": null,
+        "result": null,
+        "resumed_from": null,
+        "role": "planner"
+      },
+      "planning_workspace": {
+        "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+        "branch": "autono/6d56ffb0-60ad-4134-8bec-d7d307c8a3f0/planner",
+        "git": {
+          "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+          "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner1",
+          "metadata": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/6d56ffb0-60ad-4134-8bec-d7d307c8a3f0/planner/.git": "9a3251b327dab44293095b7c98187a0737573de9120f7227ccc62b3172ecfd16",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner1/config.worktree": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner1/gitdir": "5091e89133b13c8c62cff1fb0853815d76833959cb71c98a51d65f7e2fafc06d",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner1/info/exclude": null
+          },
+          "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/6d56ffb0-60ad-4134-8bec-d7d307c8a3f0/planner"
+        },
+        "head_commit": null,
+        "id": "e4d373a8-5a9a-49c2-8984-673eef699c93",
+        "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/6d56ffb0-60ad-4134-8bec-d7d307c8a3f0/planner"
+      },
+      "preflight": null,
+      "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo",
+      "repository_git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/commondir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/gitdir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo"
+      },
+      "requested_base": "main",
+      "revision": 7,
+      "settings": {
+        "agents": {
+          "coder": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "planner": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "reviewer": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          }
+        },
+        "execution": {
+          "max_attempts": 3,
+          "max_parallel": 2,
+          "max_review_cycles": 2
+        },
+        "permissions": {
+          "rules": {
+            "run_checks": "REQUIRE_APPROVAL",
+            "workspace_write": "REQUIRE_APPROVAL"
+          }
+        },
+        "preflight": {
+          "external_services": [],
+          "required_directories": [],
+          "required_env": [],
+          "required_tools": []
+        },
+        "verification": {
+          "commands": [
+            [
+              "/bin/sh",
+              "-c",
+              "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+            ]
+          ],
+          "timeout_seconds": 10
+        }
+      },
+      "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n",
+      "status": "INTERRUPTED",
+      "summary": "Daemon restarted; workflow ownership lost. Workspaces retained. Inspect surviving processes before starting a new run.",
+      "tasks": [],
+      "updated_at": "2026-10-21T22:05:28.894168Z"
+    },
+    "unavailable": {
+      "approved_at": null,
+      "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+      "blockers": [
+        {
+          "action": "Inspect retained workspaces and process logs before submitting a new plan",
+          "created_at": "2026-10-21T22:05:29.525968Z",
+          "detail": "cli_infrastructure: process=f2c547c3-0ef3-4912-a166-8a89d0f0077f status=Failed exit=None output_complete=Some(true) warnings=[]; spawn failed: spawn command: No such file or directory (os error 2)",
+          "kind": "manual_action",
+          "task_id": null
+        }
+      ],
+      "created_at": "2026-10-21T22:05:29.031946Z",
+      "delegation": {
+        "authorized_at": "2026-10-21T22:05:28.996830Z",
+        "contract": {
+          "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+          "limitations": [
+            "Only Claude tool-free structured responses are supported for autonomous agents; Codex tool confinement is unavailable. No agent shell, filesystem tools, MCP, subagents, or session resume. Bare/restricted mode and disabled hooks/customizations are required; the default first-party API endpoint is the only supported backend.",
+            "Daemon may read authorized regular files (256 KiB each, 1 MiB total) and pinned project context, and create/replace authorized regular UTF-8 files inside assigned worktrees. No deletes, links, mode changes, hidden paths or protected instruction/configuration edits.",
+            "Only the exact configured verification argv may run, inside the recorded local sandbox with a cleared environment, no network, and no unrelated user-home file contents. System runtimes and the assigned checkout are readable; checkout and per-command temporary storage are writable. Sandbox availability is required; no unsandboxed fallback. Preflight may run help-only provider probes and a fixed sandboxed /usr/bin/true capability probe.",
+            "Owned worktree creation, dependency merges, immutable-tree preservation and optional local integration are permitted. Remote push, publishing, production deployment, main merge, credentials, dependency installation and arbitrary external operations are excluded.",
+            "Provider/model arguments and time/attempt/review/concurrency limits are enforced. Tool-free prompts, including full review diffs, are limited to 64 KiB; larger work blocks. Token/monetary accounting and spending caps are unavailable; provider defaults and inference charges cannot be certified. The trusted tool-free provider uses its configured API credentials in bare mode; OAuth subscription login and alternate cloud/custom backends are unsupported. Autono never reads or exposes credential values.",
+            "Authorization expires by wall-clock deadline from consent, including idle time. Crash/restart interrupts active runs and never resumes or blindly replays uncertain effects. Same-UID hostile processes and trusted installed provider binaries remain inside the local trust boundary."
+          ],
+          "repository_git": {
+            "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+            "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+            "metadata": {
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/commondir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config.worktree": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/gitdir": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+              "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null
+            },
+            "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo"
+          },
+          "repository_identity": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo": "16777232:411663523:501",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git": "16777232:411663528:501"
+          },
+          "request": {
+            "local_integration": true,
+            "max_runtime_seconds": 120,
+            "submission": {
+              "base": "main",
+              "id": "68ced26d-20f9-4cef-a511-ddc7baa6d972",
+              "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo",
+              "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n"
+            },
+            "writable_files": [
+              "a.sh",
+              "b.sh",
+              "c.sh"
+            ]
+          },
+          "settings": {
+            "agents": {
+              "coder": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "planner": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              },
+              "reviewer": {
+                "model": "fixture",
+                "provider": "claude",
+                "timeout_seconds": 30
+              }
+            },
+            "execution": {
+              "max_attempts": 3,
+              "max_parallel": 2,
+              "max_review_cycles": 2
+            },
+            "permissions": {
+              "rules": {
+                "run_checks": "REQUIRE_APPROVAL",
+                "workspace_write": "REQUIRE_APPROVAL"
+              }
+            },
+            "preflight": {
+              "external_services": [],
+              "required_directories": [],
+              "required_env": [],
+              "required_tools": []
+            },
+            "verification": {
+              "commands": [
+                [
+                  "/bin/sh",
+                  "-c",
+                  "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+                ]
+              ],
+              "timeout_seconds": 10
+            }
+          },
+          "user_config_digest": "4d346c4c9e891609e6bde852b08f0de36142abc0ccbc0a091f403179835e35aa",
+          "verification_sandbox": "macos-seatbelt-v1",
+          "version": 1,
+          "worktree_root": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/68ced26d-20f9-4cef-a511-ddc7baa6d972"
+        },
+        "expires_at": "2026-10-21T22:07:28.996830Z"
+      },
+      "human_actions": [
+        {
+          "audit": [
+            {
+              "at": "2026-10-21T22:05:29.525957Z",
+              "request": null,
+              "status": "PENDING"
+            }
+          ],
+          "continuable": false,
+          "created_at": "2026-10-21T22:05:29.525957Z",
+          "id": "H-377101ad06dbca423175abae6b13ef96",
+          "requirement": {
+            "affected_tasks": [],
+            "blocking": true,
+            "confidence": 100,
+            "evidence": "Workflow stage failed; retained process IDs and workspaces identify its evidence",
+            "kind": "runtime",
+            "permission": null,
+            "reason": "Workflow stage needs external intervention",
+            "requested_action": "Inspect the stage and configure the prerequisite externally. Planning/integration/integrity failures require a new trusted plan; they are not live task pauses."
+          },
+          "resolution": null,
+          "status": "PENDING",
+          "updated_at": "2026-10-21T22:05:29.525957Z",
+          "workspace_snapshot": null
+        }
+      ],
+      "id": "68ced26d-20f9-4cef-a511-ddc7baa6d972",
+      "integration_verification": [],
+      "integration_workspace": null,
+      "plan": null,
+      "planner": {
+        "id": "d8489ae7-1f86-4a50-9d6b-fc950406630a",
+        "outcome": "cli_infrastructure",
+        "process_key": "0b8faf77-c9b7-4299-b2d9-58084ed65c36",
+        "process_run_id": null,
+        "provider": "claude",
+        "provider_session_id": null,
+        "result": "cli_infrastructure: process=f2c547c3-0ef3-4912-a166-8a89d0f0077f status=Failed exit=None output_complete=Some(true) warnings=[]; spawn failed: spawn command: No such file or directory (os error 2)",
+        "resumed_from": null,
+        "role": "planner"
+      },
+      "planning_workspace": {
+        "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+        "branch": "autono/68ced26d-20f9-4cef-a511-ddc7baa6d972/planner",
+        "git": {
+          "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+          "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner2",
+          "metadata": {
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/68ced26d-20f9-4cef-a511-ddc7baa6d972/planner/.git": "971639c8ab7e2c87b7090e76f843705e9965f84bc39b6cdc78c8461c6a960ed9",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner2/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner2/config.worktree": null,
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner2/gitdir": "2c2570646add7dca6b8cf204ebf90de88586096190cb6b8307d02d056c813b51",
+            "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/planner2/info/exclude": null
+          },
+          "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/68ced26d-20f9-4cef-a511-ddc7baa6d972/planner"
+        },
+        "head_commit": null,
+        "id": "59cbfe87-b7e0-44f2-9a11-963048944887",
+        "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/68ced26d-20f9-4cef-a511-ddc7baa6d972/planner"
+      },
+      "preflight": null,
+      "repository": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo",
+      "repository_git": {
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/commondir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/gitdir": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null
+        },
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo"
+      },
+      "requested_base": "main",
+      "revision": 6,
+      "settings": {
+        "agents": {
+          "coder": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "planner": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          },
+          "reviewer": {
+            "model": "fixture",
+            "provider": "claude",
+            "timeout_seconds": 30
+          }
+        },
+        "execution": {
+          "max_attempts": 3,
+          "max_parallel": 2,
+          "max_review_cycles": 2
+        },
+        "permissions": {
+          "rules": {
+            "run_checks": "REQUIRE_APPROVAL",
+            "workspace_write": "REQUIRE_APPROVAL"
+          }
+        },
+        "preflight": {
+          "external_services": [],
+          "required_directories": [],
+          "required_env": [],
+          "required_tools": []
+        },
+        "verification": {
+          "commands": [
+            [
+              "/bin/sh",
+              "-c",
+              "for f in a b c; do if test -f \"$f.sh\"; then case \"$f\" in a) expected=A;; b) expected=B;; c) expected=\"$(/bin/echo A; /bin/echo C)\";; esac; actual=\"$(/bin/sh \"./$f.sh\")\" || exit 1; test \"$actual\" = \"$expected\" || exit 1; fi; done"
+            ]
+          ],
+          "timeout_seconds": 10
+        }
+      },
+      "specification": "Implement shell scripts a.sh printing A and b.sh printing B independently; c.sh sources a.sh then prints C. Verify successful exits and exact output.\n",
+      "status": "BLOCKED",
+      "summary": "cli_infrastructure: process=f2c547c3-0ef3-4912-a166-8a89d0f0077f status=Failed exit=None output_complete=Some(true) warnings=[]; spawn failed: spawn command: No such file or directory (os error 2)",
+      "tasks": [],
+      "updated_at": "2026-10-21T22:05:29.525968Z"
+    }
+  },
+  "native_desktop_lifetime": {
+    "main_commit_after": "7701fa3276136af253d035638f359a11cf354b7b",
+    "main_unchanged": true,
+    "native_binary": "/Users/brunosimplicio/Dev/autono/target/release/bundle/macos/Autono.app/Contents/MacOS/autono-desktop",
+    "desktop_pid": 68635,
+    "desktop_terminated": true,
+    "daemon_pid": 68382,
+    "daemon_alive_after_desktop_exit": true,
+    "run_id": "67130986-5445-458b-9c2b-a409851e09d9",
+    "before_desktop_exit": "PLANNING",
+    "after_desktop_exit": "PLANNING",
+    "final_status": "COMPLETED",
+    "integration": {
+      "id": "0a83f30f-990a-46b0-a128-8b951635df03",
+      "path": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/67130986-5445-458b-9c2b-a409851e09d9/integration",
+      "branch": "autono/67130986-5445-458b-9c2b-a409851e09d9/integration",
+      "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+      "head_commit": "08a1727b8766b33843a7e3fb93e91ec1e6b020c4",
+      "git": {
+        "worktree": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/67130986-5445-458b-9c2b-a409851e09d9/integration",
+        "git_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration1",
+        "common_dir": "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git",
+        "metadata": {
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/home/engineering/67130986-5445-458b-9c2b-a409851e09d9/integration/.git": "61909e334db46b761d61cbb2833a7c2f800b9077cfa130318c0b63b8d781382a",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/config": "cae33efdb02cf774435c1ff9cb16bcc1014606908530c6e1dc727615fe3e8cda",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/attributes": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/exclude": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/info/grafts": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/objects/info/http-alternates": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration1/commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration1/config.worktree": null,
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration1/gitdir": "8dd0a384e75df129af3a29b744c42de2f0e188afe14bb944dc6ecb54af41f5ed",
+          "/private/var/folders/7z/d0cj4crj1x96fmpvld8rlb4h0000gn/T/.tmphBlH3K/repo/.git/worktrees/integration1/info/exclude": null
+        }
+      }
+    },
+    "base_commit": "7701fa3276136af253d035638f359a11cf354b7b",
+    "paid_inference": false,
+    "provider": "private deterministic shell fixture"
+  },
+  "validation": {
+    "rust_workspace_tests": {
+      "command": "cargo test --workspace --locked -- --test-threads=2",
+      "passed": 116,
+      "failed": 0,
+      "ignored": 2,
+      "ignored_reasons": [
+        "paid inference opt-in",
+        "isolated subprocess helper exercised by its parent"
+      ]
+    },
+    "rust_format": "cargo fmt --all --check: passed",
+    "rust_clippy": "cargo clippy --workspace --all-targets --locked -- -D warnings: passed",
+    "rust_workspace_build": "cargo build --workspace --locked: passed",
+    "rust_workspace_release_build": "cargo build --workspace --release --locked: passed",
+    "rust_docs": "cargo doc --workspace --no-deps --locked: passed",
+    "rust_msrv": "cargo +1.89.0 check --workspace --exclude autono-desktop --all-targets --locked: passed",
+    "frontend": {
+      "tests_passed": 100,
+      "typescript": "passed",
+      "lint": "passed, zero warnings",
+      "production_build": "passed",
+      "emitted_module_startup_smoke": "passed"
+    },
+    "native_tauri": "optimized macOS arm64 .app build passed; actual owned desktop termination during the run also passed",
+    "authenticated_bridge": "7 Rust unit tests and 2 token-gated integration tests passed as part of the workspace",
+    "migration_and_persistence": "immutable delegation projections, legacy decoding, receipt replay, cancellation and restart tests passed",
+    "adversarial": "scope/command violations, task-scoped planned permissions, unknown effects, login/unavailable providers, policy denial, drift, budgets, cancellation, active/inactive resolution continuation and filesystem/process/network sandbox tests passed",
+    "linux": "not executed locally; Bubblewrap installed in the Linux CI job; no unsandboxed fallback"
+  },
+  "limitations": [
+    "Initial autonomous profile uses tool-free Claude bare/restricted mode and first-party API credentials; subscription OAuth and alternate cloud/custom backends are unsupported.",
+    "Exact file list, small complete prompts and supported sandboxed system checks are required.",
+    "No monetary/token accounting or spending cap is claimed.",
+    "No general crash-safe resume, hostile same-UID isolation or hard OS-wide resource quota is claimed. Existing process-group cleanup uncertainty remains visible in verification summaries.",
+    "A fresh independent security and architecture review remains required."
+  ]
+}

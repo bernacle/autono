@@ -178,6 +178,7 @@ dependencies = [
  "autono-daemon",
  "autono-protocol",
  "base64 0.22.1",
+ "chrono",
  "clap",
  "libc",
  "reqwest 0.12.28",

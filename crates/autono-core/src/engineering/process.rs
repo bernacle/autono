@@ -18,6 +18,7 @@ const CAPTURE_LIMIT: usize = 2 * 1024 * 1024;
 pub struct ProcessRunner {
     pub supervisor: Supervisor,
     git: Arc<Mutex<BTreeMap<PathBuf, GitOwnership>>>,
+    deadline: Option<chrono::DateTime<chrono::Utc>>,
 }
 #[derive(Debug)]
 pub struct CommandOutput {
@@ -89,7 +90,29 @@ impl ProcessRunner {
         Self {
             supervisor,
             git: Arc::new(Mutex::new(BTreeMap::new())),
+            deadline: None,
         }
+    }
+    pub fn with_deadline(&self, deadline: Option<chrono::DateTime<chrono::Utc>>) -> Self {
+        let mut runner = self.clone();
+        // A nested scope may narrow an existing deadline, never extend it.
+        runner.deadline = match (self.deadline, deadline) {
+            (Some(a), Some(b)) => Some(a.min(b)),
+            (a, b) => a.or(b),
+        };
+        runner
+    }
+    pub(crate) fn check_authority(&self, stop: &CancellationToken) -> Result<()> {
+        if self.deadline.is_some_and(|d| chrono::Utc::now() >= d) {
+            return Err(super::delegation::denied(
+                "total runtime budget exhausted; active processes cancelled, completed evidence retained",
+            ));
+        }
+        anyhow::ensure!(
+            !stop.is_cancelled(),
+            "workflow cancelled before process admission"
+        );
+        Ok(())
     }
     pub fn bind_git(&self, owned: &GitOwnership) -> Result<()> {
         owned.verify()?;
@@ -141,10 +164,7 @@ impl ProcessRunner {
         key: Uuid,
         stop: &CancellationToken,
     ) -> Result<Run> {
-        anyhow::ensure!(
-            !stop.is_cancelled(),
-            "workflow cancelled before process launch"
-        );
+        self.check_authority(stop)?;
         let spec = RunSpec {
             command,
             cwd: cwd.to_owned(),
@@ -160,28 +180,40 @@ impl ProcessRunner {
         self.start_spec(spec, key, stop).await
     }
     async fn start_spec(&self, spec: RunSpec, key: Uuid, stop: &CancellationToken) -> Result<Run> {
-        anyhow::ensure!(
-            !stop.is_cancelled(),
-            "workflow cancelled before process admission"
-        );
+        self.check_authority(stop)?;
+        let authority = crate::supervisor::ExecutionAuthority {
+            cancel: stop.clone(),
+            deadline: self.deadline,
+        };
         let mut delay = Duration::from_millis(50);
         let mut retries = 0;
         let run = loop {
+            self.check_authority(stop)?;
             match self
                 .supervisor
-                .submit_keyed(autono_protocol::Submission {
-                    submission_key: key,
-                    spec: spec.clone(),
-                })
+                .submit_authorized(
+                    autono_protocol::Submission {
+                        submission_key: key,
+                        spec: spec.clone(),
+                    },
+                    authority.clone(),
+                )
                 .await
             {
                 Ok(run) => break run,
                 Err(e) if e.is::<crate::supervisor::Overloaded>() && retries < 6 => {
+                    self.check_authority(stop)?;
                     retries += 1;
-                    tokio::select! { biased; _ = stop.cancelled() => anyhow::bail!("workflow cancelled during admission backoff"), _ = tokio::time::sleep(delay) => {} }
+                    tokio::select! {
+                        biased;
+                        _ = stop.cancelled() => { self.check_authority(stop)?; anyhow::bail!("workflow cancelled during admission backoff"); },
+                        _ = authority.deadline_reached() => return Err(super::delegation::denied("total runtime budget exhausted during process admission backoff")),
+                        _ = tokio::time::sleep(delay) => {},
+                    }
                     delay *= 2;
                 }
                 Err(e) if e.is::<crate::supervisor::Overloaded>() => {
+                    self.check_authority(stop)?;
                     return Err(AgentFailure {
                         kind: "process_admission".into(),
                         detail: format!(
@@ -194,20 +226,6 @@ impl ProcessRunner {
                 Err(e) => return Err(e),
             }
         };
-        if let Some(finished) = self.supervisor.control_finished(run.id) {
-            let supervisor = self.supervisor.clone();
-            let stop = stop.clone();
-            let id = run.id;
-            // Cancellation cannot depend on a workflow checkpoint acquiring SQLite.
-            // This bounded-lifetime watcher ends with process control, before finalization.
-            tokio::spawn(async move {
-                tokio::select! {
-                    biased;
-                    _ = finished.cancelled() => {},
-                    _ = stop.cancelled() => { let _ = supervisor.cancel(id).await; },
-                }
-            });
-        }
         Ok(run)
     }
     /// On read failure, stop and finish process control before releasing caller ownership.

@@ -13,6 +13,27 @@ pub struct EngineeringNotFound(pub Uuid);
 pub struct EngineeringConflict(pub String);
 
 impl Store {
+    pub async fn engineering_delegation_proposal(&self, id: Uuid) -> Result<DelegationContract> {
+        let document: String = sqlx::query_scalar(
+            "SELECT document FROM engineering_delegation_proposals WHERE run_id=?",
+        )
+        .bind(id.to_string())
+        .fetch_optional(&self.readers)
+        .await?
+        .ok_or(EngineeringNotFound(id))?;
+        Ok(serde_json::from_str(&document)?)
+    }
+    pub(super) async fn engineering_propose(&self, contract: &DelegationContract) -> Result<()> {
+        sqlx::query("INSERT INTO engineering_delegation_proposals(run_id,document) VALUES(?,?) ON CONFLICT DO NOTHING")
+            .bind(contract.request.submission.id.to_string()).bind(serde_json::to_string(contract)?).execute(&self.pool).await?;
+        ensure!(
+            self.engineering_delegation_proposal(contract.request.submission.id)
+                .await?
+                == *contract,
+            EngineeringConflict("delegation ID already has a different proposal".into())
+        );
+        Ok(())
+    }
     pub async fn engineering_get(&self, id: Uuid) -> Result<EngineeringRun> {
         let doc: Option<String> =
             sqlx::query_scalar("SELECT document FROM engineering_runs WHERE id=?")
@@ -75,6 +96,23 @@ impl Store {
         .bind(serde_json::to_string(run)?)
         .execute(&mut *tx)
         .await?;
+        if let Some(auth) = &run.delegation {
+            ensure!(
+                auth.contract.request.submission.id == run.id
+                    && auth.expires_at
+                        == auth.authorized_at
+                            + chrono::Duration::seconds(
+                                auth.contract.request.max_runtime_seconds as i64
+                            ),
+                "invalid delegation lifetime or run binding"
+            );
+            sqlx::query("INSERT INTO engineering_delegations(run_id,document) VALUES(?,?)")
+                .bind(run.id.to_string())
+                .bind(serde_json::to_string(auth)?)
+                .execute(&mut *tx)
+                .await?;
+            append(&mut tx, run.id, "delegation_authorized", "Developer consented to the exact immutable bounded contract; no monetary accounting is available").await?;
+        }
         reserve(&mut tx, run, &run.planning_workspace).await?;
         append(
             &mut tx,
@@ -117,14 +155,15 @@ impl Store {
                 && old.repository_git == run.repository_git
                 && old.requested_base == run.requested_base
                 && old.base_commit == run.base_commit
-                && old.settings == run.settings,
+                && old.settings == run.settings
+                && old.delegation == run.delegation,
             "immutable run inputs changed"
         );
         if old.status != EngineeringStatus::Running && run.status == EngineeringStatus::Running {
             ensure!(
                 run.preflight
                     .as_ref()
-                    .is_some_and(|p| p.ready
+                    .is_some_and(|p| (p.ready || run.autonomous_preflight_ready())
                         && !p.checks.iter().any(|c| c.blocking && c.ready != Some(true))),
                 "execution requires a ready preflight report"
             );
@@ -237,6 +276,7 @@ impl Store {
                         &mut tx,
                         session.process_run_id.context("missing agent process")?,
                         None,
+                        None,
                     )
                     .await?;
                     ensure!(
@@ -244,7 +284,17 @@ impl Store {
                         "agent session did not succeed"
                     );
                 }
-                verify_checks(&mut tx, &run.settings, &last.verification).await?;
+                verify_checks(
+                    &mut tx,
+                    run,
+                    task.workspace
+                        .as_ref()
+                        .context("task workspace missing")?
+                        .path
+                        .as_path(),
+                    &last.verification,
+                )
+                .await?;
             }
         }
         if let Some(workspace) = &run.integration_workspace {
@@ -280,7 +330,17 @@ impl Store {
                     .is_some_and(|w| w.head_commit.is_some()),
                 "integration artifact missing"
             );
-            verify_checks(&mut tx, &run.settings, &run.integration_verification).await?;
+            verify_checks(
+                &mut tx,
+                run,
+                run.integration_workspace
+                    .as_ref()
+                    .context("integration workspace missing")?
+                    .path
+                    .as_path(),
+                &run.integration_verification,
+            )
+            .await?;
         }
         // Human checklist projections and idempotency receipts commit with the run/event.
         ensure!(
@@ -426,6 +486,7 @@ async fn verify_process(
     tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
     id: Uuid,
     command: Option<&Vec<String>>,
+    scope: Option<(&std::path::Path, u64, Uuid)>,
 ) -> Result<()> {
     let doc: String = sqlx::query_scalar("SELECT document FROM runs WHERE id=?")
         .bind(id.to_string())
@@ -438,6 +499,14 @@ async fn verify_process(
             && run.output_complete == Some(true),
         "process evidence is incomplete or unsuccessful"
     );
+    if let Some((cwd, seconds, key)) = scope {
+        ensure!(
+            run.spec.cwd == cwd
+                && run.spec.timeout_seconds == Some(seconds)
+                && run.submission_key == Some(key),
+            "delegated verification process context does not match evidence"
+        );
+    }
     if let Some(command) = command {
         ensure!(
             &run.spec.command == command,
@@ -448,14 +517,15 @@ async fn verify_process(
 }
 async fn verify_checks(
     tx: &mut sqlx::Transaction<'_, sqlx::Sqlite>,
-    settings: &WorkflowSettings,
+    run: &EngineeringRun,
+    cwd: &std::path::Path,
     checks: &[VerificationResult],
 ) -> Result<()> {
     ensure!(
-        checks.len() == settings.verification.commands.len(),
+        checks.len() == run.settings.verification.commands.len(),
         "missing configured verification checks"
     );
-    for (check, command) in checks.iter().zip(&settings.verification.commands) {
+    for (check, command) in checks.iter().zip(&run.settings.verification.commands) {
         ensure!(
             check.passed
                 && check.exit_code == Some(0)
@@ -463,7 +533,32 @@ async fn verify_checks(
                 && &check.command == command,
             "required verification failed"
         );
-        verify_process(tx, check.process_run_id, Some(command)).await?;
+        let effective = if let Some(auth) = &run.delegation {
+            super::delegation::sandbox_command(
+                command,
+                cwd,
+                &auth
+                    .contract
+                    .worktree_root
+                    .join("check-tmp")
+                    .join(check.process_key.to_string()),
+            )?
+        } else {
+            command.clone()
+        };
+        verify_process(
+            tx,
+            check.process_run_id,
+            Some(&effective),
+            run.delegation.as_ref().map(|_| {
+                (
+                    cwd,
+                    run.settings.verification.timeout_seconds,
+                    check.process_key,
+                )
+            }),
+        )
+        .await?;
     }
     Ok(())
 }
@@ -492,6 +587,7 @@ mod tests {
         let now = Utc::now();
         EngineeringRun {
             id,
+            delegation: None,
             revision: 0,
             status: EngineeringStatus::Planning,
             created_at: now,

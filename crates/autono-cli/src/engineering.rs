@@ -164,3 +164,48 @@ pub async fn resolve(paths: &Paths, id: Uuid, action: &str, path: PathBuf) -> Re
     );
     Ok(())
 }
+
+pub async fn propose_delegation(
+    paths: &Paths,
+    specification: PathBuf,
+    mut request: autono_protocol::engineering::DelegationProposalRequest,
+) -> Result<()> {
+    request.submission.repository = tokio::fs::canonicalize(&request.submission.repository).await?;
+    let bytes = tokio::fs::read(specification).await?;
+    anyhow::ensure!(bytes.len() <= 128 * 1024, "specification exceeds 128 KiB");
+    request.submission.specification = String::from_utf8(bytes)?;
+    eprintln!(
+        "delegation ID: {} (reuse --plan-id after an ambiguous response)",
+        request.submission.id
+    );
+    let contract: autono_protocol::engineering::DelegationContract = Client::connect(paths)
+        .await?
+        .post("/v1/delegations/propose", &request)
+        .await?;
+    println!("{}", serde_json::to_string_pretty(&contract)?);
+    Ok(())
+}
+pub async fn authorize_delegation(paths: &Paths, path: PathBuf) -> Result<()> {
+    let contract: autono_protocol::engineering::DelegationContract =
+        serde_json::from_slice(&tokio::fs::read(path).await?)?;
+    let run: EngineeringRun = Client::connect(paths)
+        .await?
+        .post(
+            &format!(
+                "/v1/delegations/{}/authorize",
+                contract.request.submission.id
+            ),
+            &contract,
+        )
+        .await?;
+    println!("{}", serde_json::to_string_pretty(&run)?);
+    Ok(())
+}
+pub async fn show_delegation(paths: &Paths, id: Uuid) -> Result<()> {
+    let contract: autono_protocol::engineering::DelegationContract = Client::connect(paths)
+        .await?
+        .get(&format!("/v1/delegations/{id}"))
+        .await?;
+    println!("{}", serde_json::to_string_pretty(&contract)?);
+    Ok(())
+}
