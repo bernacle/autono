@@ -218,9 +218,9 @@ run_checks = "REQUIRE_APPROVAL"
     let id = Uuid::new_v4();
     let mut args = vec![
         "build",
-        spec.to_str().context("spec")?,
+        "feature.md",
         "--repository",
-        repo.to_str().context("repo")?,
+        "repo",
         "--base",
         "main",
         "--plan-id",
@@ -228,7 +228,17 @@ run_checks = "REQUIRE_APPROVAL"
     let id_text = id.to_string();
     args.push(&id_text);
     args.extend(["--max-runtime-seconds", "120", "--proposal-only"]);
-    let proposal = invoke(&home, &args).await?;
+    let output = tokio::time::timeout(
+        Duration::from_secs(30),
+        cli(&home).current_dir(&root).args(&args).output(),
+    )
+    .await??;
+    ensure!(
+        output.status.success(),
+        "relative-path Build proposal failed: {}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let proposal = String::from_utf8(output.stdout)?;
     let contract: DelegationContract = serde_json::from_str(&proposal)?;
     assert_eq!(contract.version, 2);
     assert!(

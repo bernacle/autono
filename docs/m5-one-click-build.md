@@ -240,3 +240,11 @@ MSRV and native packaging job URLs are kept in the Draft PR description and its
 live checks. Both platform matrices passed for the initial implementation and
 are rerun for the final scope/candidate guard corrections. The paid real-provider
 scenario stays intentionally ignored.
+
+Partial-clone rejection happens in trusted local Git configuration validation,
+with an additional `GIT_NO_LAZY_FETCH` guard. No configuration key names or values
+are collected through a logged discovery process: subsection names themselves can
+contain credential-bearing URLs. The keyword check is deliberately conservative;
+materialize partial clones externally. A regression verifies generic rejection
+without echoing a credential-bearing subsection. The primary CLI acceptance also
+uses relative feature/repository paths, resolved canonically before proposal.

@@ -15,12 +15,12 @@
       "log": "autono-a1-frontend-delivery.log"
     },
     "v2_daemon": {
-      "sha256": "9c5b29253f21a33fa37f0dbd6253589e953c5c196f3b901f6a0c476a93535ee6",
-      "log": "autono-a1-build-delivery.log"
+      "log": "autono-a1-build-frozen.log",
+      "sha256": "924ac155b01d2fe847ef8ebe76f3dd7903537dedb2a234f270c48ddc9994ecfa"
     },
     "strict_clippy": {
-      "sha256": "3d21af7907c34ef2be8e064214ef6b55459ffdb2737d017e0ac3c45bbb2cb20d",
-      "log": "autono-a1-clippy-delivery.log"
+      "log": "autono-a1-clippy-frozen.log",
+      "sha256": "40abcc4694c0abfb5c59eb51d341162b8cd3138110bb2acf1893032e2cf7afe5"
     },
     "debug_build": {
       "sha256": "b841d724eec649dd21bc79755fa7dff37a5afb52a7dbbadda1ef0400dc6b4ad3",
@@ -49,6 +49,10 @@
     "reader_startup": {
       "sha256": "bfff2fcc0c20cc95ac5fe3c054cd075384db664bc5a979682e37e48545263861",
       "log": "autono-a1-reader-startup.log"
+    },
+    "partial_clone": {
+      "log": "autono-a1-partial-clone.log",
+      "sha256": "af990f7d87d2ecd752332cfff4d82830d10122b4ba55302a7f93c1b85860925e"
     }
   },
   "latest_scope_and_candidate_guards": "Revalidated through the actual daemon CSV/adversarial suite and strict Clippy; the final CI matrix validates the full committed tree.",
@@ -60,5 +64,7 @@
     "Bounded source contexts and complete prompts/diffs; larger scopes block.",
     "No paid real-provider acceptance; no general crash recovery.",
     "Native accessibility automation intermittently timed out; screenshots, fresh full snapshots and authenticated receipts verify the documented smoke scenarios."
-  ]
+  ],
+  "final_targeted_at": "2026-10-23T14:52:04.462068+00:00",
+  "additional_security_regression": "Partial-clone rejection before Git probes, without logging configuration keys/values."
 }

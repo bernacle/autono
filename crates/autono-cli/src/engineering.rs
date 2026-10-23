@@ -209,6 +209,7 @@ pub async fn build(
 ) -> Result<()> {
     use std::io::{IsTerminal, Write};
     request.submission.specification = tokio::fs::read_to_string(path).await?;
+    request.submission.repository = tokio::fs::canonicalize(&request.submission.repository).await?;
     eprintln!(
         "Read-only local discovery; no agent, project script or network discovery. Submission ID: {}",
         request.submission.id
