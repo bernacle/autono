@@ -251,7 +251,9 @@ export default function App() {
             setSelected(null);
           }}
           disabled={!healthy}
-          title={!healthy ? "Reconnect to a healthy daemon" : "New run · ⌘N"}
+          title={
+            !healthy ? "Reconnect to a healthy daemon" : "Build feature · ⌘N"
+          }
         >
           <Plus size={15} />
           <span>Build feature</span>
@@ -1028,7 +1030,7 @@ function QuickCommands({
       action: () => navigate("processes"),
       disabled: false,
     },
-    { label: "New run", action: newRun, disabled: !healthy },
+    { label: "Build feature", action: newRun, disabled: !healthy },
     {
       label: "Reconnect daemon",
       action: () => {

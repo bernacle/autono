@@ -74,12 +74,13 @@ impl Store {
             )
             .await
             .context("open runtime database writer")?;
-        let readers = SqlitePoolOptions::new()
-            .max_connections(4)
-            .acquire_timeout(Duration::from_millis(250))
-            .connect_with(reader_options)
-            .await
-            .context("open runtime database readers")?;
+        let readers = connect_readers(
+            reader_options,
+            SqlitePoolOptions::new()
+                .max_connections(4)
+                .acquire_timeout(Duration::from_millis(250)),
+        )
+        .await?;
         Ok(Self {
             readers,
             pool,
@@ -419,6 +420,65 @@ impl Store {
             .await?;
         }
         Ok(ids.len())
+    }
+}
+
+/// Initial read-only handshakes can briefly miss the normal 250ms pool budget
+/// on a busy host. Retry only known transient connection errors, with the same
+/// bounded persistence policy. No migration, write or process is replayed here.
+async fn connect_readers(
+    options: SqliteConnectOptions,
+    builder: SqlitePoolOptions,
+) -> Result<SqlitePool> {
+    crate::persistence::retry(|| {
+        let options = options.clone();
+        let builder = builder.clone();
+        async move { Ok(builder.connect_with(options).await?) }
+    })
+    .await
+    .context("open runtime database readers")
+}
+
+#[cfg(test)]
+mod reader_startup_tests {
+    use super::*;
+    use std::sync::{
+        Arc,
+        atomic::{AtomicUsize, Ordering},
+    };
+    #[tokio::test]
+    async fn transient_initial_reader_handshake_timeout_does_not_prevent_startup() -> Result<()> {
+        let tmp = tempfile::tempdir()?;
+        let path = tmp.path().join("runtime.sqlite3");
+        let store = Store::open(&path).await?;
+        let calls = Arc::new(AtomicUsize::new(0));
+        let counter = calls.clone();
+        let readers = connect_readers(
+            SqliteConnectOptions::new().filename(&path).read_only(true),
+            SqlitePoolOptions::new()
+                .max_connections(1)
+                .acquire_timeout(Duration::from_millis(250))
+                .after_connect(move |_, _| {
+                    let first = counter.fetch_add(1, Ordering::SeqCst) == 0;
+                    Box::pin(async move {
+                        if first {
+                            tokio::time::sleep(Duration::from_millis(500)).await;
+                        }
+                        Ok(())
+                    })
+                }),
+        )
+        .await?;
+        assert!(calls.load(Ordering::SeqCst) >= 2);
+        assert_eq!(
+            sqlx::query_scalar::<_, i64>("SELECT count(*) FROM engineering_runs")
+                .fetch_one(&readers)
+                .await?,
+            0
+        );
+        store.health().await?;
+        readers.close().await;
+        Ok(())
     }
 }
 

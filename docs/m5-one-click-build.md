@@ -200,3 +200,12 @@ crash recovery with supported replay semantics. These are not implemented here.
 Real-provider acceptance still requires explicitly authorized paid inference on
 the supported Claude API profile. General CLI coding tools and subscription
 providers require a separately confined, freshly consented profile.
+
+Validation also exposed transient SQLite reader-pool startup failure on a busy
+host: initial connection creation inherited the normal 250ms query-acquisition
+budget. Read-only connection creation now uses the existing four-second,
+known-transient-only persistence retry helper. The 250ms steady-state budget is
+unchanged; no migration, write, agent or effect is replayed. A real SQLite test
+forces the first connection handshake past that deadline and requires successful
+startup with an empty engineering-run table. Fixture startup failures now retain
+bounded daemon-log context so CI failures identify the cause.

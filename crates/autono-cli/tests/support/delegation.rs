@@ -1,7 +1,7 @@
 //! Real daemon + CLI + production adapter, with shell-only provider executables.
 //! No installed coding CLI, login or inference is invoked.
 #![cfg(any(target_os = "macos", target_os = "linux"))]
-use anyhow::{Result, ensure};
+use anyhow::{Context, Result, ensure};
 use autono_protocol::{DaemonMetadata, engineering::*};
 use std::{path::Path, process::Stdio, time::Duration};
 use tokio::process::{Child, Command};
@@ -35,7 +35,20 @@ pub async fn ready(home: &Path, previous: Option<u32>) -> Result<DaemonMetadata>
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
     })
-    .await?
+    .await
+    .with_context(|| {
+        let log = std::fs::read_to_string(home.parent().unwrap_or(home).join("daemon.log"))
+            .unwrap_or_default();
+        let tail: String = log
+            .chars()
+            .rev()
+            .take(5000)
+            .collect::<String>()
+            .chars()
+            .rev()
+            .collect();
+        format!("fixture daemon did not publish fresh metadata; recent daemon log:\n{tail}")
+    })?
 }
 pub fn start(home: &Path, root: &Path) -> Result<Child> {
     let log = std::fs::OpenOptions::new()

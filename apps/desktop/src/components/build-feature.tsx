@@ -165,6 +165,7 @@ export function BuildFeature({
             <Button
               type="button"
               variant="secondary"
+              aria-label="Change repository"
               onClick={() => void pick()}
               disabled={proposal.isPending}
             >

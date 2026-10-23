@@ -5,6 +5,21 @@ import { Button } from "./ui/button";
 import { Decisions } from "./decisions";
 import { ErrorNotice, Panel } from "./common";
 
+const progressLabels: Record<string, string> = {
+  created: "Your feature request was recorded.",
+  agent_started: "An agent started its assigned work.",
+  agent_finished: "An agent returned its result for validation.",
+  source_edits_applied: "Authorized source changes were applied.",
+  verification_finished:
+    "A configured check finished. Its result is in detailed evidence.",
+  verification_passed: "The complete configured check set passed for a task.",
+  task_completed: "A task passed checks and independent review.",
+  completed: "The combined feature passed checks and was integrated locally.",
+  human_action: "A task recorded a request requiring your input.",
+  execution_finished:
+    "Currently runnable work finished; verified artifacts are preserved.",
+};
+
 export function FeatureSummary({
   run,
   connected,
@@ -43,14 +58,7 @@ export function FeatureSummary({
               ? "Checking the combined feature"
               : "Building your feature";
   const meaningful = events.data?.items
-    .filter(
-      (e) =>
-        ![
-          "delegation_allowed",
-          "agent_process",
-          "verification_process",
-        ].includes(e.kind),
-    )
+    .filter((e) => !!progressLabels[e.kind])
     .at(-1);
   const files = [
     ...new Set(
@@ -76,7 +84,13 @@ export function FeatureSummary({
       <p className="muted">
         {run.repository} · base {run.base_commit.slice(0, 12)}
       </p>
-      <p>{report?.summary ?? run.summary}</p>
+      <p>
+        {ready
+          ? "Configured checks and independent review passed. Review your verified work locally."
+          : report?.outcome === "in_progress"
+            ? "Autono is working within your authorized scope. You can close this window."
+            : (report?.summary ?? run.summary)}
+      </p>
       {!connected && (
         <p className="notice notice-warning">
           Connection unavailable. This view may be stale; the daemon owns
@@ -172,7 +186,7 @@ export function FeatureSummary({
         <strong>Last recorded progress</strong>
         <p>
           {meaningful
-            ? `${date(meaningful.timestamp)} · ${meaningful.detail}`
+            ? `${date(meaningful.timestamp)} · ${progressLabels[meaningful.kind]}`
             : "Waiting for durable activity evidence."}
         </p>
         {events.isError && <ErrorNotice error={events.error} />}
