@@ -209,3 +209,34 @@ unchanged; no migration, write, agent or effect is replayed. A real SQLite test
 forces the first connection handshake past that deadline and requires successful
 startup with an empty engineering-run table. Fixture startup failures now retain
 bounded daemon-log context so CI failures identify the cause.
+
+## Native evidence and final authority checks
+
+The [packaged native gallery and receipts](m5-build-native/README.md) cover the
+requested dark/light size matrix, native repository selection, prompt, consent,
+planning/execution, partial outcome, verified handoff, advanced graph and
+Supervised entry. This is an actual packaged WKWebView connected to a disposable
+real daemon; the documented accessibility-tool limitations are retained.
+
+The final scope filter also excludes configuration directories, `*.config.*` /
+`*.conf.*`, and reserved CI/build/deploy/release/publish/setup stems even when
+those files have source extensions. Every delegated edit must appear in the
+staged candidate before checks may run: `.gitignore` cannot make verification
+observe a model-written source file omitted from the preserved tree. The eighth
+real-daemon denial case retains that ignored file without any check/review
+receipt or verified artifact, while independent work completes.
+
+Native proposal dismissal distinguishes an unsubmitted proposal or definitive
+409 conflict from an uncertain authorization response. The former can obtain a
+fresh proposal after a changed base/configuration. A lost consent response keeps
+its original submission identity across dismissal/navigation/reload; the daemon
+remains the sole source of authorization. Essential preplanning holds use the
+structured blocked outcome and expose the already-supported prerequisite refresh,
+without offering routine execution approvals or crash replay.
+
+Local validation and log hashes are retained in the
+[validation manifest](m5-build-validation.json). Final committed-tree Linux/macOS,
+MSRV and native packaging job URLs are kept in the Draft PR description and its
+live checks. Both platform matrices passed for the initial implementation and
+are rerun for the final scope/candidate guard corrections. The paid real-provider
+scenario stays intentionally ignored.

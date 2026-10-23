@@ -48,15 +48,17 @@ export function FeatureSummary({
     ? "Ready for review"
     : report?.outcome === "evidence_incomplete"
       ? "Needs inspection — evidence incomplete"
-      : report?.outcome === "partially_completed"
-        ? "Partially completed — needs your input"
-        : stopped
-          ? `${run.status[0]}${run.status.slice(1).toLowerCase()} — inspect retained work`
-          : run.status === "PLANNING"
-            ? "Planning your feature"
-            : run.status === "INTEGRATING"
-              ? "Checking the combined feature"
-              : "Building your feature";
+      : report?.outcome === "blocked"
+        ? "Needs your input before work can continue"
+        : report?.outcome === "partially_completed"
+          ? "Partially completed — needs your input"
+          : stopped
+            ? `${run.status[0]}${run.status.slice(1).toLowerCase()} — inspect retained work`
+            : run.status === "PLANNING"
+              ? "Planning your feature"
+              : run.status === "INTEGRATING"
+                ? "Checking the combined feature"
+                : "Building your feature";
   const meaningful = events.data?.items
     .filter((e) => !!progressLabels[e.kind])
     .at(-1);

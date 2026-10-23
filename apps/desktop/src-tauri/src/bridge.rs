@@ -159,6 +159,8 @@ impl Bridge {
             return Err(BridgeError::new(
                 if status.as_u16() == 401 {
                     "authentication"
+                } else if status.as_u16() == 409 {
+                    "conflict"
                 } else {
                     "rejected"
                 },

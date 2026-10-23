@@ -42,7 +42,8 @@ export function can(run: Run, action: RunAction) {
       );
     case "preflight":
       return (
-        ["AWAITING_APPROVAL", "BLOCKED"].includes(run.status) && !!run.plan
+        ["AWAITING_APPROVAL", "BLOCKED"].includes(run.status) &&
+        (!!run.plan || (!!run.delegation && !run.planner))
       );
     case "integrate":
       return !run.delegation && run.status === "VERIFIED";

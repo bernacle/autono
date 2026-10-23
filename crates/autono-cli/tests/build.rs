@@ -427,6 +427,7 @@ async fn v2_denials_and_deferrable_choices_preserve_independent_verified_work() 
         "configuration",
         "traversal",
         "command",
+        "ignored",
         "category_b",
         "deferrable",
     ] {
@@ -461,10 +462,14 @@ timeout_seconds = 10
             repo.join("src/format.sh"),
             "# Default export format is CSV.\n# Report columns are name,value.\n",
         )?;
+        if scenario == "ignored" {
+            std::fs::write(repo.join(".gitignore"), "src/validate.sh\n")?;
+        }
         git(&repo, &["add", "."]).await?;
         git(&repo, &["commit", "-m", "seed"]).await?;
         let mut coder = json!({"summary":"Proposed source change","blocker":"","decisions":[],"edits":[{"path":"src/validate.sh","content":"# must not be applied\n"}]});
         match scenario {
+            "ignored" => {}
             "category_b" => {
                 coder["decisions"] = json!([{"key":"storage-choice","question":"Replace reporting storage?","chosen":"SQLite","alternatives":["remote storage"],"rationale":"A significant storage choice requires human input.","kind":"significant","evidence":[],"requirements":["Add CSV export to the reporting module, including validation and tests."],"assumptions":[],"uncertainty":[],"affected_files":["src/validate.sh"],"affected_tasks":["validate"],"supersedes":null}]);
             }
@@ -574,10 +579,24 @@ timeout_seconds = 10
             .find(|t| t.plan.id == "validate")
             .context("validate")?;
         if let Some(w) = &task.workspace {
-            assert!(
-                !w.path.join("src/validate.sh").exists(),
-                "{scenario}: invalid batch applied"
-            );
+            if scenario == "ignored" {
+                assert!(
+                    w.path.join("src/validate.sh").exists(),
+                    "the ignored candidate must be retained for inspection"
+                );
+                assert!(
+                    task.attempts
+                        .iter()
+                        .all(|a| a.verification.is_empty() && a.reviews.is_empty()),
+                    "an omitted source edit must block before any verification/review receipt"
+                );
+                assert!(task.artifact_commit.is_none());
+            } else {
+                assert!(
+                    !w.path.join("src/validate.sh").exists(),
+                    "{scenario}: invalid batch applied"
+                );
+            }
         }
         assert!(!repo.join("src/validate.sh").exists());
         assert_eq!(run.delegation.as_ref().context("auth")?.contract, contract);

@@ -33,7 +33,11 @@ export function BuildFeature({
     [integration, setIntegration] = useState(true);
   const [contract, setContract] = useState<DelegationContract | null>(null),
     [pickerError, setPickerError] = useState<unknown>(null);
-  const receipt = useRef<{ signature: string; id: string } | null>(null);
+  const receipt = useRef<{
+    signature: string;
+    id: string;
+    authorization_attempted?: boolean;
+  } | null>(null);
   const proposal = useMutation({
     mutationFn: () => {
       const roots = trees
@@ -53,12 +57,20 @@ export function BuildFeature({
         try {
           const pending = JSON.parse(
             localStorage.getItem("autono.build.pending") ?? "null",
-          ) as { signature?: unknown; id?: unknown } | null;
+          ) as {
+            signature?: unknown;
+            id?: unknown;
+            authorization_attempted?: unknown;
+          } | null;
           if (
             pending?.signature === signature &&
             typeof pending.id === "string"
           )
-            receipt.current = { signature, id: pending.id };
+            receipt.current = {
+              signature,
+              id: pending.id,
+              authorization_attempted: pending.authorization_attempted === true,
+            };
         } catch {
           /* Invalid local cache never becomes authority. */
         }
@@ -90,12 +102,20 @@ export function BuildFeature({
     onSuccess: setContract,
   });
   const authorize = useMutation({
-    mutationFn: () =>
-      transport.request<Run>({
+    mutationFn: () => {
+      if (receipt.current) {
+        receipt.current.authorization_attempted = true;
+        localStorage.setItem(
+          "autono.build.pending",
+          JSON.stringify(receipt.current),
+        );
+      }
+      return transport.request<Run>({
         type: "authorize_delegation",
         id: contract!.request.submission.id,
         displayed_contract: contract!,
-      }),
+      });
+    },
     retry: false,
     onSuccess: async (run) => {
       localStorage.setItem("autono.build.repository", run.repository);
@@ -105,6 +125,22 @@ export function BuildFeature({
       onCreated(run.id);
     },
   });
+  const dismissProposal = () => {
+    if (authorize.isPending) return;
+    const conflict =
+      typeof authorize.error === "object" &&
+      authorize.error !== null &&
+      "code" in authorize.error &&
+      authorize.error.code === "conflict";
+    // A definitive conflict admits no matching grant. A lost authorization
+    // response keeps its identity even across dismissal, navigation and reload.
+    if (!receipt.current?.authorization_attempted || conflict) {
+      receipt.current = null;
+      localStorage.removeItem("autono.build.pending");
+    }
+    setContract(null);
+    authorize.reset();
+  };
   const pick = async () => {
     try {
       const path = await transport.pickRepository();
@@ -262,12 +298,7 @@ export function BuildFeature({
           description="One bounded grant covers planning, implementation, checks, independent review and the local integration shown below."
           wide
           busy={authorize.isPending}
-          onClose={() => {
-            if (!authorize.isPending) {
-              setContract(null);
-              authorize.reset();
-            }
-          }}
+          onClose={dismissProposal}
         >
           <div className="build-consent">
             <p>{contract.request.submission.specification}</p>
@@ -360,10 +391,7 @@ export function BuildFeature({
               <Button
                 variant="secondary"
                 disabled={authorize.isPending}
-                onClick={() => {
-                  setContract(null);
-                  authorize.reset();
-                }}
+                onClick={dismissProposal}
               >
                 Back
               </Button>

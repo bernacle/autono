@@ -23,6 +23,11 @@ fn ordinary(path: &str) -> bool {
                 | "target"
                 | "dist"
                 | "build"
+                | "config"
+                | "configuration"
+                | "settings"
+                | "hooks"
+                | "workflows"
         ) || part.contains("credential")
             || part.contains("secret")
             || part.contains("private-key")
@@ -31,6 +36,26 @@ fn ordinary(path: &str) -> bool {
         return false;
     }
     let name = lower.rsplit('/').next().unwrap_or("");
+    let stem = name.split('.').next().unwrap_or("");
+    if name.contains(".config.")
+        || name.contains(".conf.")
+        || matches!(
+            stem,
+            "config"
+                | "settings"
+                | "ci"
+                | "build"
+                | "deploy"
+                | "deployment"
+                | "infrastructure"
+                | "infra"
+                | "release"
+                | "publish"
+                | "setup"
+        )
+    {
+        return false;
+    }
     if matches!(
         name,
         "package.json"
@@ -411,6 +436,10 @@ mod tests {
             "src/private_key.txt",
             "src/key.pem",
             "src/credentials.py",
+            "src/vite.config.ts",
+            "src/ci.ts",
+            "src/build.sh",
+            "src/config/routes.rs",
             "src/.git/config",
         ] {
             assert!(!ordinary(path), "{path}");

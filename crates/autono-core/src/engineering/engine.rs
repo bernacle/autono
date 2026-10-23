@@ -995,6 +995,7 @@ impl Engine {
                 );
             }
             ensure!(git_state == workspace::git_state(&self.runner,&w.path)?, AgentFailure {kind:"git_control_mutation".into(), detail:"Coder changed Git HEAD/index control state (including index flags); no commands or review accepted".into(), blocked:true});
+            let mut applied_paths = Vec::new();
             if run.delegation.is_some()
                 && let Ok(response) = &mut coder
             {
@@ -1068,6 +1069,7 @@ impl Engine {
                     result,
                     source_files.as_deref(),
                 )?;
+                applied_paths = paths.clone();
                 self.journal
                     .change(
                         "source_edits_applied",
@@ -1078,6 +1080,24 @@ impl Engine {
             }
             workspace::assert_owned(&self.runner, &w, &w.base_commit, &self.stop).await?;
             workspace::stage(&self.runner, &w.path, &self.stop).await?;
+            if !applied_paths.is_empty() {
+                let staged = self
+                    .runner
+                    .git(&w.path, &["ls-files", "--stage", "-z"], &self.stop)
+                    .await?;
+                let staged_names: std::collections::BTreeSet<_> = staged
+                    .split('\0')
+                    .filter_map(|entry| entry.split_once('\t').map(|(_, path)| path))
+                    .collect();
+                for path in &applied_paths {
+                    ensure!(
+                        staged_names.contains(path.as_str()),
+                        super::delegation::denied(format!(
+                            "source edit is absent from the immutable candidate: {path}; ignored file creation is unsupported, inspect the retained file and establish a new trusted base"
+                        ))
+                    );
+                }
+            }
             let inventory = review::inventory(
                 &self.runner,
                 &w.path,

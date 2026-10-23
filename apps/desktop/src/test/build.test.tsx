@@ -146,3 +146,110 @@ it("keeps incomplete evidence truthful and never offers routine delegated approv
     for (const action of ["execute", "integrate", "continue"] as const)
       expect(can({ ...r, status }, action)).toBe(false);
 });
+
+it.each(["conflict", "disconnected"])(
+  "refreshes definitive %s proposals while preserving uncertain consent identity",
+  async (code) => {
+    localStorage.clear();
+    const request = vi.fn().mockImplementation((req) =>
+      req.type === "propose_delegation"
+        ? Promise.resolve({ ...contract, request: req.request })
+        : Promise.reject({
+            code,
+            message:
+              code === "conflict"
+                ? "Base changed; create a new proposal"
+                : "Response interrupted",
+          }),
+    );
+    setup(
+      <BuildFeature connected onCreated={vi.fn()} onSupervised={vi.fn()} />,
+      request,
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Change repository" }));
+    await user.type(
+      screen.getByRole("textbox", { name: "Feature request" }),
+      "CSV export",
+    );
+    await user.click(screen.getByRole("button", { name: "Build feature" }));
+    await screen.findByRole("dialog", { name: "Authorize this feature" });
+    await user.click(
+      screen.getByRole("button", { name: "Authorize and build" }),
+    );
+    await screen.findByText(
+      code === "conflict"
+        ? "Base changed; create a new proposal"
+        : "Response interrupted",
+    );
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    await user.click(screen.getByRole("button", { name: "Build feature" }));
+    await screen.findByRole("dialog", { name: "Authorize this feature" });
+    const proposals = request.mock.calls.filter(
+      (c) => c[0].type === "propose_delegation",
+    );
+    expect(proposals).toHaveLength(2);
+    if (code === "conflict")
+      expect(proposals[1][0].request.submission.id).not.toBe(
+        proposals[0][0].request.submission.id,
+      );
+    else {
+      expect(proposals[1][0].request.submission.id).toBe(
+        proposals[0][0].request.submission.id,
+      );
+      expect(
+        JSON.parse(localStorage.getItem("autono.build.pending")!)
+          .authorization_attempted,
+      ).toBe(true);
+    }
+  },
+);
+
+it("shows essential preplanning holds as blocked and offers the daemon's supported refresh", () => {
+  const r = run({
+    status: "AWAITING_APPROVAL",
+    plan: null,
+    planner: null,
+    delegation: { contract, authorized_at: "now", expires_at: "later" },
+    handoff: {
+      outcome: "blocked",
+      summary: "Essential provider prerequisite missing",
+      tasks: [],
+      needs_you: [
+        {
+          action_id: "H-provider",
+          action_version: 1,
+          category: "essential_before_start",
+          affected_tasks: [],
+          waiting_descendants: [],
+          requested_action: "Configure the supported provider externally",
+        },
+      ],
+      combined_checks_passed: false,
+      completion_requirements_satisfied: false,
+      internal_decision_ids: [],
+    },
+  });
+  setup(
+    <FeatureSummary
+      run={r}
+      connected
+      onDetails={vi.fn()}
+      onHuman={vi.fn()}
+      onCancel={vi.fn()}
+      onRefresh={vi.fn()}
+    />,
+    vi.fn().mockResolvedValue([]),
+  );
+  expect(
+    screen.getByRole("heading", {
+      name: "Needs your input before work can continue",
+    }),
+  ).toBeInTheDocument();
+  expect(screen.queryByText("Building your feature")).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: "Check repaired prerequisites" }),
+  ).toBeEnabled();
+  expect(can({ ...r, delegation: null }, "preflight")).toBe(false);
+  expect(can({ ...r, status: "INTERRUPTED" }, "preflight")).toBe(false);
+});
