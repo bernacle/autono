@@ -1184,7 +1184,9 @@ mod tests {
         run.specification = "Use feature".into();
         let contract = DelegationContract {
             version: 1,
+            source_inventory: vec![],
             request: DelegationProposalRequest {
+                source_scope: None,
                 submission: PlanSubmission {
                     id: run.id,
                     repository: run.repository.clone(),

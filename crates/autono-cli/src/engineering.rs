@@ -201,6 +201,54 @@ pub async fn authorize_delegation(paths: &Paths, path: PathBuf) -> Result<()> {
     println!("{}", serde_json::to_string_pretty(&run)?);
     Ok(())
 }
+pub async fn build(
+    paths: &Paths,
+    path: PathBuf,
+    mut request: autono_protocol::engineering::DelegationProposalRequest,
+    proposal_only: bool,
+) -> Result<()> {
+    use std::io::{IsTerminal, Write};
+    request.submission.specification = tokio::fs::read_to_string(path).await?;
+    eprintln!(
+        "Read-only local discovery; no agent, project script or network discovery. Submission ID: {}",
+        request.submission.id
+    );
+    let client = Client::connect(paths).await?;
+    let contract: autono_protocol::engineering::DelegationContract =
+        client.post("/v1/delegations/propose", &request).await?;
+    let document = serde_json::to_string_pretty(&contract)?;
+    if proposal_only {
+        println!("{document}");
+        return Ok(());
+    }
+    eprintln!("{document}");
+    anyhow::ensure!(
+        std::io::stdin().is_terminal(),
+        "Initial consent requires a terminal. Use build --proposal-only > contract.json, inspect it, then deliberately submit authorize-delegation contract.json. No work has started."
+    );
+    let confirmation = format!("BUILD {}", contract.request.submission.id);
+    eprint!(
+        "Authorize exactly this contract (paid inference may run; no spending cap). Type {confirmation}: "
+    );
+    std::io::stderr().flush()?;
+    let mut response = String::new();
+    std::io::stdin().read_line(&mut response)?;
+    anyhow::ensure!(
+        response.trim() == confirmation,
+        "Consent not given; no agent work started"
+    );
+    let run: EngineeringRun = client
+        .post(
+            &format!(
+                "/v1/delegations/{}/authorize",
+                contract.request.submission.id
+            ),
+            &contract,
+        )
+        .await?;
+    println!("{}", run.id);
+    Ok(())
+}
 pub async fn show_delegation(paths: &Paths, id: Uuid) -> Result<()> {
     let contract: autono_protocol::engineering::DelegationContract = Client::connect(paths)
         .await?

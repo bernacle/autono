@@ -39,6 +39,7 @@ import {
   Panel,
   StatusGlyph,
 } from "./components/common";
+import { BuildFeature } from "./components/build-feature";
 import { NewRun } from "./components/new-run";
 import { RunDetail } from "./components/run-detail";
 import { SettingsView } from "./components/settings";
@@ -49,8 +50,9 @@ import { Timeline } from "./components/execution";
 import { LogDock } from "./components/log-dock";
 import { useExecution, useNow, elapsed, timeLabel } from "./lib/execution";
 
-type Page = "overview" | "runs" | "human" | "settings" | "processes";
+type Page = "build" | "overview" | "runs" | "human" | "settings" | "processes";
 const pages = [
+  { id: "build", label: "Build", icon: Plus },
   { id: "overview", label: "Overview", icon: LayoutGrid },
   { id: "human", label: "Human actions", icon: ShieldAlert },
   { id: "runs", label: "Runs", icon: GitBranch },
@@ -60,10 +62,11 @@ export default function App() {
   const transport = useTransport(),
     client = useQueryClient(),
     appearance = useAppearance();
-  const [page, setPage] = useState<Page>("overview"),
+  const [page, setPage] = useState<Page>("build"),
     [selected, setSelected] = useState<string | null>(null),
     [runTab, setRunTab] = useState<string | undefined>(),
     [newRun, setNewRun] = useState(false),
+    [supervised, setSupervised] = useState(false),
     [process, setProcess] = useState<string | null>(null),
     [humanFocus, setHumanFocus] = useState<string | null>(null),
     [rail, setRail] = useState<boolean | null>(null),
@@ -165,6 +168,7 @@ export default function App() {
       if (mod && e.key.toLowerCase() === "n") {
         e.preventDefault();
         if (healthy) {
+          setSupervised(false);
           setNewRun(true);
           setSelected(null);
           setCommands(false);
@@ -204,7 +208,9 @@ export default function App() {
     ].includes(r.status),
   );
   const pageLabel = newRun
-    ? "New run"
+    ? supervised
+      ? "Supervised mode"
+      : "Build"
     : selected
       ? "Runs"
       : page === "human"
@@ -240,6 +246,7 @@ export default function App() {
           className="sidebar-new"
           variant="secondary"
           onClick={() => {
+            setSupervised(false);
             setNewRun(true);
             setSelected(null);
           }}
@@ -247,7 +254,7 @@ export default function App() {
           title={!healthy ? "Reconnect to a healthy daemon" : "New run · ⌘N"}
         >
           <Plus size={15} />
-          <span>New run</span>
+          <span>Build feature</span>
           <kbd>⌘N</kbd>
         </Button>
         <nav aria-label="Main navigation">
@@ -415,7 +422,7 @@ export default function App() {
                   aria-describedby={!healthy ? "connection-state" : undefined}
                 >
                   <Plus size={13} />
-                  New run
+                  Build feature
                 </Button>
               )}
           </div>
@@ -457,11 +464,14 @@ export default function App() {
           className={`sheet-body ${page === "human" && !selected && !newRun ? "human-sheet" : ""}`}
           data-stale={!healthy && !!connection.data}
         >
-          {newRun ? (
+          {newRun && supervised ? (
             <NewRun
               connected={healthy}
               activeRun={!!activeId}
-              onClose={() => setNewRun(false)}
+              onClose={() => {
+                setNewRun(false);
+                setSupervised(false);
+              }}
               onCreated={select}
             />
           ) : selected ? (
@@ -472,6 +482,22 @@ export default function App() {
               onBack={() => setSelected(null)}
               onHuman={human}
               initialTab={runTab}
+            />
+          ) : newRun || page === "build" ? (
+            <BuildFeature
+              connected={healthy}
+              active={active}
+              recent={runs.find((r) => !!r.delegation)}
+              onCreated={(id) => {
+                setNewRun(false);
+                setSupervised(false);
+                select(id);
+              }}
+              onSupervised={() => {
+                setSupervised(false);
+                setNewRun(true);
+                setSupervised(true);
+              }}
             />
           ) : page === "settings" ? (
             <SettingsView
@@ -585,6 +611,7 @@ export default function App() {
           navigate={navigate}
           newRun={() => {
             setCommands(false);
+            setSupervised(false);
             setNewRun(true);
           }}
           healthy={healthy}
@@ -741,7 +768,7 @@ function Overview({
             >
               <span>Start a run or approve one that's ready.</span>
               <Button variant="secondary" disabled={!healthy} onClick={onNew}>
-                New run
+                Build feature
               </Button>
             </Empty>
           )}

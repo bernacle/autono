@@ -596,7 +596,7 @@ impl Harness {
     }
     async fn proposal(&self, seconds: u64, integrate: bool) -> Result<DelegationContract> {
         self.service
-            .propose_delegation(DelegationProposalRequest {
+            .propose_delegation(DelegationProposalRequest { source_scope: None,
                 submission: PlanSubmission {
                     id: Uuid::new_v4(),
                     repository: self.repo.clone(),

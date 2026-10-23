@@ -161,7 +161,7 @@ pub(super) async fn sources(
         .iter()
         .flat_map(|p| &p.evidence)
         .filter_map(|e| e.file.as_ref())
-        .filter(|f| auth.contract.request.writable_files.contains(f))
+        .filter(|f| super::source_scope::can_read(&auth.contract, f))
         .collect();
     let mut total = 0;
     for file in files {
@@ -317,7 +317,7 @@ pub(super) fn record(
         let files_allowed = p
             .affected_files
             .iter()
-            .all(|f| auth.contract.request.writable_files.contains(f));
+            .all(|f| super::source_scope::can_write(&auth.contract, f));
         let mut category = match p.kind {
             DecisionKind::Authorization | DecisionKind::UnknownEffects => {
                 DecisionCategory::Authorization
@@ -325,15 +325,15 @@ pub(super) fn record(
             DecisionKind::Significant | DecisionKind::Prerequisite => DecisionCategory::Significant,
             _ => DecisionCategory::Reversible,
         };
-        let mut basis = "Existing immutable A2 delegation only: exact local files, no executable decision operations; independent checks and review required".to_string();
+        let mut basis = "Existing immutable A2 delegation only: bounded local files, no executable decision operations; independent checks and review required".to_string();
         let evidence_allowed = p.evidence.iter().all(|e| {
             e.file
                 .as_ref()
-                .is_none_or(|f| auth.contract.request.writable_files.contains(f))
+                .is_none_or(|f| super::source_scope::can_read(&auth.contract, f))
         });
         if !files_allowed || !evidence_allowed {
             category = DecisionCategory::Authorization;
-            basis = "Affected files or evidence references exceed the exact A2 allowlist; a decision cannot grant access"
+            basis = "Affected files or evidence references exceed the immutable delegation scope; a decision cannot grant access"
                 .into();
         }
         let mut evidence = vec![];

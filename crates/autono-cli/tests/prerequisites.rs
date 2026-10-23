@@ -162,7 +162,7 @@ run_checks = "REQUIRE_APPROVAL"
         m: &autono_protocol::DaemonMetadata,
         seconds: u64,
     ) -> Result<DelegationContract> {
-        let request = DelegationProposalRequest {submission:PlanSubmission {id:Uuid::new_v4(),repository:self.repo.clone(),base:"main".into(),specification:"Build model, API, validation, external adapter and independent tests. Local account simulator is explicitly permitted for this deterministic fixture; this does not verify a real service. Access is required only for task D.".into()},writable_files:["model.sh","api.sh","validate.sh","external.sh","test.sh"].iter().map(|s| (*s).to_string()).collect(),max_runtime_seconds:seconds,local_integration:true};
+        let request = DelegationProposalRequest { source_scope: None,submission:PlanSubmission {id:Uuid::new_v4(),repository:self.repo.clone(),base:"main".into(),specification:"Build model, API, validation, external adapter and independent tests. Local account simulator is explicitly permitted for this deterministic fixture; this does not verify a real service. Access is required only for task D.".into()},writable_files:["model.sh","api.sh","validate.sh","external.sh","test.sh"].iter().map(|s| (*s).to_string()).collect(),max_runtime_seconds:seconds,local_integration:true};
         Ok(http
             .post(format!("http://{}/v1/delegations/propose", m.address))
             .bearer_auth(&m.token)

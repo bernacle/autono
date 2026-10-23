@@ -60,6 +60,20 @@ pub async fn repository(
         .await?;
     let root = tokio::fs::canonicalize(root.trim()).await?;
     ensure!(root == path, "repository must be its worktree root");
+    // Local discovery must never materialize missing objects by fetching a
+    // partial clone. Query names only: configuration values can hold credentials.
+    let keys = runner
+        .git(&root, &["config", "--local", "--name-only", "--list"], stop)
+        .await?;
+    ensure!(
+        !keys.lines().any(|key| {
+            let key = key.to_ascii_lowercase();
+            key == "extensions.partialclone"
+                || (key.starts_with("remote.")
+                    && (key.ends_with(".promisor") || key.ends_with(".partialclonefilter")))
+        }),
+        "partial-clone discovery is unsupported; materialize repository objects externally before delegation"
+    );
     let oid = runner
         .git(
             &root,

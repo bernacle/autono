@@ -72,6 +72,27 @@ mod unix {
                 }
                 Err(error) => return Err(error),
             };
+            // Never traverse a nested repository/submodule, including one
+            // introduced after discovery. Do not follow its .git marker.
+            let marker = CString::new(".git")?;
+            let mut info = std::mem::MaybeUninit::<libc::stat>::uninit();
+            // SAFETY: live directory, terminated name and valid output storage.
+            let found = unsafe {
+                libc::fstatat(
+                    directory.as_raw_fd(),
+                    marker.as_ptr(),
+                    info.as_mut_ptr(),
+                    libc::AT_SYMLINK_NOFOLLOW,
+                )
+            };
+            if found == 0 {
+                return Err(std::io::Error::other(
+                    "nested repositories are outside source authority",
+                ));
+            }
+            if std::io::Error::last_os_error().kind() != std::io::ErrorKind::NotFound {
+                return Err(std::io::Error::last_os_error());
+            }
         }
         Ok((
             directory,
@@ -131,7 +152,7 @@ mod unix {
         Ok(Some(value))
     }
 
-    pub(super) fn replace(cwd: &Path, name: &str, content: &str) -> Result<()> {
+    pub(super) fn replace(cwd: &Path, name: &str, content: &str, create_only: bool) -> Result<()> {
         let (directory, name) = parent(cwd, name, true)?;
         let mode = existing(&directory, &name)?
             .map(|f| f.metadata().map(|m| m.permissions().mode() & 0o777))
@@ -150,13 +171,31 @@ mod unix {
             file.sync_all()?;
             // Replace the directory entry, never truncate/follow the prior inode.
             // SAFETY: both names and the retained parent descriptor are live.
-            let renamed = unsafe {
-                libc::renameat(
-                    directory.as_raw_fd(),
-                    temporary.as_ptr(),
-                    directory.as_raw_fd(),
-                    name.as_ptr(),
-                )
+            let renamed = if create_only {
+                // Atomic no-clobber publication: a newly appeared user file is
+                // never replaced between validation and application.
+                let linked = unsafe {
+                    libc::linkat(
+                        directory.as_raw_fd(),
+                        temporary.as_ptr(),
+                        directory.as_raw_fd(),
+                        name.as_ptr(),
+                        0,
+                    )
+                };
+                if linked == 0 {
+                    unsafe { libc::unlinkat(directory.as_raw_fd(), temporary.as_ptr(), 0) };
+                }
+                linked
+            } else {
+                unsafe {
+                    libc::renameat(
+                        directory.as_raw_fd(),
+                        temporary.as_ptr(),
+                        directory.as_raw_fd(),
+                        name.as_ptr(),
+                    )
+                }
             };
             ensure!(
                 renamed == 0,
@@ -199,7 +238,18 @@ pub(super) fn read(cwd: &std::path::Path, name: &str) -> anyhow::Result<Option<S
 pub(super) fn replace(cwd: &std::path::Path, name: &str, content: &str) -> anyhow::Result<()> {
     #[cfg(unix)]
     {
-        unix::replace(cwd, name, content)
+        unix::replace(cwd, name, content, false)
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = (cwd, name, content);
+        anyhow::bail!("scoped files unsupported on this OS")
+    }
+}
+pub(super) fn create(cwd: &std::path::Path, name: &str, content: &str) -> anyhow::Result<()> {
+    #[cfg(unix)]
+    {
+        unix::replace(cwd, name, content, true)
     }
     #[cfg(not(unix))]
     {

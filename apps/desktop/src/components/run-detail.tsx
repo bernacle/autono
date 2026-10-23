@@ -1,4 +1,5 @@
 import { PartialHandoff } from "./partial-handoff";
+import { FeatureSummary } from "./feature-summary";
 import { Decisions } from "./decisions";
 import { useCallback, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -191,6 +192,28 @@ export function RunDetail({
       onSelect: () => ask("cancel"),
     },
   ];
+  if (run.delegation && chosenTab === null)
+    return (
+      <>
+        <FeatureSummary
+          run={run}
+          connected={enabled}
+          onDetails={() => setTab("tasks")}
+          onHuman={openHuman}
+          onCancel={() => ask("cancel")}
+          onRefresh={() => preflight.mutate()}
+        />
+        {preflight.isError && <ErrorNotice error={preflight.error} />}
+        {confirmation && (
+          <ConfirmAction
+            {...confirmation}
+            onClose={() => setConfirmation(null)}
+            connected={enabled}
+            onAccepted={setNotice}
+          />
+        )}
+      </>
+    );
   return (
     <div className="run-detail">
       <div className="run-header">
