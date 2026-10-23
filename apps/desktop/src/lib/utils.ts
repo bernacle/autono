@@ -35,16 +35,18 @@ export function can(run: Run, action: RunAction) {
   switch (action) {
     case "execute":
       return (
+        !run.delegation &&
         run.status === "AWAITING_APPROVAL" &&
         run.preflight?.ready === true &&
         !run.human_actions.some((a) => a.requirement.blocking && pending(a))
       );
     case "preflight":
       return (
-        ["AWAITING_APPROVAL", "BLOCKED"].includes(run.status) && !!run.plan
+        ["AWAITING_APPROVAL", "BLOCKED"].includes(run.status) &&
+        (!!run.plan || (!!run.delegation && !run.planner))
       );
     case "integrate":
-      return run.status === "VERIFIED";
+      return !run.delegation && run.status === "VERIFIED";
     case "cancel":
       return [
         "PLANNING",
@@ -56,6 +58,7 @@ export function can(run: Run, action: RunAction) {
       ].includes(run.status);
     case "continue":
       return (
+        !run.delegation &&
         ["RUNNING", "BLOCKED"].includes(run.status) &&
         !!run.approved_at &&
         run.tasks.some((t) => {

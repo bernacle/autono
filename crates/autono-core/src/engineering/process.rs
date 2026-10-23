@@ -348,6 +348,7 @@ impl ProcessRunner {
             ("GIT_CONFIG_COUNT".into(), "0".into()),
             ("GIT_CONFIG_PARAMETERS".into(), String::new()),
             ("GIT_NO_REPLACE_OBJECTS".into(), "1".into()),
+            ("GIT_NO_LAZY_FETCH".into(), "1".into()),
             ("GIT_ATTR_NOSYSTEM".into(), "1".into()),
             ("GIT_ALTERNATE_OBJECT_DIRECTORIES".into(), String::new()),
             ("GIT_TERMINAL_PROMPT".into(), "0".into()),

@@ -1,6 +1,8 @@
 //! Fixed-route desktop client. This module never starts a process or owns daemon lifetime.
 use autono_core::config::{Config, Paths};
-use autono_protocol::engineering::{EngineeringRun, PlanSubmission, ResolutionRequest};
+use autono_protocol::engineering::{
+    DelegationProposalRequest, EngineeringRun, PlanSubmission, ResolutionRequest,
+};
 use autono_protocol::{API_VERSION, ApiError, DaemonMetadata, Event, EventKind, RunView};
 use base64::{Engine, engine::general_purpose::STANDARD};
 use regex::Regex;
@@ -49,6 +51,13 @@ pub enum Request {
     Settings,
     Plan {
         submission: PlanSubmission,
+    },
+    ProposeDelegation {
+        request: DelegationProposalRequest,
+    },
+    AuthorizeDelegation {
+        id: Uuid,
+        displayed_contract: Value,
     },
     Action {
         id: Uuid,
@@ -150,6 +159,8 @@ impl Bridge {
             return Err(BridgeError::new(
                 if status.as_u16() == 401 {
                     "authentication"
+                } else if status.as_u16() == 409 {
+                    "conflict"
                 } else {
                     "rejected"
                 },
@@ -257,6 +268,34 @@ impl Bridge {
                     ),
                 )
                 .await?
+            }
+            Request::ProposeDelegation { request } => {
+                self.request(
+                    "/v1/delegations/propose",
+                    Some(
+                        serde_json::to_value(request)
+                            .map_err(|_| BridgeError::new("input", "Invalid source delegation"))?,
+                    ),
+                )
+                .await?
+            }
+            Request::AuthorizeDelegation {
+                id,
+                displayed_contract,
+            } => {
+                // Native Rust retains the exact authoritative contract. Redaction
+                // may alter displayed text, so never send that projection as authority.
+                let contract = self.request(&format!("/v1/delegations/{id}"), None).await?;
+                let mut displayed = contract.clone();
+                self.redactor.value(&mut displayed);
+                if displayed != displayed_contract {
+                    return Err(BridgeError::new(
+                        "stale",
+                        "Consent must match the complete displayed proposal. Inspect a fresh proposal.",
+                    ));
+                }
+                self.request(&format!("/v1/delegations/{id}/authorize"), Some(contract))
+                    .await?
             }
             Request::Action {
                 id,

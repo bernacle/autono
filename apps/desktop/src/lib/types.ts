@@ -191,6 +191,11 @@ export interface RunHandoff {
   internal_decision_ids: string[];
 }
 export interface Run {
+  delegation?: {
+    contract: DelegationContract;
+    authorized_at: string;
+    expires_at: string;
+  } | null;
   handoff?: RunHandoff | null;
 
   decisions?: DecisionRecord[];
@@ -293,6 +298,12 @@ export interface LocalSettings extends Settings {
 export type RunAction =
   "execute" | "preflight" | "continue" | "cancel" | "integrate";
 export type Request =
+  | { type: "propose_delegation"; request: DelegationProposal }
+  | {
+      type: "authorize_delegation";
+      id: string;
+      displayed_contract: DelegationContract;
+    }
   | { type: "status" }
   | { type: "runs"; offset: number }
   | { type: "run"; id: string }
@@ -317,6 +328,35 @@ export type Request =
       action_id: string;
       resolution: Resolution;
     };
+
+export interface SourceScope {
+  version: number;
+  read_subtrees: string[];
+  write_subtrees: string[];
+  allow_create: boolean;
+}
+export interface DelegationProposal {
+  submission: {
+    id: string;
+    repository: string;
+    base: string;
+    specification: string;
+  };
+  source_scope?: SourceScope | null;
+  writable_files: string[];
+  max_runtime_seconds: number;
+  local_integration: boolean;
+}
+export interface DelegationContract {
+  version: number;
+  request: DelegationProposal;
+  base_commit: string;
+  worktree_root: string;
+  settings: Run["settings"];
+  verification_sandbox: string;
+  source_inventory?: string[];
+  limitations: string[];
+}
 
 export interface DecisionRecord {
   id: string;

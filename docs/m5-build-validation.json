@@ -1,0 +1,70 @@
+{
+  "captured_at": "2026-10-23T14:39:13.435764+00:00",
+  "platform": "Darwin arm64",
+  "paid_inference": false,
+  "workspace_completed_passes": 158,
+  "workspace_ignored": 2,
+  "frontend_passes": 115,
+  "local_log_hashes": {
+    "workspace": {
+      "sha256": "7d7c1a32ae5f94131dd3187ed7ef050af662648e892d0c7a6fd5a41498653608",
+      "log": "autono-a1-workspace-delivery.log"
+    },
+    "frontend": {
+      "sha256": "e43a6874a97071df0eec746a17feed79cd8c90e7e460a50c7adef097dc843884",
+      "log": "autono-a1-frontend-delivery.log"
+    },
+    "v2_daemon": {
+      "log": "autono-a1-build-frozen.log",
+      "sha256": "924ac155b01d2fe847ef8ebe76f3dd7903537dedb2a234f270c48ddc9994ecfa"
+    },
+    "strict_clippy": {
+      "log": "autono-a1-clippy-frozen.log",
+      "sha256": "40abcc4694c0abfb5c59eb51d341162b8cd3138110bb2acf1893032e2cf7afe5"
+    },
+    "debug_build": {
+      "sha256": "b841d724eec649dd21bc79755fa7dff37a5afb52a7dbbadda1ef0400dc6b4ad3",
+      "log": "autono-a1-debug-workspace-build.log"
+    },
+    "release_build": {
+      "sha256": "9a39ae0092b79fec0c90bf1a6280f2e8b35b27b65921a1d1d60d91a74d89a8b5",
+      "log": "autono-a1-release-workspace-build.log"
+    },
+    "rustdoc": {
+      "sha256": "415453cbddf8928710a3deb69b94816a3fc0b49bab0bbdad5fa338432396989f",
+      "log": "autono-a1-rustdoc.log"
+    },
+    "msrv_1_89": {
+      "sha256": "150b957985f382c5e27232740dba46eccecc9397de78fb22be96725245786211",
+      "log": "autono-a1-msrv.log"
+    },
+    "native_package": {
+      "sha256": "e4e14b679fed2a1afc02ab3d790d3ae651bc3f24c23ed92c7284e26c349aaf6e",
+      "log": "autono-a1-native-package-final.log"
+    },
+    "native_bridge": {
+      "sha256": "b533d13d8969b28f6920bb67c6ebf7e2d27084f47acbc573ce14841cfb18c617",
+      "log": "autono-a1-bridge-build.log"
+    },
+    "reader_startup": {
+      "sha256": "bfff2fcc0c20cc95ac5fe3c054cd075384db664bc5a979682e37e48545263861",
+      "log": "autono-a1-reader-startup.log"
+    },
+    "partial_clone": {
+      "log": "autono-a1-partial-clone.log",
+      "sha256": "af990f7d87d2ecd752332cfff4d82830d10122b4ba55302a7f93c1b85860925e"
+    }
+  },
+  "latest_scope_and_candidate_guards": "Revalidated through the actual daemon CSV/adversarial suite and strict Clippy; the final CI matrix validates the full committed tree.",
+  "native_evidence": "m5-build-native/README.md",
+  "ci_results": "https://github.com/bernacle/autono/pull/8/checks",
+  "ci_note": "Final completed job URLs and exact commit are recorded in the PR description.",
+  "limitations": [
+    "Tool-free first-party Claude API profile only; no Codex subscription/general coding tools.",
+    "Bounded source contexts and complete prompts/diffs; larger scopes block.",
+    "No paid real-provider acceptance; no general crash recovery.",
+    "Native accessibility automation intermittently timed out; screenshots, fresh full snapshots and authenticated receipts verify the documented smoke scenarios."
+  ],
+  "final_targeted_at": "2026-10-23T14:52:04.462068+00:00",
+  "additional_security_regression": "Partial-clone rejection before Git probes, without logging configuration keys/values."
+}

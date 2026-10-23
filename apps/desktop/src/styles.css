@@ -3790,7 +3790,6 @@ textarea::placeholder {
   white-space: normal;
 }
 
-
 .handoff-content {
   display: grid;
   gap: 12px;
@@ -3804,4 +3803,119 @@ textarea::placeholder {
 }
 .handoff-content li {
   overflow-wrap: anywhere;
+}
+
+/* A1 uses the existing instrument surface and theme tokens. */
+.build-page {
+  width: min(850px, 100%);
+  margin: 0 auto;
+  padding: 42px 30px 60px;
+}
+.build-intro {
+  margin-bottom: 32px;
+}
+.build-page h1 {
+  font-size: clamp(26px, 3.3vw, 38px);
+  letter-spacing: -0.04em;
+  line-height: 1.18;
+  margin: 14px 0;
+}
+.build-page h2 {
+  font-size: 20px;
+  line-height: 1.4;
+}
+.build-page .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.build-prompt {
+  min-height: 200px;
+  resize: vertical;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.build-advanced {
+  margin: 18px 0;
+}
+.build-advanced summary,
+.build-consent summary {
+  cursor: pointer;
+  padding: 10px 0;
+}
+.build-settings {
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+}
+.build-safety {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 22px 0 8px;
+}
+.build-safety svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+.build-safety p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.build-page .repository-picker input {
+  min-width: 0;
+  flex: 1;
+}
+.build-consent {
+  overflow: auto;
+  min-height: 0;
+  padding: 0 22px 22px;
+}
+.build-contract {
+  display: grid;
+  grid-template-columns: 125px minmax(0, 1fr);
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.build-contract dt {
+  opacity: 0.7;
+}
+.build-contract dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.build-consent pre {
+  max-height: 240px;
+  overflow: auto;
+  font-size: 11px;
+}
+.build-consent .notice {
+  font-size: 12px;
+}
+.build-recent {
+  margin: 24px 0;
+  padding: 20px;
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.feature-summary > .panel {
+  margin: 20px 0;
+}
+.build-last-progress {
+  margin: 25px 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 1000px) {
+  .build-page {
+    padding: 24px 20px 40px;
+  }
+  .build-contract {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
 }

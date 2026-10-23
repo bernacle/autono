@@ -33,6 +33,14 @@ fn safe_config(path: &Path) -> Result<()> {
         return Ok(());
     };
     let text = std::str::from_utf8(&bytes)?;
+    // Reject lazy-fetch configuration before any Git probe. Even config key
+    // names can embed credential-bearing URLs in subsections; do not collect
+    // them through a logged process. Git key spellings cannot be escaped.
+    let lower = text.to_ascii_lowercase();
+    ensure!(
+        !lower.contains("partialclone") && !lower.contains("promisor"),
+        "partial-clone discovery is unsupported; materialize repository objects externally before delegation"
+    );
     for line in text.lines() {
         let line = line.trim().to_ascii_lowercase();
         if let Some(header) = line.strip_prefix('[') {
@@ -162,5 +170,32 @@ impl Ownership for GitOwnership {
             }
             .into()
         })
+    }
+}
+
+#[cfg(test)]
+mod config_discovery_tests {
+    use super::*;
+    #[test]
+    fn partial_clone_rejection_is_local_and_never_echoes_config_subsections() -> Result<()> {
+        let tmp = tempfile::tempdir()?;
+        let config = tmp.path().join("config");
+        for content in [
+            "[extensions]\npartialClone = origin\n",
+            "[remote \"https://credential-canary@example.invalid\"]\npromisor = true\n",
+            "[remote \"origin\"]\npartialCloneFilter = blob:none\n",
+        ] {
+            std::fs::write(&config, content)?;
+            let error =
+                safe_config(&config).expect_err("partial clones must fail before Git probes");
+            assert!(error.to_string().contains("partial-clone"));
+            assert!(!error.to_string().contains("credential-canary"));
+        }
+        std::fs::write(
+            &config,
+            "[remote \"origin\"]\nurl = https://credential-canary@example.invalid/repo\n",
+        )?;
+        safe_config(&config)?;
+        Ok(())
     }
 }

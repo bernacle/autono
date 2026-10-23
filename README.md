@@ -4,14 +4,22 @@ Autono is a local-first autonomous engineering harness, with a durable Rust
 daemon supervising processes and autonomous engineering workflows. The runtime
 is the source of truth; coding agents are replaceable execution providers.
 
-It can plan a Markdown feature, wait for developer approval, run coding agents
+The native app opens on **What do you want to build?** Select a repository,
+describe a feature and inspect one bounded authorization. The daemon discovers
+source files, plans, implements, checks, independently reviews and integrates
+verified work into an isolated local branch. Existing detailed controls remain
+available as **Supervised mode**. See [one-click Build and its supported limits](docs/m5-one-click-build.md).
+
+The supervised workflow can plan a Markdown feature, wait for developer approval, run coding agents
 in isolated Git worktrees, verify changes, request independent review, apply
 bounded fixes, preflight human prerequisites, pause tasks for explicit human
 resolution while independent work continues, and integrate verified commits into
 a local branch. Existing
 Runtime v0 command supervision, durable logs, cancellation, timeouts, restart
 reconciliation, and macOS idle-sleep inhibition remain available. Agent workflows
-use installed Codex/Claude CLI login; raw process execution requires neither.
+can use installed Codex/Claude CLI login in Supervised mode. Autonomous Build
+currently requires the restricted, tool-free Claude API profile for all roles;
+subscription login and general coding tools are unsupported. Raw process execution requires neither.
 No cloud service or desktop UI is required.
 
 See [the engineering workflow](docs/engineering.md) for commands, configuration,
@@ -28,6 +36,16 @@ cargo build --workspace --locked
 cargo install --path crates/autono-cli --locked
 autono doctor
 autono daemon
+```
+
+With all three agents configured for Claude API and sandbox-compatible checks:
+
+```sh
+autono build feature.md --repository /absolute/project
+# Inspect the pinned contract; type the displayed BUILD <UUID> once to consent.
+# Defaults to bounded ordinary source changes inside src/ and tests/.
+autono handoff <run-id>
+autono summary <run-id>
 ```
 
 The daemon runs in the foreground. In **another terminal**, submit a command:

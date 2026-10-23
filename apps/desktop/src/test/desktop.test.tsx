@@ -312,7 +312,7 @@ describe("connection and durable events", () => {
     ).not.toBeInTheDocument();
     expect(
       screen
-        .getAllByRole("button", { name: /New run/ })
+        .getAllByRole("button", { name: /Build feature/ })
         .every((b) => b.hasAttribute("disabled")),
     ).toBe(true);
   });

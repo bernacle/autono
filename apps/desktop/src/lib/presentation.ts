@@ -26,6 +26,7 @@ export const actionLabels: Record<RunAction, string> = {
   preflight: "Refresh preflight",
 };
 export function primaryAction(run: Run): RunAction | null {
+  if (run.delegation) return null;
   for (const action of ["execute", "continue", "integrate"] as const)
     if (can(run, action)) return action;
   if (run.status === "AWAITING_APPROVAL") return "execute";

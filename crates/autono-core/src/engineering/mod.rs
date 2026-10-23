@@ -11,6 +11,7 @@ pub mod process;
 mod review;
 mod scoped_files;
 mod service;
+mod source_scope;
 mod store;
 pub mod workspace;
 pub use autono_protocol::engineering::*;

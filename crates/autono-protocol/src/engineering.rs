@@ -994,10 +994,32 @@ pub struct PreflightReport {
 #[serde(deny_unknown_fields)]
 pub struct DelegationProposalRequest {
     pub submission: PlanSubmission,
+    /// v2 only. Absent means the original v1 exact-file authority, unchanged.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_scope: Option<SourceScope>,
     /// Exact relative UTF-8 regular files; no globs, deletes, links or mode changes.
     pub writable_files: Vec<String>,
     pub max_runtime_seconds: u64,
     pub local_integration: bool,
+}
+/// Finite source discovery; never a general filesystem or command capability.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceScope {
+    pub version: u32,
+    pub read_subtrees: Vec<String>,
+    pub write_subtrees: Vec<String>,
+    pub allow_create: bool,
+}
+impl Default for SourceScope {
+    fn default() -> Self {
+        Self {
+            version: 1,
+            read_subtrees: vec!["src".into(), "tests".into()],
+            write_subtrees: vec!["src".into(), "tests".into()],
+            allow_create: true,
+        }
+    }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -1013,6 +1035,9 @@ pub struct DelegationContract {
     pub verification_sandbox: String,
     pub user_config_digest: Option<String>,
     pub limitations: Vec<String>,
+    /// Trusted read-only discovery at the pinned base. Informational, not an allowlist.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub source_inventory: Vec<String>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

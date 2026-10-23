@@ -30,6 +30,27 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Build within source subtrees after one inspected consent. No paid work before consent.
+    Build {
+        specification: PathBuf,
+        #[arg(long)]
+        repository: Option<PathBuf>,
+        #[arg(long, default_value = "HEAD")]
+        base: String,
+        #[arg(long)]
+        plan_id: Option<Uuid>,
+        /// Source subtrees, never exact files. Defaults to src and tests.
+        #[arg(long = "source-tree")]
+        source_trees: Vec<String>,
+        #[arg(long, default_value_t = 1800)]
+        max_runtime_seconds: u64,
+        /// Print the authoritative contract for later authorize-delegation consent.
+        #[arg(long)]
+        proposal_only: bool,
+        /// Stop at verified task branches instead of isolated local integration.
+        #[arg(long)]
+        no_local_integration: bool,
+    },
     /// Plan a Markdown feature in a retained read-only checkout; returns immediately.
     Plan {
         specification: PathBuf,
@@ -173,6 +194,40 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
     let paths = Paths::discover(cli.home)?;
     match cli.command {
+        Commands::Build {
+            specification,
+            repository,
+            base,
+            plan_id,
+            source_trees,
+            max_runtime_seconds,
+            proposal_only,
+            no_local_integration,
+        } => {
+            let mut scope = autono_protocol::engineering::SourceScope::default();
+            if !source_trees.is_empty() {
+                scope.read_subtrees = source_trees.clone();
+                scope.write_subtrees = source_trees;
+            }
+            engineering::build(
+                &paths,
+                specification,
+                autono_protocol::engineering::DelegationProposalRequest {
+                    submission: autono_protocol::engineering::PlanSubmission {
+                        id: plan_id.unwrap_or_else(Uuid::new_v4),
+                        repository: repository.unwrap_or(std::env::current_dir()?),
+                        base,
+                        specification: String::new(),
+                    },
+                    source_scope: Some(scope),
+                    writable_files: vec![],
+                    max_runtime_seconds,
+                    local_integration: !no_local_integration,
+                },
+                proposal_only,
+            )
+            .await
+        }
         Commands::Plan {
             specification,
             repository,
@@ -192,6 +247,7 @@ async fn main() -> Result<()> {
                 &paths,
                 specification,
                 autono_protocol::engineering::DelegationProposalRequest {
+                    source_scope: None,
                     submission: autono_protocol::engineering::PlanSubmission {
                         id: plan_id.unwrap_or_else(Uuid::new_v4),
                         repository: repository.unwrap_or(std::env::current_dir()?),
