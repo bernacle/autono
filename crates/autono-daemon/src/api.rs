@@ -103,6 +103,7 @@ fn build_router(
         .route("/v1/engineering/health", get(engineering_health))
         .route("/v1/engineering/{id}", get(engineering_inspect))
         .route("/v1/engineering/{id}/decisions", get(engineering_decisions))
+        .route("/v1/engineering/{id}/handoff", get(engineering_handoff))
         .route("/v1/engineering/{id}/execute", post(engineering_execute))
         .route(
             "/v1/engineering/{id}/preflight",
@@ -317,6 +318,18 @@ async fn engineering_inspect(
     Path(id): Path<Uuid>,
 ) -> Result<Json<EngineeringRun>, Failure> {
     Ok(Json(engineering(&app)?.store().engineering_get(id).await?))
+}
+async fn engineering_handoff(
+    State(app): State<Arc<App>>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<autono_protocol::engineering::RunHandoff>, Failure> {
+    Ok(Json(
+        engineering(&app)?
+            .store()
+            .engineering_get(id)
+            .await?
+            .partial_completion(),
+    ))
 }
 async fn engineering_decisions(
     State(app): State<Arc<App>>,

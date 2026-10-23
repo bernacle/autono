@@ -1,0 +1,93 @@
+{
+  "milestone": "M5 A4",
+  "validated_at": "2026-10-22T22:38:26.657614+00:00",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "architecture": "arm64",
+  "base_commit": "ad698662c552efa9c70fdcded2f41a19231f49e4",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "paid_inference": false,
+  "real_external_service_verified": false,
+  "checks": {
+    "rust_workspace": {
+      "command": "RUST_TEST_THREADS=2 cargo test --workspace --locked",
+      "result": "passed",
+      "log_sha256": "5e396cd8bd2f96244a67a70ab0bab39323ca332787fb36e3d9a9d0eeb0347afb",
+      "passed": 151,
+      "ignored": 2,
+      "test_binaries_and_doctest_groups": 25
+    },
+    "strict_clippy": {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "passed",
+      "log_sha256": "3becfd2176a022a8581119446e525a91f97870e936f3d5a253bd0df8f0e04aa0"
+    },
+    "debug_build": {
+      "command": "cargo build --workspace --locked",
+      "result": "passed",
+      "log_sha256": "f279e4b878a3232e791b7c105ca72ab0728be6e36d2b44e7b4751871b8ad720b"
+    },
+    "release_build": {
+      "command": "cargo build --workspace --release --locked",
+      "result": "passed",
+      "log_sha256": "effe503438734861df7c1e0e524c5c694671cc6668595d12d6ed9275fab17090"
+    },
+    "rustdoc": {
+      "command": "cargo doc --workspace --no-deps --locked",
+      "result": "passed",
+      "log_sha256": "80fba78effe154a6cb3a7e2dd09448a03e42adab4b2ef52d4ddf9642dcc3704b"
+    },
+    "msrv_1_89": {
+      "command": "cargo +1.89.0 check --workspace --exclude autono-desktop --all-targets --locked",
+      "result": "passed",
+      "log_sha256": "dad54c65029882605b335550e3f1f4cd3c5e83eb016b9cea0773e2026ccb177d"
+    },
+    "desktop_msrv_1_90": {
+      "command": "cargo +1.90.0 check -p autono-desktop --all-targets --locked",
+      "result": "passed",
+      "log_sha256": "5277e1f6e0cd65444dbbfc8ef7099b5de69f6192e420cd2c54fa5769501df7fa"
+    },
+    "desktop_core_msrv_final": {
+      "command": "cargo +1.90.0 check -p autono-core --all-targets --locked",
+      "result": "passed",
+      "log_sha256": "e10b61b148a09cfb2b4cbac008b79852f0e76a7a2897bdb192ee0f42028464bf"
+    },
+    "native_bundle": {
+      "command": "npm run tauri -- build --bundles app",
+      "result": "passed",
+      "log_sha256": "2df3a38b77b633d69e9d6923a04c0673c6c71f023dc469e3cf015dbf5097ffb9"
+    },
+    "frontend": {
+      "command": "npm run typecheck && npm run lint && npm test && npm run build",
+      "result": "passed",
+      "tests_passed": 109,
+      "node": "24.21.0",
+      "log_sha256": "39a72a587cd16852e584ff01de4ce9ad5d5743ca2405169ee11e1c305088a02f"
+    },
+    "formatting": {
+      "command": "cargo fmt --all --check; git diff --check",
+      "result": "passed"
+    },
+    "native_smoke": {
+      "result": "passed",
+      "receipt": "docs/m5-prerequisites-native-smoke.json"
+    },
+    "deterministic_acceptance": {
+      "result": "passed",
+      "tests": 6,
+      "receipt": "docs/m5-prerequisites-acceptance.json"
+    }
+  },
+  "independent_reviews": {
+    "correctness": "completed; all findings addressed and corrections re-reviewed",
+    "security": "completed; all findings addressed and corrections re-reviewed",
+    "scope": "static code reviews plus separately executed daemon/native/persistence tests"
+  },
+  "remote_ci": "Linux/macOS/MSRV/native GitHub Actions will be triggered by the Draft PR; inspect host checks for their current status",
+  "known_limitations": [
+    "A2 external network/deployment/push remains unsupported; fixture uses explicitly authorized local simulator",
+    "Nonempty provider credential presence is necessary but not proof of validity",
+    "No generalized crash-safe resume or unknown-effect replay",
+    "Exact structural blocker deduplication; semantic deduplication is not claimed",
+    "No A1 One-click Build, A5 memory/designer/dynamic discovery or complete A6 feedback UX"
+  ]
+}

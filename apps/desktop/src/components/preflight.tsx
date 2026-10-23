@@ -6,8 +6,8 @@ export function PreflightChecklist({ report }: { report: Preflight | null }) {
   if (!report)
     return (
       <Empty title="Preflight has not run">
-        The daemon generates readiness checks after planning. Refresh preflight
-        when the plan is ready.
+        The daemon checks essential prerequisites before planning and refreshes
+        readiness before execution.
       </Empty>
     );
   return (
@@ -16,7 +16,9 @@ export function PreflightChecklist({ report }: { report: Preflight | null }) {
         <strong>
           {report.ready
             ? "Ready for explicit approval"
-            : "Prerequisites need attention"}
+            : report.independent_work_ready
+              ? "Independent authorized work can proceed"
+              : "Prerequisites need attention"}
         </strong>
         <span>Checked {date(report.checked_at)}</span>
       </div>

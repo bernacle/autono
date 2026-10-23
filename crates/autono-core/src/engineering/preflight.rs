@@ -17,7 +17,21 @@ pub(super) fn action(
     snapshot: Option<String>,
 ) -> HumanAction {
     let now = Utc::now();
+    let category =
+        if requirement.permission.is_some() || requirement.kind == HumanActionType::Runtime {
+            PrerequisiteCategory::UnsafeOrUncertain
+        } else if requirement.affected_tasks.is_empty() {
+            PrerequisiteCategory::EssentialBeforeStart
+        } else {
+            PrerequisiteCategory::DeferrableManualDependency
+        };
     HumanAction {
+        prerequisite: Some(PrerequisiteClassification {
+            category,
+            basis: "Daemon classification from exact action kind and frozen task scope; no model assertion grants authority".into(),
+            alternative_decision_id: None,
+            verification_remaining: vec!["Original task checks, fresh independent review and combined integration checks remain required".into()],
+        }),
         id: stable_id(key),
         requirement,
         status: HumanActionStatus::Pending,
@@ -70,6 +84,47 @@ pub(super) fn available(program: &str, cwd: &Path) -> bool {
         std::env::split_paths(&path).any(|p| executable(&cwd.join(p).join(program)))
     })
 }
+fn planner_requirements(
+    proposed: &[HumanRequirement],
+    existing: &[HumanAction],
+) -> Vec<HumanRequirement> {
+    // Stable hashes predate A4. Preserve their exact original grouping/order on
+    // upgrade; no new question may replace an already accepted legacy action.
+    if existing
+        .iter()
+        .any(|a| a.prerequisite.is_none() && proposed.contains(&a.requirement))
+    {
+        return proposed.to_vec();
+    }
+    let mut requirements: Vec<HumanRequirement> = vec![];
+    for proposed in proposed {
+        let mut identity = proposed.clone();
+        identity.affected_tasks.clear();
+        if let Some(existing) = requirements.iter_mut().find(|r| {
+            let mut r = (*r).clone();
+            r.affected_tasks.clear();
+            r == identity
+        }) {
+            // An empty scope means run-wide; merging cannot narrow it.
+            if existing.affected_tasks.is_empty() || proposed.affected_tasks.is_empty() {
+                existing.affected_tasks.clear();
+            } else {
+                existing
+                    .affected_tasks
+                    .extend(proposed.affected_tasks.clone());
+                existing.affected_tasks.sort();
+                existing.affected_tasks.dedup();
+            }
+        } else {
+            let mut proposed = proposed.clone();
+            proposed.affected_tasks.sort();
+            proposed.affected_tasks.dedup();
+            requirements.push(proposed);
+        }
+    }
+    requirements
+}
+
 pub(super) async fn inspect(
     journal: &Journal,
     runner: &ProcessRunner,
@@ -182,12 +237,14 @@ pub(super) async fn inspect(
     for service in &run.settings.preflight.external_services {
         actions.push(action(requirement(HumanActionType::Environment, format!("External prerequisite {service}"), format!("Confirm {service} is configured through its existing mechanism; provide no credentials")), &format!("service-{service}"), false, None));
     }
-    for proposed in &run
-        .plan
-        .as_ref()
-        .map(|p| p.human_requirements.clone())
-        .unwrap_or_default()
-    {
+    let requirements = planner_requirements(
+        run.plan
+            .as_ref()
+            .map(|p| p.human_requirements.as_slice())
+            .unwrap_or_default(),
+        &run.human_actions,
+    );
+    for proposed in &requirements {
         let mut proposed = proposed.clone();
         // A model can propose a question or exact operation; it cannot approve it.
         proposed.reason = safe_text(&proposed.reason)?;
@@ -257,6 +314,7 @@ pub(super) async fn inspect(
             ));
         }
     }
+    checks.extend(agents.authentication_readiness(run.delegation.is_some()));
     if accessible && planning_owned {
         checks.extend(
             agents
@@ -319,8 +377,10 @@ pub(super) async fn inspect(
         }
         let ready = !checks.iter().any(|c| c.blocking && c.ready != Some(true)) &&
             !r.human_actions.iter().filter(|a| ids.contains(&a.id)).any(|a| r.action_blocks(a));
-        r.preflight = Some(PreflightReport { checked_at: Utc::now(), checks, action_ids: ids, ready,
-            limitation: "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication may be unknown until invocation.".into() });
+        r.preflight = Some(PreflightReport { checked_at: Utc::now(), checks, action_ids: ids, ready, independent_work_ready: false,
+            limitation: "Best-effort checks of declared prerequisites and material planning decisions; cannot discover or guarantee absence of future human dependencies. Authentication validity may be unknown until invocation.".into() });
+        let independent = r.autonomous_preflight_ready();
+        if let Some(p) = &mut r.preflight { p.independent_work_ready = independent; }
         Ok(())
     }).await
 }
@@ -349,4 +409,54 @@ pub(super) fn safe_text(value: &str) -> Result<String> {
         "credential-like material is forbidden; configure credentials externally"
     );
     Ok(value.into())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn shared_new_requirements_group_but_legacy_action_identities_survive_refresh() {
+        let mut first = requirement(
+            HumanActionType::Environment,
+            "Shared account".into(),
+            "Configure account externally".into(),
+        );
+        first.affected_tasks = vec!["B".into(), "A".into()];
+        let mut second = first.clone();
+        second.affected_tasks = vec!["C".into()];
+        let proposed = vec![first.clone(), second.clone()];
+        let grouped = planner_requirements(&proposed, &[]);
+        assert_eq!(grouped.len(), 1);
+        assert_eq!(grouped[0].affected_tasks, vec!["A", "B", "C"]);
+        let mut legacy = action(
+            first.clone(),
+            &serde_json::to_string(&first).expect("requirement"),
+            false,
+            None,
+        );
+        legacy.prerequisite = None;
+        legacy.status = HumanActionStatus::Resolved;
+        let original_id = legacy.id.clone();
+        let refreshed = planner_requirements(&proposed, &[legacy]);
+        assert_eq!(refreshed, proposed);
+        assert_eq!(
+            action(
+                refreshed[0].clone(),
+                &serde_json::to_string(&refreshed[0]).expect("requirement"),
+                false,
+                None
+            )
+            .id,
+            original_id
+        );
+        let mut permission = first;
+        permission.kind = HumanActionType::Permission;
+        permission.permission = Some(PermissionRequest {
+            operation: PermissionOperation::ExternalOperation,
+            scope: "account one".into(),
+        });
+        let mut other = permission.clone();
+        other.permission.as_mut().expect("permission").scope = "account two".into();
+        assert_eq!(planner_requirements(&[permission, other], &[]).len(), 2);
+    }
 }

@@ -118,3 +118,5 @@ pub struct PowerStatus {
 }
 
 pub mod decisions;
+
+pub mod prerequisites;

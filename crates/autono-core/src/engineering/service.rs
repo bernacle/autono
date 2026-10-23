@@ -202,7 +202,28 @@ impl EngineeringService {
                     .and_then(|(_, token)| registry.journal.clone().map(|j| (j, token.clone())))
             };
             if let Some((journal, token)) = active {
-                let delegated = journal.read().await.delegation.is_some();
+                let current = journal.read().await;
+                let delegated = current.delegation.is_some();
+                if delegated {
+                    let runner = self
+                        .inner
+                        .runner
+                        .with_deadline(current.delegation.as_ref().map(|a| a.expires_at));
+                    super::delegation::validate(
+                        &current,
+                        &runner,
+                        &self.inner.config,
+                        &self.inner.home,
+                        &token,
+                    )
+                    .await?;
+                    super::preflight::inspect(&journal, &runner, &self.inner.agents, &token)
+                        .await?;
+                    ensure!(
+                        journal.read().await.autonomous_preflight_ready(),
+                        EngineeringConflict("essential preflight gates are not ready".into())
+                    );
+                }
                 journal
                     .change(
                         if delegated { "delegation_continued" } else { "continued" },
@@ -313,6 +334,21 @@ impl EngineeringService {
                             if error.is::<EngineeringConflict>()
                                 || error.is::<crate::supervisor::Overloaded>() =>
                         {
+                            // Retry only a scheduler-drain race. Persistent readiness
+                            // conflicts must not turn one resolution into a probe loop.
+                            let latest = match self.store().engineering_get(id).await {
+                                Ok(r) => r,
+                                Err(_) => return,
+                            };
+                            if latest.status == EngineeringStatus::Running
+                                && self
+                                    .registry()
+                                    .active
+                                    .as_ref()
+                                    .is_some_and(|(active, _)| *active == id)
+                            {
+                                return;
+                            }
                             continue;
                         }
                         Err(_) => return,
@@ -375,6 +411,7 @@ impl EngineeringService {
         let committed = journal.change("human_resolution", "Explicit developer resolution recorded; no operation was executed", |r| {
             ensure!(matches!(r.status, EngineeringStatus::AwaitingApproval | EngineeringStatus::Running | EngineeringStatus::Blocked), EngineeringConflict("cannot resolve a terminal or interrupted workflow".into()));
             let action = r.human_actions.iter_mut().find(|a| a.id == action_id).context("unknown human action")?;
+            ensure!(request.expected_action_version.is_none_or(|v| v == action.audit.len()), EngineeringConflict("stale prerequisite version; refresh the action before resolving".into()));
             ensure!(action.status != HumanActionStatus::Resolved, EngineeringConflict("action already resolved; reuse the original request key".into()));
             match request.disposition {
                 ResolutionDisposition::Approve => {
@@ -752,6 +789,7 @@ impl EngineeringService {
                 let now = Utc::now();
                 let run = EngineeringRun {
                     decisions: vec![],
+                    handoff: None,
                     delegation,
                     id: submission.id,
                     revision: 0,
@@ -839,7 +877,7 @@ impl EngineeringService {
                 )
                 .await?;
                 ensure!(
-                    run.plan.is_some()
+                    (run.plan.is_some() || run.planner.is_none())
                         && matches!(
                             run.status,
                             EngineeringStatus::AwaitingApproval | EngineeringStatus::Blocked
@@ -848,7 +886,39 @@ impl EngineeringService {
                 );
                 let journal = Journal::new(self.store().clone(), run);
                 super::preflight::inspect(&journal, runner, &self.inner.agents, stop).await?;
-                Ok((journal, 3))
+                let before = journal.read().await;
+                let mut operation = if before.plan.is_none()
+                    && before.planner.is_none()
+                    && before.essential_prerequisites_ready()
+                {
+                    0
+                } else {
+                    3
+                };
+                if before.delegation.is_some()
+                    && before.status == EngineeringStatus::Blocked
+                    && before.autonomous_preflight_ready()
+                    && mark_continued(&mut before.clone()).is_ok()
+                {
+                    journal
+                        .change(
+                            "delegation_continued",
+                            "Repaired preflight re-admits resolved tasks under original delegation",
+                            mark_continued,
+                        )
+                        .await?;
+                    operation = 1;
+                }
+                if operation == 0 {
+                    journal.change("planning_released", "Repaired essential gates admit the never-invoked planner; ownership is active", |r| {
+                        runner.check_authority(stop)?;
+                        ensure!(r.plan.is_none() && r.planner.is_none(), EngineeringConflict("planner was already invoked".into()));
+                        r.status = EngineeringStatus::Planning;
+                        r.summary = "Essential gates passed; planning admitted under original request".into();
+                        Ok(())
+                    }).await?;
+                }
+                Ok((journal, operation))
             }
             Operation::Continue(id) => {
                 let run = self.store().engineering_get(id).await?;
@@ -1188,6 +1258,7 @@ mod tests {
         }
         let _release = Release(gate.clone());
         let request = ResolutionRequest {
+            expected_action_version: None,
             request_id: Uuid::new_v4(),
             disposition: ResolutionDisposition::Resolve,
             note: "Use the selected behavior; inspected all effects".into(),
@@ -1340,8 +1411,8 @@ esac
         assert!(log.lines().all(|line| line.ends_with(" --help")));
         assert_eq!(
             log.lines().count(),
-            12,
-            "both provider/role combinations must use help probes only"
+            16,
+            "planner/coder/reviewer provider combinations must use help probes only"
         );
         Ok(())
     }

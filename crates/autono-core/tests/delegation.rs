@@ -62,6 +62,8 @@ struct Fixture {
     reached: tokio::sync::Notify,
     release: CancellationToken,
     delayed_readiness: std::sync::atomic::AtomicBool,
+    readiness_failed: std::sync::atomic::AtomicBool,
+    failed_probe: tokio::sync::Notify,
 }
 fn quote(s: &str) -> String {
     format!("'{}'", s.replace('\'', "'\\''"))
@@ -107,9 +109,15 @@ impl AgentRuntime for Fixture {
                     )
                     .await?;
             }
+            let ready = !self
+                .readiness_failed
+                .load(std::sync::atomic::Ordering::SeqCst);
+            if !ready {
+                self.failed_probe.notify_one();
+            }
             Ok(vec![ReadinessCheck {
                 id: "fixture-readiness".into(),
-                ready: Some(true),
+                ready: Some(ready),
                 blocking: true,
                 evidence: "Deterministic local capability fixture".into(),
             }])
@@ -571,6 +579,8 @@ impl Harness {
             reached: Default::default(),
             release: Default::default(),
             delayed_readiness: Default::default(),
+            readiness_failed: Default::default(),
+            failed_probe: Default::default(),
         });
         let service =
             EngineeringService::with_agents(supervisor, home.clone(), config.clone(), fake.clone());
@@ -775,6 +785,7 @@ async fn out_of_scope_commands_files_and_uncertain_effects_preserve_independent_
                         id,
                         &a.id,
                         ResolutionRequest {
+                            expected_action_version: None,
                             request_id: Uuid::new_v4(),
                             disposition: ResolutionDisposition::Resolve,
                             note: "Uncertain effect remains unknown".into(),
@@ -905,6 +916,7 @@ async fn precise_human_resolution_reuses_consent_without_manual_continue() -> Re
         .find(|a| a.continuable)
         .context("continuable")?;
     let request = ResolutionRequest {
+        expected_action_version: None,
         request_id: Uuid::new_v4(),
         disposition: ResolutionDisposition::Resolve,
         note: "Use the local good feature behavior".into(),
@@ -971,6 +983,7 @@ async fn local_integration_and_user_denials_cannot_be_overridden_by_stage_apis()
             id,
             &action.id,
             ResolutionRequest {
+                expected_action_version: None,
                 request_id: Uuid::new_v4(),
                 disposition: ResolutionDisposition::Resolve,
                 note: "Use local feature".into(),
@@ -1156,6 +1169,7 @@ async fn task_scoped_planned_permissions_pause_only_the_affected_work() -> Resul
         .find(|a| a.requirement.permission.is_some())
         .context("permission action")?;
     let request = ResolutionRequest {
+        expected_action_version: None,
         request_id: Uuid::new_v4(),
         disposition: ResolutionDisposition::Approve,
         note: "Approval cannot expand the original check grant".into(),
@@ -1202,6 +1216,7 @@ async fn live_resolution_continues_with_healthy_workers_without_manual_admission
             id,
             &action.id,
             ResolutionRequest {
+                expected_action_version: None,
                 request_id: Uuid::new_v4(),
                 disposition: ResolutionDisposition::Resolve,
                 note: "Use the local good behavior".into(),
@@ -1630,6 +1645,7 @@ async fn decisions_fail_closed_without_stopping_unrelated_authorized_work() -> R
                         id,
                         &action.id,
                         ResolutionRequest {
+                            expected_action_version: None,
                             request_id: Uuid::new_v4(),
                             disposition: ResolutionDisposition::Resolve,
                             note: "Acknowledgement is no permission".into(),
@@ -1646,6 +1662,7 @@ async fn decisions_fail_closed_without_stopping_unrelated_authorized_work() -> R
                         id,
                         &action.id,
                         ResolutionRequest {
+                            expected_action_version: None,
                             request_id: Uuid::new_v4(),
                             disposition: ResolutionDisposition::Approve,
                             note: "Cannot expand immutable authority".into(),
@@ -1997,4 +2014,99 @@ async fn review_regressions_stale_replay_candidate_provenance_and_explicit_prohi
         assert!(durable.decisions.iter().all(|d| !d.verified()));
     }
     Ok(())
+}
+
+#[tokio::test]
+async fn a_resolution_with_failed_essentials_does_not_spin_or_cancel_healthy_work() -> Result<()> {
+    if !sandbox_present() {
+        return Ok(());
+    }
+    let h = Harness::new(Case::LiveHuman).await?;
+    let c = h.proposal(120, true).await?;
+    let id = c.request.submission.id;
+    h.service.authorize_delegation(c).await?;
+    tokio::time::timeout(
+        std::time::Duration::from_secs(30),
+        h.fake.reached.notified(),
+    )
+    .await?;
+    let paused = tokio::time::timeout(std::time::Duration::from_secs(30), async {
+        let mut changed = h.service.store().subscribe();
+        loop {
+            let r = h.service.store().engineering_get(id).await?;
+            if r.human_actions.iter().any(|a| a.continuable) {
+                return Ok::<_, anyhow::Error>(r);
+            }
+            changed.changed().await?;
+        }
+    })
+    .await??;
+    let action = paused
+        .human_actions
+        .iter()
+        .find(|a| a.continuable)
+        .context("pause")?;
+    h.fake
+        .readiness_failed
+        .store(true, std::sync::atomic::Ordering::SeqCst);
+    h.service
+        .resolve(
+            id,
+            &action.id,
+            ResolutionRequest {
+                expected_action_version: Some(action.audit.len()),
+                request_id: Uuid::new_v4(),
+                disposition: ResolutionDisposition::Resolve,
+                note: "Use local behavior".into(),
+                effect: EffectState::NotPerformed,
+                permission: None,
+            },
+        )
+        .await?;
+    tokio::time::timeout(
+        std::time::Duration::from_secs(10),
+        h.fake.failed_probe.notified(),
+    )
+    .await?;
+    assert!(
+        tokio::time::timeout(
+            std::time::Duration::from_millis(150),
+            h.fake.failed_probe.notified()
+        )
+        .await
+        .is_err(),
+        "one resolution must not repeatedly refresh a failed essential gate"
+    );
+    let live = h.service.store().engineering_get(id).await?;
+    assert_eq!(
+        live.tasks
+            .iter()
+            .find(|t| t.plan.id == "a")
+            .context("A")?
+            .status,
+        TaskStatus::Running
+    );
+    assert_eq!(
+        live.tasks
+            .iter()
+            .find(|t| t.plan.id == "b")
+            .context("B")?
+            .status,
+        TaskStatus::BlockedHuman
+    );
+    h.fake.release.cancel();
+    let held = h.inactive(id).await?;
+    assert_eq!(held.status, EngineeringStatus::Blocked);
+    h.fake
+        .readiness_failed
+        .store(false, std::sync::atomic::Ordering::SeqCst);
+    h.service.preflight(id).await?;
+    let done = h.inactive(id).await?;
+    assert_eq!(
+        done.status,
+        EngineeringStatus::Completed,
+        "{}",
+        done.summary
+    );
+    h.shutdown().await
 }

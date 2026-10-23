@@ -137,7 +137,7 @@ impl Engine {
             return Ok(());
         }
         let run = self.journal.read().await;
-        if run.status == EngineeringStatus::AwaitingApproval {
+        if run.status == EngineeringStatus::AwaitingApproval && run.plan.is_some() {
             self.admit("execution admission", None).await?;
             if !run.preflight.as_ref().is_some_and(|p| p.ready) && !run.autonomous_preflight_ready()
             {
@@ -218,20 +218,55 @@ impl Engine {
             .await?;
         let mut run = self.journal.read().await;
         let _lease = WorkspaceLease::acquire(&run.planning_workspace).map_err(workspace_blocker)?;
-        workspace::create(
-            &self.runner,
-            &run.repository,
-            &mut run.planning_workspace,
-            &self.stop,
-        )
-        .await
-        .map_err(workspace_blocker)?;
-        self.journal
-            .change("planning_workspace_ready", "Pinned Git ownership", |r| {
-                r.planning_workspace = run.planning_workspace.clone();
-                Ok(())
-            })
+        if run.planning_workspace.git.is_some() {
+            ensure!(
+                run.plan.is_none() && run.planner.is_none(),
+                "planner invocation cannot be replayed"
+            );
+            workspace::assert_owned(
+                &self.runner,
+                &run.planning_workspace,
+                &run.base_commit,
+                &self.stop,
+            )
             .await?;
+            ensure!(
+                self.runner
+                    .git(
+                        &run.planning_workspace.path,
+                        &["status", "--porcelain"],
+                        &self.stop
+                    )
+                    .await?
+                    .is_empty(),
+                "preplanning workspace changed; establish a new trusted plan"
+            );
+        } else {
+            workspace::create(
+                &self.runner,
+                &run.repository,
+                &mut run.planning_workspace,
+                &self.stop,
+            )
+            .await
+            .map_err(workspace_blocker)?;
+            self.journal
+                .change("planning_workspace_ready", "Pinned Git ownership", |r| {
+                    r.planning_workspace = run.planning_workspace.clone();
+                    Ok(())
+                })
+                .await?;
+        }
+        // Deterministic prerequisites precede any paid planner/coder invocation.
+        super::preflight::inspect(&self.journal, &self.runner, &self.agents, &self.stop).await?;
+        let checked = self.journal.read().await;
+        if !checked.essential_prerequisites_ready() {
+            self.journal.change("planning_held", "Essential prerequisites failed before inference; inspect exact human actions", |r| {
+                r.status = EngineeringStatus::AwaitingApproval;
+                r.summary = "Planning has not started: essential prerequisites require attention. Repair and refresh preflight; no planner or coder inference was used.".into(); Ok(())
+            }).await?;
+            return Ok(());
+        }
         let before =
             workspace::snapshot(&self.runner, &run.planning_workspace.path, &self.stop).await?;
         let prompt = format!(
@@ -605,12 +640,17 @@ impl Engine {
                                 Ok(())
                             })
                             .await?;
+                        let mut admitted = false;
                         self.journal
                             .change(
                                 "workspace_reserved",
                                 &format!("{id}: {} ({})", w.path.display(), w.branch),
                                 |r| {
                                     self.runner.check_authority(&self.stop)?;
+                                    if !r.ready_tasks().contains(&id) {
+                                        return Ok(());
+                                    }
+                                    admitted = true;
                                     let t = task_mut(r, &id)?;
                                     t.status = TaskStatus::Running;
                                     t.workspace = Some(w);
@@ -618,6 +658,9 @@ impl Engine {
                                 },
                             )
                             .await?;
+                        if !admitted {
+                            continue;
+                        }
                         let this = self.clone();
                         jobs.spawn(async move {
                             let result = this.run_task(&id).await;
@@ -640,7 +683,7 @@ impl Engine {
                 self.journal.change("execution_finished", "All currently runnable tasks finished", |r| {
                     self.runner.check_authority(&self.stop)?;
                     if !r.ready_tasks().is_empty() { return Ok(()); }
-                    r.status = if r.tasks.iter().all(|t|t.status==TaskStatus::Completed) {EngineeringStatus::Verified} else if r.tasks.iter().any(|t|matches!(t.status,TaskStatus::Blocked | TaskStatus::BlockedHuman)) || (r.delegation.is_some() && r.human_actions.iter().any(|a|r.action_blocks(a))) {EngineeringStatus::Blocked} else {EngineeringStatus::Failed};
+                    r.status = if r.tasks.iter().all(|t|t.status==TaskStatus::Completed) && !r.human_actions.iter().any(|a| r.action_blocks(a)) {EngineeringStatus::Verified} else if r.tasks.iter().any(|t|matches!(t.status,TaskStatus::Blocked | TaskStatus::BlockedHuman)) || (r.delegation.is_some() && r.human_actions.iter().any(|a|r.action_blocks(a))) {EngineeringStatus::Blocked} else {EngineeringStatus::Failed};
                     r.summary = format!("{} of {} tasks verified and independently accepted. Inspect actions/attempts; completed artifacts retained. VERIFIED runs may explicitly integrate.", r.tasks.iter().filter(|t| t.status == TaskStatus::Completed).count(), r.tasks.len());
                     finished = true;
                     Ok(())
@@ -702,6 +745,31 @@ impl Engine {
             .iter()
             .find(|t| t.plan.id == id)
             .context("task missing")?;
+        // An empty blocker response on a later attempt does not erase earlier
+        // candidate work retained in this same owned workspace.
+        let retained_tree = if blocked && continuable {
+            if let Some(w) = &task.workspace {
+                match (
+                    workspace::candidate_tree(&self.runner, &w.path, &self.stop).await,
+                    self.runner
+                        .git(
+                            &w.path,
+                            &["rev-parse", &format!("{}^{{tree}}", w.base_commit)],
+                            &self.stop,
+                        )
+                        .await,
+                ) {
+                    (Ok(tree), Ok(base)) if tree != base.trim() => Some(tree),
+                    _ => None,
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+        // write-tree can update index cache entries; freeze continuation only
+        // after candidate inspection so our own read cannot invalidate the pause.
         let snapshot = if blocked && continuable {
             if let Some(w) = &task.workspace {
                 workspace::snapshot(&self.runner, &w.path, &self.stop)
@@ -715,12 +783,17 @@ impl Engine {
         };
         self.journal.change("task_stopped",&format!("{id}: {detail}"),|r| {
             let t=task_mut(r,id)?;t.status=if blocked && continuable {TaskStatus::BlockedHuman} else if blocked {TaskStatus::Blocked} else {TaskStatus::Failed};
-            if let Some(a)=t.attempts.last_mut(){a.detail=Some(detail.clone());}
+            if let Some(a)=t.attempts.last_mut(){a.detail=Some(detail.clone()); if a.implementation_tree.is_none() { a.implementation_tree = retained_tree.clone(); }}
             let attempt_count = t.attempts.len();
             if blocked {
                 r.blockers.push(Blocker{task_id:Some(id.into()),kind:kind.into(),detail:detail.clone(),action:"Inspect human actions; resolve externally and explicitly continue eligible live pauses".into(),created_at:Utc::now()});
                 let requirement = HumanRequirement { kind: HumanActionType::Runtime, reason: format!("{kind}: {detail}"), affected_tasks: vec![id.into()], requested_action: if matches!(kind, "human_action" | "effect_reconciliation") { detail.clone() } else if continuable {"Inspect the retained task and operation effects. Configure prerequisites externally and confirm whether the operation happened before continuing. Provider sandbox denials cannot be bypassed by approval.".into()} else {"Integrity/ownership failure: inspect retained artifacts and establish a new trusted base; this task cannot be continued".into()}, blocking: true, evidence: format!("Task {id}; attempt {}; retained process evidence", attempt_count), confidence: 100, permission: None };
-                r.human_actions.push(super::preflight::action(requirement, &format!("runtime-{id}-{}", attempt_count), continuable && snapshot.is_some(), snapshot));
+                let mut action = super::preflight::action(requirement, &format!("runtime-{id}-{}", attempt_count), continuable && snapshot.is_some(), snapshot);
+                if r.delegation.is_some() && kind == "human_action" && let Some(p) = &mut action.prerequisite {
+                    p.category = PrerequisiteCategory::DeferrableManualDependency;
+                    p.basis = "Tool-free A2 response cannot execute an external operation; scoped task hold only. Resolution still rechecks original authority and effects.".into();
+                }
+                if !r.human_actions.iter().any(|a| a.id == action.id) { r.human_actions.push(action); }
             }Ok(())
         }).await
     }
@@ -828,6 +901,7 @@ impl Engine {
                         reviewer: None,
                         reviews: vec![],
                         review: None,
+                        implementation_tree: None,
                         snapshot: None,
                         verified_tree: None,
                         preserved_tree: None,
@@ -1022,6 +1096,7 @@ impl Engine {
             let snapshot = workspace::snapshot(&self.runner, &w.path, &self.stop).await?;
             self.journal
                 .change("decision_implementation", id, |r| {
+                    task_mut(r, id)?.attempts[number - 1].implementation_tree = Some(tree.clone());
                     super::decisions::event(r, id, number, DecisionEventKind::Implemented, &tree);
                     Ok(())
                 })

@@ -17,13 +17,16 @@ autono blockers <run-id>
 autono resolve <run-id> <action-id> --request resolution.json
 autono continue <run-id>
 autono tasks <run-id>
+autono handoff <run-id> # verified local progress and exact remaining prerequisites
 autono integrate <run-id> # after VERIFIED, as before
 ```
 
 `preflight` prints JSON containing readiness checks, stable action IDs, human
 actions with evidence/confidence/task relationships, and the snapshotted policy.
-It runs automatically after planning and refreshes before initial execution and
-inactive continuation. It does not approve the plan. `execute` requires a READY
+It runs before planner invocation and after planning, and refreshes before initial
+execution and continuation. Known essential failures hold planning without spending
+planner/coder inference; repair externally and refresh preflight. A never-invoked
+planner admission may proceed, but an already-started planner is never replayed. It does not approve the plan. `execute` requires a READY
 report and explicitly approves the immutable plan and verification commands.
 Preflight is best effort: it cannot guarantee discovery of all future blockers.
 
@@ -38,7 +41,10 @@ worktrees at the pinned commit. Checks never execute verification commands in th
 developer checkout. Executable availability does not prove a shell script's
 internal commands or an external service will work.
 
-Authentication is reported as UNKNOWN when it cannot be established safely.
+Authentication validity is reported as UNKNOWN when it cannot be established safely.
+A2 bare mode additionally requires nonempty ANTHROPIC_API_KEY presence in the daemon
+environment before planning; the value is never retained and presence does not
+prove validity.
 Autono does not inspect credential files or run potentially credential-bearing
 login diagnostics. The existing provider login mechanism remains authoritative;
 a structured authentication error during execution produces a human pause.
@@ -46,7 +52,7 @@ Capability probes are help-only, supervised, noninteractive, time bounded and
 inference free. They are separate from invocation construction and require no
 prompt/schema artifacts; Claude readiness never opens a placeholder schema.
 Missing or incompatible CLIs block readiness. Both installed provider executables
-are reported; only configured execution providers gate readiness.
+are reported; all configured planner/coder/reviewer providers gate readiness.
 
 The existing read-only planner also reviews the specification and architecture
 for material unresolved decisions and declared permission/service prerequisites.
@@ -104,6 +110,7 @@ Resolution JSON is an explicit user request with a reusable UUID:
 ```json
 {
   "request_id": "b4bcfa15-565d-42c5-8304-0bdedac684bd",
+  "expected_action_version": 1,
   "disposition": "resolve",
   "note": "Invitations expire after seven days; send a new invitation afterward",
   "effect": "not_performed",
@@ -121,7 +128,10 @@ retained or exposed by preflight.
 Existing process/provider logs retain their Runtime v0 behavior, so providers and
 trusted commands must obey the prohibition on printing secrets.
 
-Retry an ambiguous resolution with exactly the same UUID and payload. Matching
+New clients bind `expected_action_version` to the observed action audit length
+(the handoff exposes it directly); stale versions conflict. Legacy clients retain
+identity/status guards. Retry an ambiguous resolution with exactly the same UUID
+and payload. Matching
 retries return the original accepted response snapshot; a reused UUID with
 another payload/action/run conflicts. Inspect `summary` for current workflow
 liveness: the resolution response describes the revision that accepted it.
@@ -138,8 +148,11 @@ health reports the failure and shutdown fails honestly. This does not replay
 agents or resume an interrupted workflow. Cancellation never waits
 for a resolution/database lock before signalling active processes.
 
-A resolution alone never launches a worker. `continue` explicitly schedules
+In Supervised mode a resolution alone never launches a worker. `continue` explicitly schedules
 eligible resolved live pauses, including alongside healthy independent workers.
+A2 delegates this continuation to the daemon under the original immutable grant;
+resolution and repaired preflight may re-admit eligible work after all relevant
+authority/readiness checks pass. They cannot renew an expired grant.
 It never replans, recreates the task worktree, remerges dependency commits, resumes
 a suspended provider tool call, resets attempt/review limits, or reruns completed
 tasks. It validates pinned Git ownership, branch/HEAD, index and the saved
@@ -254,3 +267,24 @@ Claude/Codex executables first on PATH. Both coder/reviewer provider combination
 are checked, compatible Claude reports READY without dummy artifacts, and
 missing safety capabilities block readiness. An argv log permits only help
 commands. These tests never invoke installed providers or inference APIs.
+
+
+## A4 task-scoped prerequisites and handoff
+
+A2 already allows independent work when only task-scoped actions are pending,
+even when full preflight is NOT READY. `independent_work_ready` exposes that
+separate admission fact without declaring the complete run ready. Run-wide
+configuration prerequisites remain essential unless the frozen plan identifies
+an exact safe scope. Supervised approval still requires full READY.
+
+`autono handoff <run-id> [--json]` and the authenticated `/handoff` endpoint report
+retained implementation, complete configured check receipts, independent local
+verification, failures, exact unresolved actions and actual waiting descendants.
+The daemon checkpoints this projection with every run change. BLOCKED with partial
+verified work remains BLOCKED; local/mock tests do not establish real-service
+integration. Legacy artifacts lacking modern tree evidence are retained as
+implemented with incomplete evidence rather than relabeled unimplemented or
+certified by a new receipt. Migration 0008 appends immutable prerequisite audit
+rows alongside the existing Human Action projection and resolution receipts.
+
+See [A4 architecture, classification and review evidence](m5-intelligent-blockers.md).

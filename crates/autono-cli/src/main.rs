@@ -92,6 +92,12 @@ enum Commands {
     Integrate { id: Uuid },
     /// Show a detailed engineering run summary.
     Summary { id: Uuid },
+    /// Read the evidence-based partial completion and exact remaining prerequisites.
+    Handoff {
+        id: Uuid,
+        #[arg(long)]
+        json: bool,
+    },
     /// Inspect optional tooling, repository, daemon, database, and host capabilities.
     Doctor,
     /// Run the daemon in the foreground until Ctrl-C or SIGTERM.
@@ -207,6 +213,7 @@ async fn main() -> Result<()> {
         Commands::Tasks { id } => engineering::inspect(&paths, id, "tasks").await,
         Commands::Decisions { id, json } => engineering::decisions(&paths, id, json).await,
         Commands::Findings { id } => engineering::inspect(&paths, id, "findings").await,
+        Commands::Handoff { id, json } => engineering::handoff(&paths, id, json).await,
         Commands::Summary { id } => engineering::inspect(&paths, id, "summary").await,
         Commands::Preflight { id } => engineering::preflight(&paths, id).await,
         Commands::Blockers { id } => engineering::inspect(&paths, id, "blockers").await,

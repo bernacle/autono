@@ -416,6 +416,7 @@ describe("Chunk 1 safe decisions", () => {
       revision: r.revision,
       action_id: a.id,
       resolution: {
+        expected_action_version: a.audit.length,
         request_id: expect.any(String),
         disposition: "approve",
         note: "Reviewed",

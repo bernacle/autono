@@ -272,6 +272,7 @@ async fn authenticated_run_projection_preserves_nonempty_review_blockers() -> Re
     run["tasks"][0]["attempts"][0]["review"] = records[0]["review"].clone();
     run["tasks"][0]["attempts"][0]["reviews"] = json!(records);
     run["summary"] = json!("Readable run summary");
+    run["handoff"] = json!({"outcome":"partially_completed","summary":"Local work verified; external verification pending","needs_you":[{"action_id":"H-external","requested_action":"Configure externally; Bearer prerequisite-canary-1234567890"}]});
     run["decisions"] = json!([{"id":"D-csv","policy_basis":"Exact A2 file scope", "proposal":{"chosen":"CSV","rationale":"Existing convention; Bearer decision-canary-1234567890"},"audit":[{"kind":"review_rejected"}]}]);
     let id: Uuid = serde_json::from_value(run["id"].clone())?;
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await?;
@@ -323,6 +324,16 @@ async fn authenticated_run_projection_preserves_nonempty_review_blockers() -> Re
         .await
         .map_err(|e| anyhow::anyhow!(e.message))?;
     assert_eq!(projected["summary"], "Readable run summary");
+    assert_eq!(projected["handoff"]["outcome"], "partially_completed");
+    assert_eq!(
+        projected["handoff"]["needs_you"][0]["action_id"],
+        "H-external"
+    );
+    assert!(
+        !projected
+            .to_string()
+            .contains("prerequisite-canary-1234567890")
+    );
     assert_eq!(projected["decisions"][0]["proposal"]["chosen"], "CSV");
     assert_eq!(
         projected["decisions"][0]["policy_basis"],

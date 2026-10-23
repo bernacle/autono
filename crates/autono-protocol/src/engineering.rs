@@ -1,5 +1,6 @@
 //! Engineering workflow contracts. Process runs remain separate execution attempts.
 pub use crate::decisions::*;
+pub use crate::prerequisites::*;
 use anyhow::{Result, ensure};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -360,7 +361,9 @@ impl EngineeringStatus {
                     | Self::Interrupted
             ),
             Self::Blocked => matches!(next, Self::Running | Self::Cancelled),
-            Self::AwaitingApproval => matches!(next, Self::Running | Self::Cancelled),
+            Self::AwaitingApproval => {
+                matches!(next, Self::Planning | Self::Running | Self::Cancelled)
+            }
             Self::Running => matches!(
                 next,
                 Self::Verified | Self::Blocked | Self::Failed | Self::Cancelled | Self::Interrupted
@@ -624,6 +627,8 @@ pub struct TaskAttempt {
     pub reviews: Vec<ReviewAttempt>,
     pub review: Option<ReviewResult>,
     pub snapshot: Option<String>,
+    #[serde(default)]
+    pub implementation_tree: Option<String>,
     /// Immutable tree audited against actual bytes/modes before verification.
     #[serde(default)]
     pub verified_tree: Option<String>,
@@ -644,6 +649,8 @@ pub struct EngineeringTask {
 pub struct EngineeringRun {
     #[serde(default)]
     pub decisions: Vec<DecisionRecord>,
+    #[serde(default)]
+    pub handoff: Option<RunHandoff>,
     pub id: Uuid,
     pub revision: i64,
     pub status: EngineeringStatus,
@@ -688,6 +695,17 @@ impl EngineeringRun {
                     && action.status != HumanActionStatus::Resolved);
         }
         action.blocks()
+    }
+    /// Planning is read-only: execution-only broker approvals do not gate it.
+    pub fn essential_prerequisites_ready(&self) -> bool {
+        self.preflight
+            .as_ref()
+            .is_some_and(|p| !p.checks.iter().any(|c| c.blocking && c.ready != Some(true)))
+            && !self.human_actions.iter().any(|a| {
+                a.requirement.affected_tasks.is_empty()
+                    && a.requirement.permission.is_none()
+                    && self.action_blocks(a)
+            })
     }
     /// All deterministic host gates and run-wide human gates must pass. A scoped
     /// human action blocks its tasks/descendants while independent work may run.
@@ -914,6 +932,9 @@ pub enum ResolutionDisposition {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ResolutionRequest {
+    /// Optional for legacy clients. New clients bind the observed action audit version.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub expected_action_version: Option<usize>,
     pub request_id: Uuid,
     pub disposition: ResolutionDisposition,
     /// Product decisions or evidence of external setup. Never secret material.
@@ -930,6 +951,9 @@ pub struct ActionAudit {
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HumanAction {
+    /// Absent on legacy records; never inferred as authority.
+    #[serde(default)]
+    pub prerequisite: Option<PrerequisiteClassification>,
     pub id: String,
     pub requirement: HumanRequirement,
     pub status: HumanActionStatus,
@@ -959,6 +983,9 @@ pub struct PreflightReport {
     pub checks: Vec<ReadinessCheck>,
     pub action_ids: Vec<String>,
     pub ready: bool,
+    /// All essential gates pass, but task-scoped requirements may still be pending.
+    #[serde(default)]
+    pub independent_work_ready: bool,
     pub limitation: String,
 }
 

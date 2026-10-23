@@ -297,10 +297,10 @@ impl Bridge {
                             .iter()
                             .any(|a| a.request.as_ref() == Some(&resolution))
                     });
-                if !receipt && prior.revision != revision {
+                if !receipt && !resolution_view_matches(&prior, &action_id, revision, &resolution) {
                     return Err(BridgeError::new(
                         "stale",
-                        "Run changed; inspect current action before resolving",
+                        "Action changed; inspect current action before resolving",
                     ));
                 }
                 self.request(
@@ -649,9 +649,64 @@ fn sensitive(key: &str) -> bool {
     .any(|s| key.contains(s))
 }
 
+// Background workers may advance the run without changing the inspected blocker.
+// The daemon rechecks this exact action version atomically when accepting the receipt.
+fn resolution_view_matches(
+    run: &EngineeringRun,
+    action_id: &str,
+    revision: i64,
+    request: &ResolutionRequest,
+) -> bool {
+    match request.expected_action_version {
+        Some(version) => run
+            .human_actions
+            .iter()
+            .any(|a| a.id == action_id && a.audit.len() == version),
+        None => run.revision == revision,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn unrelated_worker_progress_does_not_invalidate_the_inspected_action() -> anyhow::Result<()> {
+        let fixture: Value = serde_json::from_str(include_str!(
+            "../../src/test/fixtures/completed-journal.json"
+        ))?;
+        let mut run: EngineeringRun = serde_json::from_value(fixture["run"].clone())?;
+        let action = &run.human_actions[0];
+        let id = action.id.clone();
+        let mut request = action.resolution.clone().expect("fixture resolution");
+        request.request_id = Uuid::new_v4();
+        request.expected_action_version = Some(action.audit.len());
+        assert!(resolution_view_matches(
+            &run,
+            &id,
+            run.revision - 1,
+            &request
+        ));
+        assert!(!resolution_view_matches(
+            &run,
+            "H-unknown",
+            run.revision,
+            &request
+        ));
+        let mut event = action.audit.last().expect("event").clone();
+        event.status = autono_protocol::engineering::HumanActionStatus::Deferred;
+        run.human_actions[0].audit.push(event);
+        assert!(!resolution_view_matches(&run, &id, run.revision, &request));
+        request.expected_action_version = None;
+        assert!(!resolution_view_matches(
+            &run,
+            &id,
+            run.revision - 1,
+            &request
+        ));
+        assert!(resolution_view_matches(&run, &id, run.revision, &request));
+        Ok(())
+    }
+
     #[test]
     fn review_known_secret_is_redacted_even_in_json_object_keys() {
         let secret = "pr4-known-credential-canary-1234567890";

@@ -52,6 +52,7 @@ impl Journal {
         let mut state = self.state.lock().await;
         let mut next = state.clone();
         change(&mut next)?;
+        next.handoff = Some(next.partial_completion());
         next.revision += 1;
         next.updated_at = Utc::now();
         retry(|| self.store.engineering_save(&next, kind, detail)).await?;
